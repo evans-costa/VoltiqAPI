@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Voltiq.API/Voltiq.API.csproj" />
+    <Project Path="src/Voltiq.Application/Voltiq.Application.csproj" />
+    <Project Path="src/Voltiq.Domain/Voltiq.Domain.csproj" />
+    <Project Path="src/Voltiq.Infrastructure/Voltiq.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Voltiq.Application.Tests/Voltiq.Application.Tests.csproj" />
+    <Project Path="tests/Voltiq.Domain.Tests/Voltiq.Domain.Tests.csproj" />
+    <Project Path="tests/Voltiq.Infrastructure.Tests/Voltiq.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>
