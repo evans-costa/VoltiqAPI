@@ -65,3 +65,6 @@ appsettings.Development.json
 *.pfx
 *.p12
 *.key
+
+# Copilot instructions
+.github/copilot-instructions.md
