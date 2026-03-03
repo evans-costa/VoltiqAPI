@@ -22,7 +22,7 @@ internal sealed class ValidationExceptionHandler(IHostEnvironment env) : IExcept
 
         var response = new
         {
-            title = ResourceErrorMessages.Titulo_FalhaValidacao,
+            title = ResourceErrorMessages.TITULO_FALHA_VALIDACAO,
             status = StatusCodes.Status400BadRequest,
             instance = httpContext.Request.Path.Value,
             errors,

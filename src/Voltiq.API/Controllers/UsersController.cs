@@ -24,7 +24,7 @@ public sealed class UsersController : BaseApiController
         {
             return Conflict(new ProblemDetails
             {
-                Title = ResourceErrorMessages.Titulo_Conflito,
+                Title = ResourceErrorMessages.TITULO_CONFLITO,
                 Detail = result.Error,
                 Status = StatusCodes.Status409Conflict,
                 Instance = HttpContext.Request.Path

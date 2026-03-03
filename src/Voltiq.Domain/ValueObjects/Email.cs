@@ -16,12 +16,12 @@ public sealed class Email : ValueObject
     public static Email Create(string? raw)
     {
         if (string.IsNullOrWhiteSpace(raw))
-            throw new DomainException(ResourceErrorMessages.Email_Obrigatorio);
+            throw new DomainException(ResourceErrorMessages.EMAIL_OBRIGATORIO);
 
         var normalised = raw.Trim().ToLowerInvariant();
 
         if (!_format.IsMatch(normalised))
-            throw new DomainException(string.Format(ResourceErrorMessages.Email_Invalido, raw));
+            throw new DomainException(string.Format(ResourceErrorMessages.EMAIL_INVALIDO, raw));
 
         return new Email(normalised);
     }

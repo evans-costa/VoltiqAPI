@@ -8,19 +8,19 @@ public sealed class CreateUserCommandValidator : AbstractValidator<CreateUserCom
     public CreateUserCommandValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage(ResourceErrorMessages.Usuario_Nome_Obrigatorio);
+            .NotEmpty().WithMessage(ResourceErrorMessages.USUARIO_NOME_OBRIGATORIO);
 
         RuleFor(x => x.Email)
-            .NotEmpty().WithMessage(ResourceErrorMessages.Usuario_Email_Obrigatorio)
-            .EmailAddress().WithMessage(ResourceErrorMessages.Usuario_Email_Invalido);
+            .NotEmpty().WithMessage(ResourceErrorMessages.USUARIO_EMAIL_OBRIGATORIO)
+            .EmailAddress().WithMessage(ResourceErrorMessages.USUARIO_EMAIL_INVALIDO);
 
         RuleFor(x => x.Document)
-            .NotEmpty().WithMessage(ResourceErrorMessages.Usuario_Documento_Obrigatorio)
-            .Must(BeValidDocument).WithMessage(ResourceErrorMessages.Usuario_Documento_Invalido);
+            .NotEmpty().WithMessage(ResourceErrorMessages.USUARIO_DOCUMENTO_OBRIGATORIO)
+            .Must(BeValidDocument).WithMessage(ResourceErrorMessages.USUARIO_DOCUMENTO_INVALIDO);
 
         RuleFor(x => x.Password)
-            .NotEmpty().WithMessage(ResourceErrorMessages.Usuario_Senha_Obrigatoria)
-            .MinimumLength(8).WithMessage(ResourceErrorMessages.Usuario_Senha_TamanhoMinimo);
+            .NotEmpty().WithMessage(ResourceErrorMessages.USUARIO_SENHA_OBRIGATORIA)
+            .MinimumLength(8).WithMessage(ResourceErrorMessages.USUARIO_SENHA_TAMANHO_MINIMO);
     }
 
     private static bool BeValidDocument(string? document)

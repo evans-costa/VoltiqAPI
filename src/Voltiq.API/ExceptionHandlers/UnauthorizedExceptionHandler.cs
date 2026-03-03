@@ -15,7 +15,7 @@ internal sealed class UnauthorizedExceptionHandler(IHostEnvironment env) : IExce
 
         var response = new
         {
-            title = ResourceErrorMessages.Titulo_NaoAutorizado,
+            title = ResourceErrorMessages.TITULO_NAO_AUTORIZADO,
             status = StatusCodes.Status401Unauthorized,
             instance = httpContext.Request.Path.Value,
             traceId = env.IsDevelopment() ? httpContext.TraceIdentifier : null,

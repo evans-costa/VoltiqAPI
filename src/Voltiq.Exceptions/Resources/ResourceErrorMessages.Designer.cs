@@ -38,142 +38,142 @@ public static class ResourceErrorMessages
     /// <summary>
     ///   Looks up a localized string similar to O e-mail é obrigatório.
     /// </summary>
-    public static string Email_Obrigatorio
-        => ResourceManager.GetString(nameof(Email_Obrigatorio))!;
+    public static string EMAIL_OBRIGATORIO
+        => ResourceManager.GetString(nameof(EMAIL_OBRIGATORIO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to '{0}' não é um endereço de e-mail válido.
     /// </summary>
-    public static string Email_Invalido
-        => ResourceManager.GetString(nameof(Email_Invalido))!;
+    public static string EMAIL_INVALIDO
+        => ResourceManager.GetString(nameof(EMAIL_INVALIDO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to O documento (CPF/CNPJ) é obrigatório.
     /// </summary>
-    public static string Documento_Obrigatorio
-        => ResourceManager.GetString(nameof(Documento_Obrigatorio))!;
+    public static string DOCUMENTO_OBRIGATORIO
+        => ResourceManager.GetString(nameof(DOCUMENTO_OBRIGATORIO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to O documento deve ser um CPF (11 dígitos) ou CNPJ (14 dígitos) válido.
     /// </summary>
-    public static string Documento_FormatoInvalido
-        => ResourceManager.GetString(nameof(Documento_FormatoInvalido))!;
+    public static string DOCUMENTO_FORMATO_INVALIDO
+        => ResourceManager.GetString(nameof(DOCUMENTO_FORMATO_INVALIDO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to CPF inválido.
     /// </summary>
-    public static string Cpf_Invalido
-        => ResourceManager.GetString(nameof(Cpf_Invalido))!;
+    public static string CPF_INVALIDO
+        => ResourceManager.GetString(nameof(CPF_INVALIDO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to CNPJ inválido.
     /// </summary>
-    public static string Cnpj_Invalido
-        => ResourceManager.GetString(nameof(Cnpj_Invalido))!;
+    public static string CNPJ_INVALIDO
+        => ResourceManager.GetString(nameof(CNPJ_INVALIDO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to O nome é obrigatório.
     /// </summary>
-    public static string Nome_Obrigatorio
-        => ResourceManager.GetString(nameof(Nome_Obrigatorio))!;
+    public static string NOME_OBRIGATORIO
+        => ResourceManager.GetString(nameof(NOME_OBRIGATORIO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to O hash da senha é obrigatório.
     /// </summary>
-    public static string HashSenha_Obrigatorio
-        => ResourceManager.GetString(nameof(HashSenha_Obrigatorio))!;
+    public static string HASH_SENHA_OBRIGATORIO
+        => ResourceManager.GetString(nameof(HASH_SENHA_OBRIGATORIO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to A entidade '{0}' com a chave '{1}' não foi encontrada.
     /// </summary>
-    public static string Entidade_NaoEncontrada
-        => ResourceManager.GetString(nameof(Entidade_NaoEncontrada))!;
+    public static string ENTIDADE_NAO_ENCONTRADA
+        => ResourceManager.GetString(nameof(ENTIDADE_NAO_ENCONTRADA))!;
 
     // ── Aplicação — Usuário ────────────────────────────────────────────────
 
     /// <summary>
     ///   Looks up a localized string similar to O nome é obrigatório.
     /// </summary>
-    public static string Usuario_Nome_Obrigatorio
-        => ResourceManager.GetString(nameof(Usuario_Nome_Obrigatorio))!;
+    public static string USUARIO_NOME_OBRIGATORIO
+        => ResourceManager.GetString(nameof(USUARIO_NOME_OBRIGATORIO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to O e-mail é obrigatório.
     /// </summary>
-    public static string Usuario_Email_Obrigatorio
-        => ResourceManager.GetString(nameof(Usuario_Email_Obrigatorio))!;
+    public static string USUARIO_EMAIL_OBRIGATORIO
+        => ResourceManager.GetString(nameof(USUARIO_EMAIL_OBRIGATORIO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to O e-mail informado não é válido.
     /// </summary>
-    public static string Usuario_Email_Invalido
-        => ResourceManager.GetString(nameof(Usuario_Email_Invalido))!;
+    public static string USUARIO_EMAIL_INVALIDO
+        => ResourceManager.GetString(nameof(USUARIO_EMAIL_INVALIDO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to O documento (CPF/CNPJ) é obrigatório.
     /// </summary>
-    public static string Usuario_Documento_Obrigatorio
-        => ResourceManager.GetString(nameof(Usuario_Documento_Obrigatorio))!;
+    public static string USUARIO_DOCUMENTO_OBRIGATORIO
+        => ResourceManager.GetString(nameof(USUARIO_DOCUMENTO_OBRIGATORIO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to O documento deve ser um CPF ou CNPJ válido.
     /// </summary>
-    public static string Usuario_Documento_Invalido
-        => ResourceManager.GetString(nameof(Usuario_Documento_Invalido))!;
+    public static string USUARIO_DOCUMENTO_INVALIDO
+        => ResourceManager.GetString(nameof(USUARIO_DOCUMENTO_INVALIDO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to A senha é obrigatória.
     /// </summary>
-    public static string Usuario_Senha_Obrigatoria
-        => ResourceManager.GetString(nameof(Usuario_Senha_Obrigatoria))!;
+    public static string USUARIO_SENHA_OBRIGATORIA
+        => ResourceManager.GetString(nameof(USUARIO_SENHA_OBRIGATORIA))!;
 
     /// <summary>
     ///   Looks up a localized string similar to A senha deve ter pelo menos 8 caracteres.
     /// </summary>
-    public static string Usuario_Senha_TamanhoMinimo
-        => ResourceManager.GetString(nameof(Usuario_Senha_TamanhoMinimo))!;
+    public static string USUARIO_SENHA_TAMANHO_MINIMO
+        => ResourceManager.GetString(nameof(USUARIO_SENHA_TAMANHO_MINIMO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to Já existe um usuário cadastrado com este e-mail.
     /// </summary>
-    public static string Usuario_Email_JaCadastrado
-        => ResourceManager.GetString(nameof(Usuario_Email_JaCadastrado))!;
+    public static string USUARIO_EMAIL_JA_CADASTRADO
+        => ResourceManager.GetString(nameof(USUARIO_EMAIL_JA_CADASTRADO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to Já existe um usuário cadastrado com este documento.
     /// </summary>
-    public static string Usuario_Documento_JaCadastrado
-        => ResourceManager.GetString(nameof(Usuario_Documento_JaCadastrado))!;
+    public static string USUARIO_DOCUMENTO_JA_CADASTRADO
+        => ResourceManager.GetString(nameof(USUARIO_DOCUMENTO_JA_CADASTRADO))!;
 
     // ── API — títulos HTTP ─────────────────────────────────────────────────
 
     /// <summary>
     ///   Looks up a localized string similar to Falha de validação.
     /// </summary>
-    public static string Titulo_FalhaValidacao
-        => ResourceManager.GetString(nameof(Titulo_FalhaValidacao))!;
+    public static string TITULO_FALHA_VALIDACAO
+        => ResourceManager.GetString(nameof(TITULO_FALHA_VALIDACAO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to Ocorreu um erro inesperado.
     /// </summary>
-    public static string Titulo_ErroInesperado
-        => ResourceManager.GetString(nameof(Titulo_ErroInesperado))!;
+    public static string TITULO_ERRO_INESPERADO
+        => ResourceManager.GetString(nameof(TITULO_ERRO_INESPERADO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to Não autorizado.
     /// </summary>
-    public static string Titulo_NaoAutorizado
-        => ResourceManager.GetString(nameof(Titulo_NaoAutorizado))!;
+    public static string TITULO_NAO_AUTORIZADO
+        => ResourceManager.GetString(nameof(TITULO_NAO_AUTORIZADO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to Não encontrado.
     /// </summary>
-    public static string Titulo_NaoEncontrado
-        => ResourceManager.GetString(nameof(Titulo_NaoEncontrado))!;
+    public static string TITULO_NAO_ENCONTRADO
+        => ResourceManager.GetString(nameof(TITULO_NAO_ENCONTRADO))!;
 
     /// <summary>
     ///   Looks up a localized string similar to Conflito.
     /// </summary>
-    public static string Titulo_Conflito
-        => ResourceManager.GetString(nameof(Titulo_Conflito))!;
+    public static string TITULO_CONFLITO
+        => ResourceManager.GetString(nameof(TITULO_CONFLITO))!;
 }

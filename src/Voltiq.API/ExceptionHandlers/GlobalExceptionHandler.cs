@@ -17,7 +17,7 @@ internal sealed class GlobalExceptionHandler(
         object response = env.IsDevelopment()
             ? new
             {
-                title = ResourceErrorMessages.Titulo_ErroInesperado,
+                title = ResourceErrorMessages.TITULO_ERRO_INESPERADO,
                 status = StatusCodes.Status500InternalServerError,
                 instance = httpContext.Request.Path.Value,
                 traceId = httpContext.TraceIdentifier,
@@ -25,7 +25,7 @@ internal sealed class GlobalExceptionHandler(
             }
             : (object)new
             {
-                title = ResourceErrorMessages.Titulo_ErroInesperado,
+                title = ResourceErrorMessages.TITULO_ERRO_INESPERADO,
                 status = StatusCodes.Status500InternalServerError,
                 instance = httpContext.Request.Path.Value,
             };

@@ -20,7 +20,7 @@ public sealed class CreateUserCommandHandler(
             cancellationToken);
 
         if (existingByEmail.Any())
-            return Result.Failure<Guid>(ResourceErrorMessages.Usuario_Email_JaCadastrado);
+            return Result.Failure<Guid>(ResourceErrorMessages.USUARIO_EMAIL_JA_CADASTRADO);
 
         var documentDigits = Regex.Replace(request.Document, @"\D", "");
 
@@ -29,7 +29,7 @@ public sealed class CreateUserCommandHandler(
             cancellationToken);
 
         if (existingByDocument.Any())
-            return Result.Failure<Guid>(ResourceErrorMessages.Usuario_Documento_JaCadastrado);
+            return Result.Failure<Guid>(ResourceErrorMessages.USUARIO_DOCUMENTO_JA_CADASTRADO);
 
         var passwordHash = passwordHasher.Hash(request.Password);
 

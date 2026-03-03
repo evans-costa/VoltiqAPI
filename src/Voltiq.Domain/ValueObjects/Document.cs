@@ -19,7 +19,7 @@ public sealed class Document : ValueObject
     public static Document Create(string? raw)
     {
         if (string.IsNullOrWhiteSpace(raw))
-            throw new DomainException(ResourceErrorMessages.Documento_Obrigatorio);
+            throw new DomainException(ResourceErrorMessages.DOCUMENTO_OBRIGATORIO);
 
         var digits = _digits.Replace(raw.Trim(), "");
 
@@ -27,14 +27,14 @@ public sealed class Document : ValueObject
         {
             11 => ValidateCpf(digits),
             14 => ValidateCnpj(digits),
-            _ => throw new DomainException(ResourceErrorMessages.Documento_FormatoInvalido)
+            _ => throw new DomainException(ResourceErrorMessages.DOCUMENTO_FORMATO_INVALIDO)
         };
     }
 
     private static Document ValidateCpf(string d)
     {
         if (d.Distinct().Count() == 1)
-            throw new DomainException(ResourceErrorMessages.Cpf_Invalido);
+            throw new DomainException(ResourceErrorMessages.CPF_INVALIDO);
 
         int Sum(int len, int factor) =>
             Enumerable.Range(0, len).Sum(i => int.Parse(d[i].ToString()) * (factor - i));
@@ -43,7 +43,7 @@ public sealed class Document : ValueObject
 
         if (Digit(Sum(9, 10)) != int.Parse(d[9].ToString()) ||
             Digit(Sum(10, 11)) != int.Parse(d[10].ToString()))
-            throw new DomainException(ResourceErrorMessages.Cpf_Invalido);
+            throw new DomainException(ResourceErrorMessages.CPF_INVALIDO);
 
         return new Document(d);
     }
@@ -51,7 +51,7 @@ public sealed class Document : ValueObject
     private static Document ValidateCnpj(string d)
     {
         if (d.Distinct().Count() == 1)
-            throw new DomainException(ResourceErrorMessages.Cnpj_Invalido);
+            throw new DomainException(ResourceErrorMessages.CNPJ_INVALIDO);
 
         static int Calc(string n, int[] weights) =>
             weights.Select((w, i) => int.Parse(n[i].ToString()) * w).Sum();
@@ -63,7 +63,7 @@ public sealed class Document : ValueObject
 
         if (Digit(Calc(d, w1)) != int.Parse(d[12].ToString()) ||
             Digit(Calc(d, w2)) != int.Parse(d[13].ToString()))
-            throw new DomainException(ResourceErrorMessages.Cnpj_Invalido);
+            throw new DomainException(ResourceErrorMessages.CNPJ_INVALIDO);
 
         return new Document(d);
     }

@@ -7,7 +7,7 @@ public class NotFoundException : DomainException
 
     public NotFoundException(string entityName, object key)
         : base(string.Format(
-            Resources.ResourceErrorMessages.Entidade_NaoEncontrada,
+            Resources.ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA,
             entityName,
             key))
     {

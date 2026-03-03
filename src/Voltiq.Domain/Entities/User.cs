@@ -27,10 +27,10 @@ public class User : AuditableEntity
     public static User Create(string name, string email, string document, string passwordHash)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException(ResourceErrorMessages.Nome_Obrigatorio);
+            throw new DomainException(ResourceErrorMessages.NOME_OBRIGATORIO);
 
         if (string.IsNullOrWhiteSpace(passwordHash))
-            throw new DomainException(ResourceErrorMessages.HashSenha_Obrigatorio);
+            throw new DomainException(ResourceErrorMessages.HASH_SENHA_OBRIGATORIO);
 
         return new User(
             name.Trim(),

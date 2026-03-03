@@ -16,11 +16,11 @@ internal sealed class NotFoundExceptionHandler(IHostEnvironment env) : IExceptio
 
         var response = new
         {
-            title = ResourceErrorMessages.Titulo_NaoEncontrado,
+            title = ResourceErrorMessages.TITULO_NAO_ENCONTRADO,
             status = StatusCodes.Status404NotFound,
             instance = httpContext.Request.Path.Value,
             detail = string.Format(
-                ResourceErrorMessages.Entidade_NaoEncontrada,
+                ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA,
                 notFoundException.EntityName,
                 notFoundException.Key),
             traceId = env.IsDevelopment() ? httpContext.TraceIdentifier : null,

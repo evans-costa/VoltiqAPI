@@ -61,79 +61,79 @@
 
   <!-- ═══════════════════════════════ Domínio ═══════════════════════════════ -->
 
-  <data name="Email_Obrigatorio" xml:space="preserve">
+  <data name="EMAIL_OBRIGATORIO" xml:space="preserve">
     <value>O e-mail é obrigatório.</value>
   </data>
-  <data name="Email_Invalido" xml:space="preserve">
+  <data name="EMAIL_INVALIDO" xml:space="preserve">
     <value>'{0}' não é um endereço de e-mail válido.</value>
   </data>
-  <data name="Documento_Obrigatorio" xml:space="preserve">
+  <data name="DOCUMENTO_OBRIGATORIO" xml:space="preserve">
     <value>O documento (CPF/CNPJ) é obrigatório.</value>
   </data>
-  <data name="Documento_FormatoInvalido" xml:space="preserve">
+  <data name="DOCUMENTO_FORMATO_INVALIDO" xml:space="preserve">
     <value>O documento deve ser um CPF (11 dígitos) ou CNPJ (14 dígitos) válido.</value>
   </data>
-  <data name="Cpf_Invalido" xml:space="preserve">
+  <data name="CPF_INVALIDO" xml:space="preserve">
     <value>CPF inválido.</value>
   </data>
-  <data name="Cnpj_Invalido" xml:space="preserve">
+  <data name="CNPJ_INVALIDO" xml:space="preserve">
     <value>CNPJ inválido.</value>
   </data>
-  <data name="Nome_Obrigatorio" xml:space="preserve">
+  <data name="NOME_OBRIGATORIO" xml:space="preserve">
     <value>O nome é obrigatório.</value>
   </data>
-  <data name="HashSenha_Obrigatorio" xml:space="preserve">
+  <data name="HASH_SENHA_OBRIGATORIO" xml:space="preserve">
     <value>O hash da senha é obrigatório.</value>
   </data>
-  <data name="Entidade_NaoEncontrada" xml:space="preserve">
+  <data name="ENTIDADE_NAO_ENCONTRADA" xml:space="preserve">
     <value>A entidade '{0}' com a chave '{1}' não foi encontrada.</value>
   </data>
 
   <!-- ═══════════════════════════════ Aplicação — Usuário ═══════════════════ -->
 
-  <data name="Usuario_Nome_Obrigatorio" xml:space="preserve">
+  <data name="USUARIO_NOME_OBRIGATORIO" xml:space="preserve">
     <value>O nome é obrigatório.</value>
   </data>
-  <data name="Usuario_Email_Obrigatorio" xml:space="preserve">
+  <data name="USUARIO_EMAIL_OBRIGATORIO" xml:space="preserve">
     <value>O e-mail é obrigatório.</value>
   </data>
-  <data name="Usuario_Email_Invalido" xml:space="preserve">
+  <data name="USUARIO_EMAIL_INVALIDO" xml:space="preserve">
     <value>O e-mail informado não é válido.</value>
   </data>
-  <data name="Usuario_Documento_Obrigatorio" xml:space="preserve">
+  <data name="USUARIO_DOCUMENTO_OBRIGATORIO" xml:space="preserve">
     <value>O documento (CPF/CNPJ) é obrigatório.</value>
   </data>
-  <data name="Usuario_Documento_Invalido" xml:space="preserve">
+  <data name="USUARIO_DOCUMENTO_INVALIDO" xml:space="preserve">
     <value>O documento deve ser um CPF ou CNPJ válido.</value>
   </data>
-  <data name="Usuario_Senha_Obrigatoria" xml:space="preserve">
+  <data name="USUARIO_SENHA_OBRIGATORIA" xml:space="preserve">
     <value>A senha é obrigatória.</value>
   </data>
-  <data name="Usuario_Senha_TamanhoMinimo" xml:space="preserve">
+  <data name="USUARIO_SENHA_TAMANHO_MINIMO" xml:space="preserve">
     <value>A senha deve ter pelo menos 8 caracteres.</value>
   </data>
-  <data name="Usuario_Email_JaCadastrado" xml:space="preserve">
+  <data name="USUARIO_EMAIL_JA_CADASTRADO" xml:space="preserve">
     <value>Já existe um usuário cadastrado com este e-mail.</value>
   </data>
-  <data name="Usuario_Documento_JaCadastrado" xml:space="preserve">
+  <data name="USUARIO_DOCUMENTO_JA_CADASTRADO" xml:space="preserve">
     <value>Já existe um usuário cadastrado com este documento.</value>
   </data>
 
   <!-- ═══════════════════════════════ API — títulos HTTP ════════════════════ -->
 
-  <data name="Titulo_FalhaValidacao" xml:space="preserve">
+  <data name="TITULO_FALHA_VALIDACAO" xml:space="preserve">
     <value>Falha de validação</value>
   </data>
-  <data name="Titulo_ErroInesperado" xml:space="preserve">
+  <data name="TITULO_ERRO_INESPERADO" xml:space="preserve">
     <value>Ocorreu um erro inesperado.</value>
   </data>
-  <data name="Titulo_NaoAutorizado" xml:space="preserve">
+  <data name="TITULO_NAO_AUTORIZADO" xml:space="preserve">
     <value>Não autorizado</value>
   </data>
-  <data name="Titulo_NaoEncontrado" xml:space="preserve">
+  <data name="TITULO_NAO_ENCONTRADO" xml:space="preserve">
     <value>Não encontrado</value>
   </data>
-  <data name="Titulo_Conflito" xml:space="preserve">
+  <data name="TITULO_CONFLITO" xml:space="preserve">
     <value>Conflito</value>
   </data>
 
