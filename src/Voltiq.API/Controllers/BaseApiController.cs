@@ -8,10 +8,7 @@ namespace Voltiq.API.Controllers;
 [Route("api/[controller]")]
 public abstract class BaseApiController : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    protected BaseApiController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
+    [field: AllowNull, MaybeNull]
+    protected ISender Sender =>
+        field ??= HttpContext.RequestServices.GetRequiredService<ISender>();
 }

@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Voltiq.Domain.Common;
 
 public class Result
@@ -20,13 +22,12 @@ public class Result
 
 public class Result<T> : Result
 {
-    private readonly T? _value;
-
-    private Result(T value) : base(true, null) => _value = value;
+    private Result(T value) : base(true, null) => Value = value;
     private Result(string error) : base(false, error) { }
 
+    [field: AllowNull, MaybeNull]
     public T Value => IsSuccess
-        ? _value!
+        ? field!
         : throw new InvalidOperationException("Cannot access Value of a failed Result.");
 
     public static Result<T> Success(T value) => new(value);
