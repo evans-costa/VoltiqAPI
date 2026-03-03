@@ -3,6 +3,7 @@
     <Project Path="src/Voltiq.API/Voltiq.API.csproj" />
     <Project Path="src/Voltiq.Application/Voltiq.Application.csproj" />
     <Project Path="src/Voltiq.Domain/Voltiq.Domain.csproj" />
+    <Project Path="src/Voltiq.Exceptions/Voltiq.Exceptions.csproj" />
     <Project Path="src/Voltiq.Infrastructure/Voltiq.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">

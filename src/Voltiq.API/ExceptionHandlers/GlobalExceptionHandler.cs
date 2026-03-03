@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.API.ExceptionHandlers;
 
@@ -16,7 +17,7 @@ internal sealed class GlobalExceptionHandler(
         object response = env.IsDevelopment()
             ? new
             {
-                title = "An unexpected error occurred.",
+                title = ResourceErrorMessages.Titulo_ErroInesperado,
                 status = StatusCodes.Status500InternalServerError,
                 instance = httpContext.Request.Path.Value,
                 traceId = httpContext.TraceIdentifier,
@@ -24,7 +25,7 @@ internal sealed class GlobalExceptionHandler(
             }
             : (object)new
             {
-                title = "An unexpected error occurred.",
+                title = ResourceErrorMessages.Titulo_ErroInesperado,
                 status = StatusCodes.Status500InternalServerError,
                 instance = httpContext.Request.Path.Value,
             };

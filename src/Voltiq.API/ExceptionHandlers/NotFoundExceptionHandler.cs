@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
-using Voltiq.Domain.Exceptions;
+using Voltiq.Exceptions.Exceptions;
+using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.API.ExceptionHandlers;
 
@@ -15,10 +16,13 @@ internal sealed class NotFoundExceptionHandler(IHostEnvironment env) : IExceptio
 
         var response = new
         {
-            title = "Not Found",
+            title = ResourceErrorMessages.Titulo_NaoEncontrado,
             status = StatusCodes.Status404NotFound,
             instance = httpContext.Request.Path.Value,
-            detail = notFoundException.Message,
+            detail = string.Format(
+                ResourceErrorMessages.Entidade_NaoEncontrada,
+                notFoundException.EntityName,
+                notFoundException.Key),
             traceId = env.IsDevelopment() ? httpContext.TraceIdentifier : null,
         };
 

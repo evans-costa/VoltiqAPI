@@ -17,6 +17,8 @@ API RESTful construída com **.NET 10** seguindo os princípios de **Clean Archi
   - [Application](#application)
   - [Infrastructure](#infrastructure)
   - [API](#api)
+- [Endpoints](#endpoints)
+  - [Usuários](#usuários)
 - [Convenções](#convenções)
   - [CQRS com MediatR](#cqrs-com-mediatr)
   - [Entidades de Domínio](#entidades-de-domínio)
@@ -94,10 +96,11 @@ chore: add .gitignore for .NET solution
 O projeto segue **Clean Architecture** com regras estritas de dependência entre camadas:
 
 ```
-Voltiq.API → Voltiq.Application + Voltiq.Infrastructure
-Voltiq.Application → Voltiq.Domain
+Voltiq.Exceptions  → (sem dependências Voltiq)
+Voltiq.API         → Voltiq.Application + Voltiq.Infrastructure + Voltiq.Exceptions
+Voltiq.Application → Voltiq.Domain  (Voltiq.Exceptions transitivo)
 Voltiq.Infrastructure → Voltiq.Application + Voltiq.Domain
-Voltiq.Domain → (sem dependências)
+Voltiq.Domain      → Voltiq.Exceptions
 ```
 
 ---
@@ -128,7 +131,7 @@ voltiq/
 │   │   ├── Features/                      # Commands e Queries por feature
 │   │   └── DependencyInjection.cs
 │   │
-│   ├── Voltiq.Domain/                     # Núcleo do domínio (sem dependências externas)
+│   ├── Voltiq.Domain/                     # Núcleo do domínio
 │   │   ├── Common/
 │   │   │   └── Result.cs                  # Result pattern (railway-oriented)
 │   │   ├── Entities/
@@ -137,14 +140,19 @@ voltiq/
 │   │   ├── Events/
 │   │   │   ├── IDomainEvent.cs
 │   │   │   └── BaseDomainEvent.cs
-│   │   ├── Exceptions/
-│   │   │   ├── DomainException.cs         # Exceção base de domínio (400)
-│   │   │   └── NotFoundException.cs       # Recurso não encontrado (404)
 │   │   ├── Interfaces/
 │   │   │   ├── IRepository.cs
 │   │   │   └── IUnitOfWork.cs
 │   │   └── ValueObjects/
 │   │       └── ValueObject.cs
+│   │
+│   ├── Voltiq.Exceptions/                 # Tipos de exceção + mensagens centralizadas
+│   │   ├── Exceptions/
+│   │   │   ├── DomainException.cs         # Exceção base de domínio (400)
+│   │   │   └── NotFoundException.cs       # Recurso não encontrado (404) + EntityName/Key
+│   │   └── Resources/
+│   │       ├── ResourceErrorMessages.resx # Todas as mensagens de erro (pt-BR)
+│   │       └── ResourceErrorMessages.Designer.cs
 │   │
 │   └── Voltiq.Infrastructure/             # EF Core, JWT, repositórios
 │       ├── Auth/
@@ -168,7 +176,7 @@ voltiq/
 ## Pré-requisitos
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- SQL Server (local ou via Docker)
+- PostgreSQL (local ou via Docker)
 
 ---
 
@@ -179,7 +187,7 @@ Edite `src/Voltiq.API/appsettings.json` (ou use variáveis de ambiente / User Se
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=VoltiqDb;Trusted_Connection=True;TrustServerCertificate=True"
+    "DefaultConnection": "Host=localhost;Database=voltiq;Username=postgres;Password=SUA_SENHA"
   },
   "JwtSettings": {
     "SecretKey": "SUA_CHAVE_SECRETA_COM_32_CARACTERES_OU_MAIS",
@@ -192,7 +200,7 @@ Edite `src/Voltiq.API/appsettings.json` (ou use variáveis de ambiente / User Se
 
 | Chave | Descrição |
 |---|---|
-| `ConnectionStrings:DefaultConnection` | Connection string do SQL Server |
+| `ConnectionStrings:DefaultConnection` | Connection string do PostgreSQL (formato Npgsql) |
 | `JwtSettings:SecretKey` | Chave de assinatura JWT — **mínimo 32 caracteres** |
 | `JwtSettings:Issuer` | Emissor do token (padrão: `Voltiq.API`) |
 | `JwtSettings:Audience` | Audiência do token (padrão: `Voltiq.Client`) |
@@ -251,7 +259,8 @@ Contém todos os casos de uso como **Commands** e **Queries** via MediatR.
 
 Implementações de infraestrutura.
 
-- **`ApplicationDbContext`** — EF Core com SQL Server. Aplica configurações da assembly automaticamente.
+- **`ApplicationDbContext`** — EF Core com PostgreSQL (Npgsql). Aplica configurações da assembly automaticamente.
+- **`Argon2PasswordHasher`** — implementa `IPasswordHasher` usando **Argon2id** (via `Konscious.Security.Cryptography.Argon2`). Parâmetros: 4 iterações, 64 MB de memória, paralelismo 2.
 - **`Repository<T>`** — implementação genérica de `IRepository<T>` usando EF Core.
 - **`UnitOfWork`** — delega `SaveChangesAsync` ao `ApplicationDbContext`.
 - **`TokenService`** — gera tokens JWT com claims de `userId`, `userName` e `roles`.
@@ -267,7 +276,48 @@ Ponto de entrada da aplicação.
 
 ---
 
-## Convenções
+## Endpoints
+
+### Usuários
+
+#### `POST /api/users` — Criar usuário
+
+Cria um novo usuário na plataforma.
+
+**Request body:**
+```json
+{
+  "name": "João Silva",
+  "email": "joao@example.com",
+  "document": "529.982.247-25",
+  "password": "MinhaS3nh@Segura"
+}
+```
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `name` | string | ✅ | Nome completo do usuário |
+| `email` | string | ✅ | Endereço de e-mail válido e único |
+| `document` | string | ✅ | CPF (11 dígitos) ou CNPJ (14 dígitos), com ou sem pontuação |
+| `password` | string | ✅ | Mínimo 8 caracteres; armazenada como hash Argon2id |
+
+**Respostas:**
+
+| Status | Descrição |
+|---|---|
+| `201 Created` | `{ "id": "<guid>" }` |
+| `400 Bad Request` | Erro de validação (campos inválidos) |
+| `409 Conflict` | E-mail ou CPF/CNPJ já cadastrado |
+
+**Regras de validação:**
+- E-mail deve ser único no sistema.
+- CPF e CNPJ são validados com verificação de dígitos verificadores. CPF com todos os dígitos iguais (e.g., `111.111.111-11`) são rejeitados.
+- Documento deve ser único no sistema.
+- Senha é armazenada como hash **Argon2id** — nunca em texto puro.
+
+---
+
+
 
 ### CQRS com MediatR
 
@@ -354,16 +404,25 @@ O tratamento de erros usa **`IExceptionHandler`** (ASP.NET Core) com um handler 
 | `UnauthorizedExceptionHandler` | `UnauthorizedAccessException` | `401 Unauthorized` |
 | `GlobalExceptionHandler` | `Exception` (fallback) | `500 Internal Server Error` |
 
+### Mensagens de Erro Centralizadas
+
+Todas as mensagens de erro estão centralizadas em **`src/Voltiq.Exceptions/Resources/ResourceErrorMessages.resx`**, todas em **pt-BR**.
+
+- Acesse via classe fortemente tipada `ResourceErrorMessages` do namespace `Voltiq.Exceptions.Resources`.
+- **Nunca** hardcode strings de erro em arquivos-fonte — adicione uma nova chave ao `.resx` primeiro.
+- Chaves com parâmetros usam `{0}`, `{1}`, etc.; use `string.Format(ResourceErrorMessages.Chave, ...)` no ponto de uso.
+- Grupos de chaves: erros de domínio, erros de aplicação (por feature), títulos HTTP da API.
+
 #### Formato das respostas
 
 **400 — Validation Error**
 ```json
 {
-  "title": "Validation failed",
+  "title": "Falha de validação",
   "status": 400,
   "instance": "/api/products",
   "errors": [
-    { "propertyName": "Name", "errorMessage": "'Name' must not be empty." },
+    { "propertyName": "Name", "errorMessage": "O nome é obrigatório." },
     { "propertyName": "Price", "errorMessage": "'Price' must be greater than 0." }
   ]
 }
@@ -372,17 +431,17 @@ O tratamento de erros usa **`IExceptionHandler`** (ASP.NET Core) com um handler 
 **404 — Not Found**
 ```json
 {
-  "title": "Not Found",
+  "title": "Não encontrado",
   "status": 404,
   "instance": "/api/products/abc",
-  "detail": "Entity 'Product' with key 'abc' was not found."
+  "detail": "A entidade 'Product' com a chave 'abc' não foi encontrada."
 }
 ```
 
 **401 — Unauthorized**
 ```json
 {
-  "title": "Unauthorized",
+  "title": "Não autorizado",
   "status": 401,
   "instance": "/api/orders"
 }
@@ -445,7 +504,17 @@ var isAuthenticated = _currentUserService.IsAuthenticated;
 - **Framework:** xUnit
 - **Mocks:** Moq
 - **Assertions:** Shouldly
-- **EF Core (Infrastructure):** InMemory provider
+- **Testes de integração (Infrastructure):** [Testcontainers](https://dotnet.testcontainers.org/) com `Testcontainers.PostgreSql` — sobe um container real de PostgreSQL para cada execução de teste.
+
+### Workflow TDD
+
+Todo o projeto segue o padrão **red → green → refactor**:
+
+1. **Red** — escreva o teste antes da implementação
+2. **Green** — implemente o mínimo para o teste passar
+3. **Refactor** — melhore o código sem quebrar os testes
+
+A primeira commit em uma branch de feature deve conter apenas os testes (`test: ...`). Os commits de implementação vêm em seguida.
 
 Os projetos de teste espelham a camada correspondente em `src/`. Coloque novos testes no projeto correto:
 

@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.API.ExceptionHandlers;
 
@@ -21,7 +22,7 @@ internal sealed class ValidationExceptionHandler(IHostEnvironment env) : IExcept
 
         var response = new
         {
-            title = "Validation failed",
+            title = ResourceErrorMessages.Titulo_FalhaValidacao,
             status = StatusCodes.Status400BadRequest,
             instance = httpContext.Request.Path.Value,
             errors,
@@ -40,3 +41,4 @@ internal sealed class ValidationExceptionHandler(IHostEnvironment env) : IExcept
 file sealed record ValidationErrorItem(
     [property: JsonPropertyName("propertyName")] string PropertyName,
     [property: JsonPropertyName("errorMessage")] string ErrorMessage);
+

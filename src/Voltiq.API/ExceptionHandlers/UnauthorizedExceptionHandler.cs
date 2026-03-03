@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.API.ExceptionHandlers;
 
@@ -14,7 +15,7 @@ internal sealed class UnauthorizedExceptionHandler(IHostEnvironment env) : IExce
 
         var response = new
         {
-            title = "Unauthorized",
+            title = ResourceErrorMessages.Titulo_NaoAutorizado,
             status = StatusCodes.Status401Unauthorized,
             instance = httpContext.Request.Path.Value,
             traceId = env.IsDevelopment() ? httpContext.TraceIdentifier : null,

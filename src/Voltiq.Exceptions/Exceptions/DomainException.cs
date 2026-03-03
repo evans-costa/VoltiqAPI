@@ -1,4 +1,4 @@
-namespace Voltiq.Domain.Exceptions;
+namespace Voltiq.Exceptions.Exceptions;
 
 public class DomainException : Exception
 {

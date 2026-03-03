@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Voltiq.Application\Voltiq.Application.csproj" />
+    <ProjectReference Include="..\Voltiq.Exceptions\Voltiq.Exceptions.csproj" />
     <ProjectReference Include="..\Voltiq.Infrastructure\Voltiq.Infrastructure.csproj" />
   </ItemGroup>
 

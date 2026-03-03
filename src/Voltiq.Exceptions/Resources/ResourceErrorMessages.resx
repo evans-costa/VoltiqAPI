@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- ═══════════════════════════════ Domínio ═══════════════════════════════ -->
+
+  <data name="Email_Obrigatorio" xml:space="preserve">
+    <value>O e-mail é obrigatório.</value>
+  </data>
+  <data name="Email_Invalido" xml:space="preserve">
+    <value>'{0}' não é um endereço de e-mail válido.</value>
+  </data>
+  <data name="Documento_Obrigatorio" xml:space="preserve">
+    <value>O documento (CPF/CNPJ) é obrigatório.</value>
+  </data>
+  <data name="Documento_FormatoInvalido" xml:space="preserve">
+    <value>O documento deve ser um CPF (11 dígitos) ou CNPJ (14 dígitos) válido.</value>
+  </data>
+  <data name="Cpf_Invalido" xml:space="preserve">
+    <value>CPF inválido.</value>
+  </data>
+  <data name="Cnpj_Invalido" xml:space="preserve">
+    <value>CNPJ inválido.</value>
+  </data>
+  <data name="Nome_Obrigatorio" xml:space="preserve">
+    <value>O nome é obrigatório.</value>
+  </data>
+  <data name="HashSenha_Obrigatorio" xml:space="preserve">
+    <value>O hash da senha é obrigatório.</value>
+  </data>
+  <data name="Entidade_NaoEncontrada" xml:space="preserve">
+    <value>A entidade '{0}' com a chave '{1}' não foi encontrada.</value>
+  </data>
+
+  <!-- ═══════════════════════════════ Aplicação — Usuário ═══════════════════ -->
+
+  <data name="Usuario_Nome_Obrigatorio" xml:space="preserve">
+    <value>O nome é obrigatório.</value>
+  </data>
+  <data name="Usuario_Email_Obrigatorio" xml:space="preserve">
+    <value>O e-mail é obrigatório.</value>
+  </data>
+  <data name="Usuario_Email_Invalido" xml:space="preserve">
+    <value>O e-mail informado não é válido.</value>
+  </data>
+  <data name="Usuario_Documento_Obrigatorio" xml:space="preserve">
+    <value>O documento (CPF/CNPJ) é obrigatório.</value>
+  </data>
+  <data name="Usuario_Documento_Invalido" xml:space="preserve">
+    <value>O documento deve ser um CPF ou CNPJ válido.</value>
+  </data>
+  <data name="Usuario_Senha_Obrigatoria" xml:space="preserve">
+    <value>A senha é obrigatória.</value>
+  </data>
+  <data name="Usuario_Senha_TamanhoMinimo" xml:space="preserve">
+    <value>A senha deve ter pelo menos 8 caracteres.</value>
+  </data>
+  <data name="Usuario_Email_JaCadastrado" xml:space="preserve">
+    <value>Já existe um usuário cadastrado com este e-mail.</value>
+  </data>
+  <data name="Usuario_Documento_JaCadastrado" xml:space="preserve">
+    <value>Já existe um usuário cadastrado com este documento.</value>
+  </data>
+
+  <!-- ═══════════════════════════════ API — títulos HTTP ════════════════════ -->
+
+  <data name="Titulo_FalhaValidacao" xml:space="preserve">
+    <value>Falha de validação</value>
+  </data>
+  <data name="Titulo_ErroInesperado" xml:space="preserve">
+    <value>Ocorreu um erro inesperado.</value>
+  </data>
+  <data name="Titulo_NaoAutorizado" xml:space="preserve">
+    <value>Não autorizado</value>
+  </data>
+  <data name="Titulo_NaoEncontrado" xml:space="preserve">
+    <value>Não encontrado</value>
+  </data>
+  <data name="Titulo_Conflito" xml:space="preserve">
+    <value>Conflito</value>
+  </data>
+
+</root>
