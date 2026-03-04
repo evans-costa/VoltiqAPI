@@ -1,4 +1,5 @@
 using FluentValidation;
+using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Features.Users.Commands.CreateUser;
@@ -16,24 +17,11 @@ public sealed class CreateUserCommandValidator : AbstractValidator<CreateUserCom
 
         RuleFor(x => x.Document)
             .NotEmpty().WithMessage(ResourceErrorMessages.USUARIO_DOCUMENTO_OBRIGATORIO)
-            .Must(BeValidDocument).WithMessage(ResourceErrorMessages.USUARIO_DOCUMENTO_INVALIDO);
+            .Must(d => Document.TryParse(d, out _, out _))
+            .WithMessage(ResourceErrorMessages.USUARIO_DOCUMENTO_INVALIDO);
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage(ResourceErrorMessages.USUARIO_SENHA_OBRIGATORIA)
             .MinimumLength(8).WithMessage(ResourceErrorMessages.USUARIO_SENHA_TAMANHO_MINIMO);
-    }
-
-    private static bool BeValidDocument(string? document)
-    {
-        if (string.IsNullOrWhiteSpace(document)) return false;
-        try
-        {
-            Domain.ValueObjects.Document.Create(document);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
     }
 }

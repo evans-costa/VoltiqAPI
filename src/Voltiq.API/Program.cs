@@ -2,6 +2,7 @@ using Microsoft.OpenApi.Models;
 using Voltiq.API.ExceptionHandlers;
 using Voltiq.Application;
 using Voltiq.Infrastructure;
+using Voltiq.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,9 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+    await DatabaseMigration.ApplyAsync(app.Services);
 
 app.UseExceptionHandler();
 

@@ -61,7 +61,7 @@ nuget.config
 Thumbs.db
 
 # Secrets / environment
-appsettings.Development.json
+appsettings.Production.json
 *.pfx
 *.p12
 *.key

@@ -1,8 +1,8 @@
-using System.Text.RegularExpressions;
 using MediatR;
 using Voltiq.Domain.Common;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
+using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Features.Users.Commands.CreateUser;
@@ -15,18 +15,17 @@ public sealed class CreateUserCommandHandler(
 {
     public async Task<Result<Guid>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
+        var requestEmail = Email.Create(request.Email);
+        var requestDocument = Document.Create(request.Document);
+
         var existingByEmail = await userRepository.FindAsync(
-            u => u.Email.Value == request.Email.Trim().ToLowerInvariant(),
-            cancellationToken);
+            u => u.Email == requestEmail, cancellationToken);
 
         if (existingByEmail.Any())
             return Result.Failure<Guid>(ResourceErrorMessages.USUARIO_EMAIL_JA_CADASTRADO);
 
-        var documentDigits = Regex.Replace(request.Document, @"\D", "");
-
         var existingByDocument = await userRepository.FindAsync(
-            u => u.Document.Value == documentDigits,
-            cancellationToken);
+            u => u.Document == requestDocument, cancellationToken);
 
         if (existingByDocument.Any())
             return Result.Failure<Guid>(ResourceErrorMessages.USUARIO_DOCUMENTO_JA_CADASTRADO);

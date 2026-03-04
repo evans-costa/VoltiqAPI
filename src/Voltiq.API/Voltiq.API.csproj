@@ -7,7 +7,27 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Features\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Features\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Features\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Features\**" />
   </ItemGroup>
 
   <PropertyGroup>

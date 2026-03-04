@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Shouldly;
 using Testcontainers.PostgreSql;
+using Voltiq.Application.Common.Interfaces;
 using Voltiq.Domain.Entities;
+using Voltiq.Domain.ValueObjects;
 using Voltiq.Infrastructure.Persistence;
 using Voltiq.Infrastructure.Persistence.Repositories;
 
@@ -24,7 +27,10 @@ public class UserRepositoryTests : IAsyncLifetime
             .UseNpgsql(_postgres.GetConnectionString())
             .Options;
 
-        _dbContext = new ApplicationDbContext(options);
+        var currentUser = new Mock<ICurrentUserService>();
+        currentUser.Setup(s => s.UserId).Returns((string?)null);
+
+        _dbContext = new ApplicationDbContext(options, currentUser.Object);
         await _dbContext.Database.MigrateAsync();
 
         _repository = new Repository<User>(_dbContext);
@@ -61,7 +67,8 @@ public class UserRepositoryTests : IAsyncLifetime
         await _repository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
 
-        var results = await _repository.FindAsync(u => u.Email.Value == "maria@example.com");
+        var email = Email.Create("maria@example.com");
+        var results = await _repository.FindAsync(u => u.Email == email);
 
         results.ShouldHaveSingleItem();
         results[0].Name.ShouldBe("Maria Santos");

@@ -8,8 +8,8 @@ namespace Voltiq.Domain.Entities;
 public class User : AuditableEntity
 {
     public string Name { get; private set; } = null!;
-    public Email Email { get; private set; } = null!;
-    public Document Document { get; private set; } = null!;
+    public Email Email { get; private set; }
+    public Document Document { get; private set; }
     public string PasswordHash { get; private set; } = null!;
 
     // Required by EF Core

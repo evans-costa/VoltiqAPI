@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Voltiq.Domain.Entities;
+using Voltiq.Domain.ValueObjects;
 
 namespace Voltiq.Infrastructure.Persistence.Configurations;
 
@@ -14,25 +15,21 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.OwnsOne(u => u.Email, email =>
-        {
-            email.Property(e => e.Value)
-                .HasColumnName("Email")
-                .IsRequired()
-                .HasMaxLength(320);
+        builder.Property(u => u.Email)
+            .HasConversion(e => e.Value, v => Email.Create(v))
+            .HasColumnName("Email")
+            .IsRequired()
+            .HasMaxLength(320);
 
-            email.HasIndex(e => e.Value).IsUnique();
-        });
+        builder.HasIndex(u => u.Email).IsUnique();
 
-        builder.OwnsOne(u => u.Document, doc =>
-        {
-            doc.Property(d => d.Value)
-                .HasColumnName("Document")
-                .IsRequired()
-                .HasMaxLength(14);
+        builder.Property(u => u.Document)
+            .HasConversion(d => d.Value, v => Document.Create(v))
+            .HasColumnName("Document")
+            .IsRequired()
+            .HasMaxLength(14);
 
-            doc.HasIndex(d => d.Value).IsUnique();
-        });
+        builder.HasIndex(u => u.Document).IsUnique();
 
         builder.Property(u => u.PasswordHash)
             .IsRequired()
