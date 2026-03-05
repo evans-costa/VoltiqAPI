@@ -18,7 +18,7 @@ using System.Reflection;
 /// </summary>
 public static class ResourceErrorMessages
 {
-    private static global::System.Resources.ResourceManager? _resourceManager;
+    private static global::System.Resources.ResourceManager _resourceManager;
 
     /// <summary>
     ///   Returns the cached ResourceManager instance used by this class.
