@@ -2,41 +2,37 @@ using MediatR;
 using Voltiq.Domain.Common;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
+using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
+using Voltiq.Exceptions.Errors;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Features.Users.Commands.CreateUser;
 
 public sealed class CreateUserCommandHandler(
-    IRepository<User> userRepository,
+    IUserRepository userRepository,
     IUnitOfWork unitOfWork,
     IPasswordHasher passwordHasher)
     : IRequestHandler<CreateUserCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        var requestEmail = Email.Create(request.Email);
-        var requestDocument = Document.Create(request.Document);
+        var email = Email.Create(request.Email).Value;
+        var document = Document.Create(request.Document).Value;
 
-        var existingByEmail = await userRepository.FindAsync(
-            u => u.Email == requestEmail, cancellationToken);
+        var userAlreadyExists = await userRepository.ExistsUserAsync(
+            document, email, cancellationToken);
 
-        if (existingByEmail.Any())
-            return Result.Failure<Guid>(ResourceErrorMessages.USUARIO_EMAIL_JA_CADASTRADO);
-
-        var existingByDocument = await userRepository.FindAsync(
-            u => u.Document == requestDocument, cancellationToken);
-
-        if (existingByDocument.Any())
-            return Result.Failure<Guid>(ResourceErrorMessages.USUARIO_DOCUMENTO_JA_CADASTRADO);
+        if (userAlreadyExists)
+            return Result<Guid>.Failure(new ConflictError(ResourceErrorMessages.USUARIO_EMAIL_JA_CADASTRADO));
 
         var passwordHash = passwordHasher.Hash(request.Password);
 
-        var user = User.Create(request.Name, request.Email, request.Document, passwordHash);
+        var user = User.Create(request.Name, email, document, passwordHash);
 
         await userRepository.AddAsync(user, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(user.Id);
+        return Result<Guid>.Success(user.Id);
     }
 }

@@ -1,6 +1,7 @@
 using Shouldly;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Events;
+using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Exceptions;
 
 namespace Voltiq.Domain.Tests.Entities;
@@ -8,18 +9,19 @@ namespace Voltiq.Domain.Tests.Entities;
 public class UserTests
 {
     private const string ValidName = "João Silva";
-    private const string ValidEmail = "joao@example.com";
-    private const string ValidDocument = "529.982.247-25"; // valid CPF
     private const string ValidPasswordHash = "$argon2id$hashed";
+
+    private static Email ValidEmail() => Email.Create("joao@example.com").Value;
+    private static Document ValidDocument() => Document.Create("529.982.247-25").Value;
 
     [Fact]
     public void Create_WithValidData_ShouldCreateUser()
     {
-        var user = User.Create(ValidName, ValidEmail, ValidDocument, ValidPasswordHash);
+        var user = User.Create(ValidName, ValidEmail(), ValidDocument(), ValidPasswordHash);
 
         user.Id.ShouldNotBe(Guid.Empty);
         user.Name.ShouldBe(ValidName);
-        user.Email.Value.ShouldBe(ValidEmail.ToLowerInvariant());
+        user.Email.Value.ShouldBe("joao@example.com");
         user.Document.Value.ShouldNotBeNullOrWhiteSpace();
         user.PasswordHash.ShouldBe(ValidPasswordHash);
     }
@@ -27,7 +29,7 @@ public class UserTests
     [Fact]
     public void Create_ShouldRaise_UserCreatedEvent()
     {
-        var user = User.Create(ValidName, ValidEmail, ValidDocument, ValidPasswordHash);
+        var user = User.Create(ValidName, ValidEmail(), ValidDocument(), ValidPasswordHash);
 
         user.DomainEvents.ShouldContain(e => e is UserCreatedEvent);
     }
@@ -39,7 +41,7 @@ public class UserTests
     public void Create_WithNullOrEmptyName_ShouldThrowDomainException(string? name)
     {
         Should.Throw<DomainException>(() =>
-            User.Create(name!, ValidEmail, ValidDocument, ValidPasswordHash));
+            User.Create(name!, ValidEmail(), ValidDocument(), ValidPasswordHash));
     }
 
     [Theory]
@@ -48,20 +50,6 @@ public class UserTests
     public void Create_WithNullOrEmptyPasswordHash_ShouldThrowDomainException(string? hash)
     {
         Should.Throw<DomainException>(() =>
-            User.Create(ValidName, ValidEmail, ValidDocument, hash!));
-    }
-
-    [Fact]
-    public void Create_WithInvalidEmail_ShouldThrowDomainException()
-    {
-        Should.Throw<DomainException>(() =>
-            User.Create(ValidName, "not-an-email", ValidDocument, ValidPasswordHash));
-    }
-
-    [Fact]
-    public void Create_WithInvalidDocument_ShouldThrowDomainException()
-    {
-        Should.Throw<DomainException>(() =>
-            User.Create(ValidName, ValidEmail, "000.000.000-00", ValidPasswordHash));
+            User.Create(ValidName, ValidEmail(), ValidDocument(), hash!));
     }
 }

@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
-using Voltiq.Exceptions.Exceptions;
+using Voltiq.Domain.Common;
+using Voltiq.Exceptions.Errors;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Domain.ValueObjects;
@@ -12,12 +13,19 @@ public readonly partial record struct Document
 {
     public string Value { get; } 
 
-    private Document(string value) => Value = value;
+    public Document(string value) => Value = value;
 
-    public static Document Create(string? raw)
+    public static Result<Document> Create(string? raw)
     {
-        return !TryParse(raw, out var document, out var errorMessage) ? 
-            throw new DomainException(errorMessage) : document;
+        return TryParse(raw, out var document, out var errorMessage)
+            ? Result<Document>.Success(document)
+            : Result<Document>.Failure(new Error(errorMessage));
+    }
+    
+    public static Document FromDatabase(string value)
+    {
+        TryParse(value, out var doc, out _);
+        return doc;
     }
 
     public static bool TryParse(string? raw, out Document document, out string errorMessage)
@@ -88,6 +96,6 @@ public readonly partial record struct Document
     }
 
     public override string ToString() => Value;
-    [GeneratedRegex(@"\D", RegexOptions.Compiled)]
+    [GeneratedRegex(@"\D")]
     private static partial Regex OnlyDigits();
 }

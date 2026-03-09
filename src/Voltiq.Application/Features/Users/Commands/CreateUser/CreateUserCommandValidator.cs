@@ -13,11 +13,12 @@ public sealed class CreateUserCommandValidator : AbstractValidator<CreateUserCom
 
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage(ResourceErrorMessages.USUARIO_EMAIL_OBRIGATORIO)
-            .EmailAddress().WithMessage(ResourceErrorMessages.USUARIO_EMAIL_INVALIDO);
+            .Must(email => Email.TryParse(email, out _, out _))
+            .WithMessage(ResourceErrorMessages.USUARIO_EMAIL_INVALIDO);
 
         RuleFor(x => x.Document)
             .NotEmpty().WithMessage(ResourceErrorMessages.USUARIO_DOCUMENTO_OBRIGATORIO)
-            .Must(d => Document.TryParse(d, out _, out _))
+            .Must(doc => Document.TryParse(doc, out _, out _))
             .WithMessage(ResourceErrorMessages.USUARIO_DOCUMENTO_INVALIDO);
 
         RuleFor(x => x.Password)

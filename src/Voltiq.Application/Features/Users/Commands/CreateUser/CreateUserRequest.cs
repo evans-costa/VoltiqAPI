@@ -1,4 +1,4 @@
-namespace Voltiq.API.Features.Users;
+namespace Voltiq.Application.Features.Users.Commands.CreateUser;
 
 public sealed record CreateUserRequest(
     string Name,

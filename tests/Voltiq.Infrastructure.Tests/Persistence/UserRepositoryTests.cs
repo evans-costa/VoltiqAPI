@@ -7,6 +7,7 @@ using Voltiq.Domain.Entities;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Infrastructure.Persistence;
 using Voltiq.Infrastructure.Persistence.Repositories;
+using Voltiq.Infrastructure.Persistence.Repositories.User;
 
 namespace Voltiq.Infrastructure.Tests.Persistence;
 
@@ -17,6 +18,7 @@ public class UserRepositoryTests : IAsyncLifetime
 
     private ApplicationDbContext _dbContext = null!;
     private Repository<User> _repository = null!;
+    private UserRepository _userRepository = null!;
     private UnitOfWork _unitOfWork = null!;
 
     public async Task InitializeAsync()
@@ -34,6 +36,7 @@ public class UserRepositoryTests : IAsyncLifetime
         await _dbContext.Database.MigrateAsync();
 
         _repository = new Repository<User>(_dbContext);
+        _userRepository = new UserRepository(_dbContext);
         _unitOfWork = new UnitOfWork(_dbContext);
     }
 
@@ -46,7 +49,9 @@ public class UserRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task AddAndGetById_ShouldPersistUser()
     {
-        var user = User.Create("João Silva", "joao@example.com", "529.982.247-25", "$argon2id$hash");
+        var email = Email.Create("joao@example.com").Value;
+        var document = Document.Create("529.982.247-25").Value;
+        var user = User.Create("João Silva", email, document, "$argon2id$hash");
 
         await _repository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
@@ -60,17 +65,17 @@ public class UserRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task FindByEmail_ShouldReturnMatchingUser()
+    public async Task ExistsUserAsync_ShouldReturnTrue_WhenEmailOrDocumentExists()
     {
-        var user = User.Create("Maria Santos", "maria@example.com", "11222333000181", "$argon2id$hash");
+        var email = Email.Create("maria@example.com").Value;
+        var document = Document.Create("11222333000181").Value;
+        var user = User.Create("Maria Santos", email, document, "$argon2id$hash");
 
         await _repository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
 
-        var email = Email.Create("maria@example.com");
-        var results = await _repository.FindAsync(u => u.Email == email);
+        var exists = await _userRepository.ExistsUserAsync(document, email);
 
-        results.ShouldHaveSingleItem();
-        results[0].Name.ShouldBe("Maria Santos");
+        exists.ShouldBeTrue();
     }
 }
