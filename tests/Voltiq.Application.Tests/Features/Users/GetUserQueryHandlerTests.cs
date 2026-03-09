@@ -2,8 +2,9 @@ using Moq;
 using Shouldly;
 using Voltiq.Application.Features.Users.Queries.GetUser;
 using Voltiq.Domain.Entities;
-using Voltiq.Domain.Interfaces;
-using Voltiq.Exceptions.Exceptions;
+using Voltiq.Domain.Interfaces.Repositories;
+using Voltiq.Domain.ValueObjects;
+using Voltiq.Exceptions.Errors;
 
 namespace Voltiq.Application.Tests.Features.Users;
 
@@ -17,7 +18,9 @@ public class GetUserQueryHandlerTests
     [Fact]
     public async Task Handle_WithExistingId_ShouldReturnUserResponse()
     {
-        var user = User.Create("João Silva", "joao@example.com", "529.982.247-25", "$argon2id$hash");
+        var email = Email.Create("joao@example.com").Value;
+        var document = Document.Create("529.982.247-25").Value;
+        var user = User.Create("João Silva", email, document, "$argon2id$hash");
 
         _userRepoMock
             .Setup(r => r.GetByIdAsync(user.Id, It.IsAny<CancellationToken>()))
@@ -26,12 +29,13 @@ public class GetUserQueryHandlerTests
         var handler = CreateHandler();
         var result = await handler.Handle(new GetUserQuery(user.Id), CancellationToken.None);
 
-        result.Name.ShouldBe("João Silva");
-        result.Email.ShouldBe("joao@example.com");
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Name.ShouldBe("João Silva");
+        result.Value.Email.ShouldBe("joao@example.com");
     }
 
     [Fact]
-    public async Task Handle_WithNonExistentId_ShouldThrowNotFoundException()
+    public async Task Handle_WithNonExistentId_ShouldReturnNotFoundError()
     {
         var id = Guid.NewGuid();
 
@@ -40,8 +44,9 @@ public class GetUserQueryHandlerTests
             .ReturnsAsync((User?)null);
 
         var handler = CreateHandler();
+        var result = await handler.Handle(new GetUserQuery(id), CancellationToken.None);
 
-        await Should.ThrowAsync<NotFoundException>(
-            () => handler.Handle(new GetUserQuery(id), CancellationToken.None));
+        result.IsFailure.ShouldBeTrue();
+        result.FirstError.ShouldBeOfType<NotFoundError>();
     }
 }

@@ -1,17 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using Voltiq.API.Features.Users;
 using Voltiq.Application.Features.Users.Commands.CreateUser;
 using Voltiq.Application.Features.Users.Queries.GetUser;
-using Voltiq.Exceptions.Resources;
 
-namespace Voltiq.API.Controllers;
+namespace Voltiq.API.Controllers.Users;
 
 public sealed class UsersController : BaseApiController
 {
     /// <summary>Creates a new user account.</summary>
     /// <response code="201">User created successfully.</response>
     /// <response code="400">Validation error.</response>
-    /// <response code="409">Email or document already in use.</response>
+    /// <response code="409">Email and/or document already in use.</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -23,18 +21,9 @@ public sealed class UsersController : BaseApiController
         var command = new CreateUserCommand(request.Name, request.Email, request.Document, request.Password);
         var result = await Sender.Send(command, cancellationToken);
 
-        if (result.IsFailure)
-        {
-            return Conflict(new ProblemDetails
-            {
-                Title = ResourceErrorMessages.TITULO_CONFLITO,
-                Detail = result.Error,
-                Status = StatusCodes.Status409Conflict,
-                Instance = HttpContext.Request.Path
-            });
-        }
-
-        return CreatedAtAction(nameof(Create), new { id = result.Value }, new { id = result.Value });
+        return result.IsFailure ? 
+            ToErrorResult(result) : 
+            CreatedAtAction(nameof(Create), new { id = result.Value }, new { id = result.Value });
     }
 
     /// <summary>Gets a user by ID.</summary>
@@ -47,7 +36,8 @@ public sealed class UsersController : BaseApiController
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var response = await Sender.Send(new GetUserQuery(id), cancellationToken);
-        return Ok(response);
+        var result = await Sender.Send(new GetUserQuery(id), cancellationToken);
+
+        return result.IsFailure ? ToErrorResult(result) : Ok(result.Value);
     }
 }

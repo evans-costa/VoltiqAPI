@@ -1,18 +1,23 @@
 using MediatR;
+using Voltiq.Domain.Common;
 using Voltiq.Domain.Entities;
-using Voltiq.Domain.Interfaces;
-using Voltiq.Exceptions.Exceptions;
+using Voltiq.Domain.Interfaces.Repositories;
+using Voltiq.Exceptions.Errors;
+using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Features.Users.Queries.GetUser;
 
 public sealed class GetUserQueryHandler(IRepository<User> userRepository)
-    : IRequestHandler<GetUserQuery, GetUserResponse>
+    : IRequestHandler<GetUserQuery, Result<GetUserResponse>>
 {
-    public async Task<GetUserResponse> Handle(GetUserQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GetUserResponse>> Handle(GetUserQuery request, CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetByIdAsync(request.Id, cancellationToken)
-            ?? throw new NotFoundException(nameof(User), request.Id);
+        var user = await userRepository.GetByIdAsync(request.Id, cancellationToken);
 
-        return new GetUserResponse(user.Name, user.Email.Value);
+        if (user is null)
+            return Result<GetUserResponse>.Failure(
+                new NotFoundError(string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), request.Id)));
+
+        return Result<GetUserResponse>.Success(new GetUserResponse(user.Name, user.Email.Value));
     }
 }

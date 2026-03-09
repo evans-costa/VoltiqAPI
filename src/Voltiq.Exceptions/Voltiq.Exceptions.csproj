@@ -6,9 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="12.1.1" />
-  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="Resources\ResourceErrorMessages.resx">

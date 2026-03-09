@@ -16,7 +16,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(200);
 
         builder.Property(u => u.Email)
-            .HasConversion(e => e.Value, v => Email.Create(v))
+            .HasConversion(
+                e => e.Value, 
+                v => new Email(v))
             .HasColumnName("Email")
             .IsRequired()
             .HasMaxLength(320);
@@ -24,7 +26,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasIndex(u => u.Email).IsUnique();
 
         builder.Property(u => u.Document)
-            .HasConversion(d => d.Value, v => Document.Create(v))
+            .HasConversion(d => d.Value, v => new Document(v))
             .HasColumnName("Document")
             .IsRequired()
             .HasMaxLength(14);

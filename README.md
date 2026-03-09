@@ -112,10 +112,8 @@ voltiq/
 ├── src/
 │   ├── Voltiq.API/                        # Entrada da aplicação (controllers, handlers de exceção, DI)
 │   │   ├── Controllers/
-│   │   │   └── BaseApiController.cs       # Controller base com MediatR
-│   │   ├── ExceptionHandlers/             # IExceptionHandler por tipo de exceção
-│   │   │   ├── ValidationExceptionHandler.cs
-│   │   │   ├── NotFoundExceptionHandler.cs
+│   │   │   └── BaseApiController.cs       # Controller base com MediatR + ToErrorResult → ProblemDetails
+│   │   ├── ExceptionHandlers/             # IExceptionHandler para erros inesperados
 │   │   │   ├── UnauthorizedExceptionHandler.cs
 │   │   │   └── GlobalExceptionHandler.cs
 │   │   └── Program.cs
@@ -141,15 +139,23 @@ voltiq/
 │   │   │   ├── IDomainEvent.cs
 │   │   │   └── BaseDomainEvent.cs
 │   │   ├── Interfaces/
-│   │   │   ├── IRepository.cs
-│   │   │   └── IUnitOfWork.cs
+│   │   │   ├── IUnitOfWork.cs
+│   │   │   └── Repositories/
+│   │   │       ├── IRepository.cs
+│   │   │       └── User/
+│   │   │           └── IUserRepository.cs
 │   │   └── ValueObjects/
 │   │       └── ValueObject.cs
 │   │
-│   ├── Voltiq.Exceptions/                 # Tipos de exceção + mensagens centralizadas
+│   ├── Voltiq.Exceptions/                 # Tipos de erro + exceções + mensagens centralizadas
+│   │   ├── Errors/
+│   │   │   ├── Error.cs                   # Classe base de erro tipado
+│   │   │   ├── ValidationError.cs         # Erro de validação (com PropertyName)
+│   │   │   ├── NotFoundError.cs           # Recurso não encontrado
+│   │   │   └── ConflictError.cs           # Conflito de unicidade
 │   │   ├── Exceptions/
-│   │   │   ├── DomainException.cs         # Exceção base de domínio (400)
-│   │   │   └── NotFoundException.cs       # Recurso não encontrado (404) + EntityName/Key
+│   │   │   ├── DomainException.cs         # Exceção de invariante de domínio
+│   │   │   └── NotFoundException.cs       # Recurso não encontrado (exception)
 │   │   └── Resources/
 │   │       ├── ResourceErrorMessages.resx # Todas as mensagens de erro (pt-BR)
 │   │       └── ResourceErrorMessages.Designer.cs
@@ -161,8 +167,10 @@ voltiq/
 │       ├── Persistence/
 │       │   ├── ApplicationDbContext.cs
 │       │   └── Repositories/
-│       │       ├── Repository.cs
-│       │       └── UnitOfWork.cs
+│       │       ├── Repository.cs           # Repositório genérico
+│       │       ├── UnitOfWork.cs
+│       │       └── User/
+│       │           └── UserRepository.cs   # Repositório especializado (ExistsUserAsync)
 │       └── DependencyInjection.cs
 │
 └── tests/
@@ -241,10 +249,10 @@ Núcleo da aplicação, **sem dependências externas**.
 - **`AuditableEntity`** — estende `BaseEntity` com `CreatedAt`, `CreatedBy` e `UpdatedAt`.
 - **`ValueObject`** — base para objetos de valor com igualdade por componentes.
 - **`IDomainEvent` / `BaseDomainEvent`** — contrato e base para eventos de domínio (incluem `OccurredOn`).
-- **`IRepository<T>`** — interface genérica de repositório (`GetByIdAsync`, `GetAllAsync`, `FindAsync`, `AddAsync`, `Update`, `Remove`).
+- **`IRepository<T>`** — interface genérica de repositório (`GetByIdAsync`, `AddAsync`, `Update`, `Remove`).
 - **`IUnitOfWork`** — interface para persistir mudanças (`SaveChangesAsync`).
-- **`Result<T>`** — padrão railway-oriented para retornos de handlers (evita exceções em falhas esperadas).
-- **Exceções** — `DomainException` (genérica, 400) e `NotFoundException` (recurso não encontrado, 404).
+- **`Result` / `Result<T>`** — padrão railway-oriented com erros tipados (`Error`, `ValidationError`, `NotFoundError`, `ConflictError`). Handlers retornam `Result<T>` para falhas esperadas em vez de lançar exceções.
+- **Exceções** — `DomainException` (violação de invariante de domínio) e `NotFoundException` (recurso não encontrado) — reservadas para falhas fora do pipeline MediatR.
 
 ### Application
 
@@ -270,8 +278,8 @@ Implementações de infraestrutura.
 
 Ponto de entrada da aplicação.
 
-- **`BaseApiController`** — controller base com `[ApiController]` e `[Route("api/[controller]")]`. Injeta `IMediator`.
-- **`ExceptionHandlers/`** — tratamento de exceções via `IExceptionHandler` (ver seção abaixo).
+- **`BaseApiController`** — controller base com `[ApiController]` e `[Route("api/[controller]")]`. Injeta `ISender` via `HttpContext.RequestServices`. Expõe `ToErrorResult(Result)` que converte erros tipados do `Result` em `ProblemDetails` (`ValidationProblemDetails` para 400, `ProblemDetails` para 404/409/500).
+- **`ExceptionHandlers/`** — tratamento de exceções não esperadas via `IExceptionHandler` (`UnauthorizedExceptionHandler` → 401, `GlobalExceptionHandler` → 500).
 - **`Program.cs`** — registra todos os serviços e configura o pipeline.
 
 ---
@@ -364,17 +372,33 @@ public class Order : AuditableEntity
 
 ### Result Pattern
 
-Handlers devem retornar `Result<T>` para falhas esperadas em vez de lançar exceções:
+Handlers retornam `Result<T>` (ou `Result` para operações sem retorno como Update/Delete) com **erros tipados**:
 
 ```csharp
 // Sucesso
-return Result.Success(produto);
+return Result<Guid>.Success(user.Id);
 
-// Falha esperada
-return Result.Failure<Product>("Estoque insuficiente.");
+// Sucesso sem valor (para Update/Delete → 204 No Content)
+return Result.Success();
+
+// Falha esperada — conflito (409)
+return Result<Guid>.Failure(new ConflictError("Já existe um usuário com este e-mail."));
+
+// Falha esperada — não encontrado (404)
+return Result<GetUserResponse>.Failure(
+    new NotFoundError(string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), id)));
 ```
 
-Reserve exceções (`NotFoundException`, `DomainException`) para violações de invariantes ou recursos inexistentes.
+**Hierarquia de erros** (em `Voltiq.Exceptions/Errors/`):
+
+| Tipo | Uso | HTTP Status |
+|---|---|---|
+| `Error` (base) | Erro genérico | 500 |
+| `ValidationError` | Falha de validação (com `PropertyName`) | 400 |
+| `NotFoundError` | Recurso não encontrado | 404 |
+| `ConflictError` | Conflito de unicidade | 409 |
+
+Reserve exceções (`DomainException`) para violações de invariantes de domínio na camada Domain.
 
 ### Validação
 
@@ -387,20 +411,43 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
     {
         RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
         RuleFor(x => x.Price).GreaterThan(0);
+
+        // Validação de formato de Value Objects via TryParse
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage(ResourceErrorMessages.USUARIO_EMAIL_OBRIGATORIO)
+            .Must(email => Email.TryParse(email, out _, out _))
+            .WithMessage(ResourceErrorMessages.USUARIO_EMAIL_INVALIDO);
     }
 }
 ```
 
-O `ValidationBehavior` no pipeline MediatR executa todos os validators automaticamente e lança `ValidationException` (capturada pelo `ValidationExceptionHandler`) em caso de falha.
+O `ValidationBehavior` no pipeline MediatR:
+1. Executa todos os validators automaticamente **antes** do handler.
+2. Se houver falhas, retorna `Result.Failure(...)` com `ValidationError` tipados — **sem lançar exceções**.
+3. O controller recebe o `Result` com `IsFailure == true` e converte para `ValidationProblemDetails` (400).
 
-### Tratamento de Exceções
+> **Constraint:** o `ValidationBehavior` exige `where TResponse : Result`, portanto todo command/query deve retornar `Result` ou `Result<T>`.
 
-O tratamento de erros usa **`IExceptionHandler`** (ASP.NET Core) com um handler por tipo de exceção, registrados em cadeia no `Program.cs`. Todos os handlers retornam `application/problem+json`.
+### Tratamento de Erros
+
+O tratamento de erros usa uma abordagem **dual**:
+
+**1. Erros esperados → `Result` com erros tipados (dentro do pipeline MediatR)**
+
+O handler retorna `Result.Failure(new ConflictError(...))` ou o `ValidationBehavior` retorna `Result.Failure(new ValidationError(...))`. O controller converte via `ToErrorResult(result)` em `ProblemDetails` nativo do ASP.NET Core:
+
+| Tipo de Erro | HTTP Status | Resposta |
+|---|---|---|
+| `ValidationError` | `400 Bad Request` | `ValidationProblemDetails` com `errors` dict |
+| `NotFoundError` | `404 Not Found` | `ProblemDetails` com `detail` |
+| `ConflictError` | `409 Conflict` | `ProblemDetails` com `detail` |
+
+**2. Erros inesperados → `IExceptionHandler` (fora do pipeline MediatR)**
+
+Para exceções não capturadas e exceções de autenticação, `IExceptionHandler` converte em `application/problem+json`:
 
 | Handler | Captura | HTTP Status |
 |---|---|---|
-| `ValidationExceptionHandler` | `FluentValidation.ValidationException` | `400 Bad Request` |
-| `NotFoundExceptionHandler` | `NotFoundException` | `404 Not Found` |
 | `UnauthorizedExceptionHandler` | `UnauthorizedAccessException` | `401 Unauthorized` |
 | `GlobalExceptionHandler` | `Exception` (fallback) | `500 Internal Server Error` |
 
@@ -415,26 +462,39 @@ Todas as mensagens de erro estão centralizadas em **`src/Voltiq.Exceptions/Reso
 
 #### Formato das respostas
 
-**400 — Validation Error**
+**400 — Validation Error** (`ValidationProblemDetails`)
 ```json
 {
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
   "title": "Falha de validação",
   "status": 400,
-  "instance": "/api/products",
-  "errors": [
-    { "propertyName": "Name", "errorMessage": "O nome é obrigatório." },
-    { "propertyName": "Price", "errorMessage": "'Price' must be greater than 0." }
-  ]
+  "instance": "/api/users",
+  "errors": {
+    "Email": ["O e-mail informado não é válido."],
+    "Password": ["A senha deve ter pelo menos 8 caracteres."]
+  }
 }
 ```
 
-**404 — Not Found**
+**404 — Not Found** (`ProblemDetails`)
 ```json
 {
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.5",
   "title": "Não encontrado",
   "status": 404,
-  "instance": "/api/products/abc",
-  "detail": "A entidade 'Product' com a chave 'abc' não foi encontrada."
+  "instance": "/api/users/abc",
+  "detail": "A entidade 'User' com a chave 'abc' não foi encontrada."
+}
+```
+
+**409 — Conflict** (`ProblemDetails`)
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+  "title": "Conflito",
+  "status": 409,
+  "instance": "/api/users",
+  "detail": "Já existe um usuário cadastrado com este e-mail."
 }
 ```
 
@@ -460,14 +520,26 @@ Todas as mensagens de erro estão centralizadas em **`src/Voltiq.Exceptions/Reso
 > - `traceId` — incluído em todos os handlers
 > - `stackTrace` — incluído apenas no `GlobalExceptionHandler`
 
-#### Como lançar exceções nos handlers
+#### Como retornar erros nos handlers
 
 ```csharp
 // Recurso não encontrado → 404
-throw new NotFoundException(nameof(Product), id);
+return Result<GetUserResponse>.Failure(
+    new NotFoundError(string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), id)));
 
-// Violação de regra de domínio → 400
-throw new DomainException("O produto está inativo e não pode ser vendido.");
+// Conflito de unicidade → 409
+return Result<Guid>.Failure(
+    new ConflictError(ResourceErrorMessages.USUARIO_EMAIL_JA_CADASTRADO));
+```
+
+No controller:
+```csharp
+var result = await Sender.Send(new GetUserQuery(id), cancellationToken);
+
+if (result.IsFailure)
+    return ToErrorResult(result);  // Converte para ProblemDetails automaticamente
+
+return Ok(result.Value);
 ```
 
 Nunca retorne status HTTP diretamente da camada Application.
@@ -477,11 +549,13 @@ Nunca retorne status HTTP diretamente da camada Application.
 ```csharp
 // Leitura
 var product = await _repository.GetByIdAsync(id, cancellationToken);
-var products = await _repository.FindAsync(p => p.IsActive, cancellationToken);
 
 // Escrita — sempre chame SaveChangesAsync via IUnitOfWork
 await _repository.AddAsync(newProduct, cancellationToken);
 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+// Queries especializadas — defina no repositório específico (ex: IUserRepository)
+var exists = await _userRepository.ExistsUserAsync(document, email, cancellationToken);
 ```
 
 Não chame `SaveChanges` diretamente em `IApplicationDbContext` nos handlers.

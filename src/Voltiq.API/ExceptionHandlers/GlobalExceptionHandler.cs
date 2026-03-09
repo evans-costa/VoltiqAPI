@@ -23,7 +23,7 @@ internal sealed class GlobalExceptionHandler(
                 traceId = httpContext.TraceIdentifier,
                 stackTrace = exception.ToString(),
             }
-            : (object)new
+            : new
             {
                 title = ResourceErrorMessages.TITULO_ERRO_INESPERADO,
                 status = StatusCodes.Status500InternalServerError,
