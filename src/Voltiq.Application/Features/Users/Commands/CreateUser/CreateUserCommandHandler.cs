@@ -1,5 +1,6 @@
 using MediatR;
 using Voltiq.Application.Common.Interfaces;
+using Voltiq.Application.Mappings.Users;
 using Voltiq.Domain.Common;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
@@ -37,6 +38,6 @@ public sealed class CreateUserCommandHandler(
 
         var token = tokenService.GenerateToken(user.Id.ToString(), user.Name, []);
 
-        return Result<CreateUserResponse>.Success(new CreateUserResponse(user.Id, token));
+        return Result<CreateUserResponse>.Success(user.ToCreateUserResponse(token));
     }
 }
