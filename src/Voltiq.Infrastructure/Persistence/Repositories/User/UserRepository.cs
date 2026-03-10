@@ -14,4 +14,11 @@ public class UserRepository(ApplicationDbContext context)
                 user.Document == document || user.Email == email,
             cancellationToken: ct);
     }
+
+    public async Task<Domain.Entities.User?> GetByEmailAsync(Email email,
+        CancellationToken ct = default)
+    {
+        return await Context.Users.AsNoTracking()
+            .FirstOrDefaultAsync(user => user.Email == email, cancellationToken: ct);
+    }
 }

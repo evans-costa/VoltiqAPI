@@ -145,6 +145,14 @@ public static class ResourceErrorMessages
     public static string USUARIO_DOCUMENTO_JA_CADASTRADO
         => ResourceManager.GetString(nameof(USUARIO_DOCUMENTO_JA_CADASTRADO))!;
 
+    // ── Aplicação — Auth ───────────────────────────────────────────────────
+
+    /// <summary>
+    ///   Looks up a localized string similar to E-mail ou senha inválidos.
+    /// </summary>
+    public static string LOGIN_CREDENCIAIS_INVALIDAS
+        => ResourceManager.GetString(nameof(LOGIN_CREDENCIAIS_INVALIDAS))!;
+
     // ── API — títulos HTTP ─────────────────────────────────────────────────
 
     /// <summary>

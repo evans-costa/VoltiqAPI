@@ -18,6 +18,7 @@ API RESTful construída com **.NET 10** seguindo os princípios de **Clean Archi
   - [Infrastructure](#infrastructure)
   - [API](#api)
 - [Endpoints](#endpoints)
+  - [Autenticação](#autenticação)
   - [Usuários](#usuários)
 - [Convenções](#convenções)
   - [CQRS com MediatR](#cqrs-com-mediatr)
@@ -285,6 +286,39 @@ Ponto de entrada da aplicação.
 ---
 
 ## Endpoints
+
+### Autenticação
+
+#### `POST /auth/login` — Login
+
+Autentica um usuário com e-mail e senha e retorna um JWT token.
+
+**Request body:**
+```json
+{
+  "email": "joao@example.com",
+  "password": "MinhaS3nh@Segura"
+}
+```
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `email` | string | ✅ | E-mail do usuário |
+| `password` | string | ✅ | Senha do usuário |
+
+**Respostas:**
+
+| Status | Descrição |
+|---|---|
+| `200 OK` | `{ "token": "<JWT>" }` |
+| `400 Bad Request` | Erro de validação (e-mail vazio/inválido ou senha vazia) |
+| `401 Unauthorized` | E-mail ou senha inválidos |
+
+**Observações de segurança:**
+- Em caso de credenciais inválidas, a resposta 401 não indica se o e-mail existe ou não (mensagem genérica).
+- O token JWT gerado deve ser enviado no cabeçalho `Authorization: Bearer <token>` nas requisições autenticadas.
+
+---
 
 ### Usuários
 

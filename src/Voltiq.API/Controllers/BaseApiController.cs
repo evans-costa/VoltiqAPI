@@ -35,6 +35,12 @@ public abstract class BaseApiController : ControllerBase
                 statusCode: StatusCodes.Status409Conflict,
                 instance: HttpContext.Request.Path),
 
+            UnauthorizedError unauthorized => Problem(
+                title: ResourceErrorMessages.TITULO_NAO_AUTORIZADO,
+                detail: unauthorized.Message,
+                statusCode: StatusCodes.Status401Unauthorized,
+                instance: HttpContext.Request.Path),
+
             _ => Problem(
                 title: ResourceErrorMessages.TITULO_ERRO_INESPERADO,
                 statusCode: StatusCodes.Status500InternalServerError,
