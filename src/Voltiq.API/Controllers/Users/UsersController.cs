@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Voltiq.Application.Features.Users.Commands.CreateUser;
 using Voltiq.Application.Features.Users.Queries.GetUser;
@@ -10,6 +11,7 @@ public sealed class UsersController : BaseApiController
     /// <response code="201">User created successfully.</response>
     /// <response code="400">Validation error.</response>
     /// <response code="409">Email and/or document already in use.</response>
+    [AllowAnonymous]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
