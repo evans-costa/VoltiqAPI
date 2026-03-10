@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Voltiq.Application.Features.Users.Commands.CreateUser;
-using Voltiq.Application.Features.Users.Queries.GetUser;
 
 namespace Voltiq.API.Controllers.Users;
 
@@ -26,20 +25,5 @@ public sealed class UsersController : BaseApiController
         return result.IsFailure ?
             ToErrorResult(result) :
             CreatedAtAction(nameof(Create), new { id = result.Value.Id }, result.Value);
-    }
-
-    /// <summary>Gets a user by ID.</summary>
-    /// <response code="200">User found.</response>
-    /// <response code="404">User not found.</response>
-    [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(GetUserResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetById(
-        [FromRoute] Guid id,
-        CancellationToken cancellationToken)
-    {
-        var result = await Sender.Send(new GetUserQuery(id), cancellationToken);
-
-        return result.IsFailure ? ToErrorResult(result) : Ok(result.Value);
     }
 }
