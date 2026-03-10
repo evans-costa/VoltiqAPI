@@ -320,6 +320,25 @@ Autentica um usuário com e-mail e senha e retorna um JWT token.
 
 ---
 
+#### `GET /auth/me` — Usuário autenticado
+
+Retorna os dados do usuário atualmente autenticado, identificado pelo JWT enviado no cabeçalho `Authorization`.
+
+**Headers obrigatórios:**
+```
+Authorization: Bearer <token>
+```
+
+**Respostas:**
+
+| Status | Descrição |
+|---|---|
+| `200 OK` | `{ "name": "João Silva", "email": "joao@example.com" }` |
+| `401 Unauthorized` | Token ausente ou inválido |
+| `404 Not Found` | Usuário do token não existe mais no banco |
+
+---
+
 ### Usuários
 
 #### `POST /api/users` — Criar usuário
@@ -347,7 +366,7 @@ Cria um novo usuário na plataforma.
 
 | Status | Descrição |
 |---|---|
-| `201 Created` | `{ "id": "<guid>" }` |
+| `201 Created` | `{ "id": "<guid>", "token": "<JWT>" }` — retorna token para auto-login |
 | `400 Bad Request` | Erro de validação (campos inválidos) |
 | `409 Conflict` | E-mail ou CPF/CNPJ já cadastrado |
 

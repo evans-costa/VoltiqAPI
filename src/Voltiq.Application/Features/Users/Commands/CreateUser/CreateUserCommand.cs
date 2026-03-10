@@ -7,4 +7,4 @@ public sealed record CreateUserCommand(
     string Name,
     string Email,
     string Document,
-    string Password) : IRequest<Result<Guid>>;
+    string Password) : IRequest<Result<CreateUserResponse>>;
