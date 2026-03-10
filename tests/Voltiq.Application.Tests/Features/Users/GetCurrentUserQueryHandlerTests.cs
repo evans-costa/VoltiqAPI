@@ -2,7 +2,6 @@ using Moq;
 using Shouldly;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Application.Features.Users.Queries.GetCurrentUser;
-using Voltiq.Application.Features.Users.Queries.GetUser;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces.Repositories;
 using Voltiq.Domain.ValueObjects;
