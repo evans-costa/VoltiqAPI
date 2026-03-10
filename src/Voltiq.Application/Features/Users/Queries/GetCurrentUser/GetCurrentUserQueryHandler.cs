@@ -1,6 +1,6 @@
 using MediatR;
 using Voltiq.Application.Common.Interfaces;
-using Voltiq.Application.Features.Users.Queries.GetUser;
+using Voltiq.Application.Mappings.Users;
 using Voltiq.Domain.Common;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces.Repositories;
@@ -26,6 +26,6 @@ public sealed class GetCurrentUserQueryHandler(
             return Result<GetUserResponse>.Failure(
                 new NotFoundError(string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), userId)));
 
-        return Result<GetUserResponse>.Success(new GetUserResponse(user.Name, user.Email.Value));
+        return Result<GetUserResponse>.Success(user.ToGetUserResponse());
     }
 }
