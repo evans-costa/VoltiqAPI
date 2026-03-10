@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Voltiq.Application.Features.Users.Commands.CreateUser;
+using Voltiq.Application.Mappings.Users;
 
 namespace Voltiq.API.Controllers.Users;
 
@@ -19,7 +20,7 @@ public sealed class UsersController : BaseApiController
         [FromBody] CreateUserRequest request,
         CancellationToken cancellationToken)
     {
-        var command = new CreateUserCommand(request.Name, request.Email, request.Document, request.Password);
+        var command = request.ToCommand();
         var result = await Sender.Send(command, cancellationToken);
 
         return result.IsFailure ?
