@@ -21,9 +21,9 @@ public sealed class UsersController : BaseApiController
         var command = new CreateUserCommand(request.Name, request.Email, request.Document, request.Password);
         var result = await Sender.Send(command, cancellationToken);
 
-        return result.IsFailure ? 
-            ToErrorResult(result) : 
-            CreatedAtAction(nameof(Create), new { id = result.Value }, new { id = result.Value });
+        return result.IsFailure ?
+            ToErrorResult(result) :
+            CreatedAtAction(nameof(Create), new { id = result.Value.Id }, result.Value);
     }
 
     /// <summary>Gets a user by ID.</summary>
