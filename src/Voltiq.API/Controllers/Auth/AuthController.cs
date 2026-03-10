@@ -13,6 +13,7 @@ public sealed class AuthController : BaseApiController
     /// <response code="200">Authentication successful.</response>
     /// <response code="400">Validation error.</response>
     /// <response code="401">Invalid credentials.</response>
+    [AllowAnonymous]
     [HttpPost("login")]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -31,7 +32,6 @@ public sealed class AuthController : BaseApiController
     /// <response code="200">Current user data.</response>
     /// <response code="401">Token missing or invalid.</response>
     /// <response code="404">User no longer exists.</response>
-    [Authorize]
     [HttpGet("me")]
     [ProducesResponseType(typeof(GetUserResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
