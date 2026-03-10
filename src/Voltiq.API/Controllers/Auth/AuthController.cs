@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Voltiq.Application.Features.Auth.Commands.Login;
 using Voltiq.Application.Features.Users.Queries.GetCurrentUser;
-using Voltiq.Application.Features.Users.Queries.GetUser;
+using Voltiq.Application.Mappings.Auth;
 
 namespace Voltiq.API.Controllers.Auth;
 
@@ -22,7 +22,7 @@ public sealed class AuthController : BaseApiController
         [FromBody] LoginRequest request,
         CancellationToken cancellationToken)
     {
-        var command = new LoginCommand(request.Email, request.Password);
+        var command = request.ToCommand();
         var result = await Sender.Send(command, cancellationToken);
 
         return result.IsFailure ? ToErrorResult(result) : Ok(result.Value);
