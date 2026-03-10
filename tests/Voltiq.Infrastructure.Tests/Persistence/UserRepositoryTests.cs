@@ -78,4 +78,32 @@ public class UserRepositoryTests : IAsyncLifetime
 
         exists.ShouldBeTrue();
     }
+
+    [Fact]
+    public async Task GetByEmailAsync_ShouldReturnUser_WhenEmailExists()
+    {
+        var email = Email.Create("carlos@example.com").Value;
+        var document = Document.Create("153.509.460-56").Value;
+        var user = User.Create("Carlos Souza", email, document, "$argon2id$hash");
+
+        await _repository.AddAsync(user);
+        await _unitOfWork.SaveChangesAsync();
+
+        var found = await _userRepository.GetByEmailAsync(email);
+
+        found.ShouldNotBeNull();
+        found!.Id.ShouldBe(user.Id);
+        found.Name.ShouldBe("Carlos Souza");
+        found.Email.Value.ShouldBe("carlos@example.com");
+    }
+
+    [Fact]
+    public async Task GetByEmailAsync_ShouldReturnNull_WhenEmailNotFound()
+    {
+        var email = Email.Create("naoexiste@example.com").Value;
+
+        var found = await _userRepository.GetByEmailAsync(email);
+
+        found.ShouldBeNull();
+    }
 }

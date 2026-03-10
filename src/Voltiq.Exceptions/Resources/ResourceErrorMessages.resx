@@ -119,6 +119,12 @@
     <value>Já existe um usuário cadastrado com este documento.</value>
   </data>
 
+  <!-- ═══════════════════════════════ Aplicação — Auth ════════════════════ -->
+
+  <data name="LOGIN_CREDENCIAIS_INVALIDAS" xml:space="preserve">
+    <value>E-mail ou senha inválidos.</value>
+  </data>
+
   <!-- ═══════════════════════════════ API — títulos HTTP ════════════════════ -->
 
   <data name="TITULO_FALHA_VALIDACAO" xml:space="preserve">
