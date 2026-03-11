@@ -1,0 +1,46 @@
+using MediatR;
+using Voltiq.Application.Common.Interfaces;
+using Voltiq.Application.Features.Auth.Commands.Login;
+using Voltiq.Domain.Common;
+using Voltiq.Domain.Entities;
+using Voltiq.Domain.Interfaces;
+using Voltiq.Domain.Interfaces.Repositories;
+using Voltiq.Domain.Interfaces.Repositories.User;
+using Voltiq.Exceptions.Errors;
+using Voltiq.Exceptions.Resources;
+
+namespace Voltiq.Application.Features.Auth.Commands.Refresh;
+
+public sealed class RefreshTokenCommandHandler(
+    IRefreshTokenRepository refreshTokenRepository,
+    IUserRepository userRepository,
+    ITokenService tokenService,
+    IUnitOfWork unitOfWork)
+    : IRequestHandler<RefreshTokenCommand, Result<LoginResponse>>
+{
+    public async Task<Result<LoginResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    {
+        var refreshToken = await refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
+
+        if (refreshToken is null || !refreshToken.IsActive)
+            return Result<LoginResponse>.Failure(
+                new UnauthorizedError(ResourceErrorMessages.REFRESH_TOKEN_INVALIDO));
+
+        var user = await userRepository.GetByIdAsync(refreshToken.UserId, cancellationToken);
+
+        if (user is null)
+            return Result<LoginResponse>.Failure(
+                new UnauthorizedError(ResourceErrorMessages.REFRESH_TOKEN_INVALIDO));
+
+        refreshToken.Revoke();
+
+        var newAccessToken = tokenService.GenerateAccessToken(user.Id.ToString(), user.Name, []);
+        var newRawRefreshToken = tokenService.GenerateRefreshToken();
+
+        var newRefreshToken = RefreshToken.Create(newRawRefreshToken, user.Id, expiresInDays: 7);
+        await refreshTokenRepository.AddAsync(newRefreshToken, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result<LoginResponse>.Success(new LoginResponse(newAccessToken, newRawRefreshToken));
+    }
+}
