@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -9,7 +10,7 @@ namespace Voltiq.Infrastructure.Auth;
 
 public class TokenService(IConfiguration configuration) : ITokenService
 {
-    public string GenerateToken(string userId, string userName, IEnumerable<string> roles)
+    public string GenerateAccessToken(string userId, string userName, IEnumerable<string> roles)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
         var secretKey = jwtSettings["SecretKey"]
@@ -37,5 +38,11 @@ public class TokenService(IConfiguration configuration) : ITokenService
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public string GenerateRefreshToken()
+    {
+        var bytes = RandomNumberGenerator.GetBytes(64);
+        return Convert.ToBase64String(bytes);
     }
 }
