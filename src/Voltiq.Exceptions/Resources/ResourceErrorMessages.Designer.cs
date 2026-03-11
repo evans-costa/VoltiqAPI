@@ -153,6 +153,12 @@ public static class ResourceErrorMessages
     public static string LOGIN_CREDENCIAIS_INVALIDAS
         => ResourceManager.GetString(nameof(LOGIN_CREDENCIAIS_INVALIDAS))!;
 
+    /// <summary>
+    ///   Looks up a localized string similar to Refresh token inválido.
+    /// </summary>
+    public static string REFRESH_TOKEN_INVALIDO
+        => ResourceManager.GetString(nameof(REFRESH_TOKEN_INVALIDO))!;
+
     // ── API — títulos HTTP ─────────────────────────────────────────────────
 
     /// <summary>
