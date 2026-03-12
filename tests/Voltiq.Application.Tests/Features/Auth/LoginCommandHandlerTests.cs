@@ -8,6 +8,7 @@ using Voltiq.Domain.Interfaces.Repositories;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Errors;
+using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Auth;
 
@@ -74,6 +75,7 @@ public class LoginCommandHandlerTests
 
         result.IsFailure.ShouldBeTrue();
         result.FirstError.ShouldBeOfType<UnauthorizedError>();
+        result.FirstError.Message.ShouldBe(ResourceErrorMessages.LOGIN_CREDENCIAIS_INVALIDAS);
         _tokenServiceMock.Verify(
             t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
             Times.Never);
@@ -97,6 +99,7 @@ public class LoginCommandHandlerTests
 
         result.IsFailure.ShouldBeTrue();
         result.FirstError.ShouldBeOfType<UnauthorizedError>();
+        result.FirstError.Message.ShouldBe(ResourceErrorMessages.LOGIN_CREDENCIAIS_INVALIDAS);
         _tokenServiceMock.Verify(
             t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
             Times.Never);

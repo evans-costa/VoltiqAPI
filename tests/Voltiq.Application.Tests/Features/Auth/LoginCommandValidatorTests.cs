@@ -1,5 +1,6 @@
 using FluentValidation.TestHelper;
 using Voltiq.Application.Features.Auth.Commands.Login;
+using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Auth;
 
@@ -20,7 +21,8 @@ public class LoginCommandValidatorTests
     {
         var command = new LoginCommand("", "senha123");
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.Email);
+        result.ShouldHaveValidationErrorFor(x => x.Email)
+            .WithErrorMessage(ResourceErrorMessages.USUARIO_EMAIL_OBRIGATORIO);
     }
 
     [Fact]
@@ -28,7 +30,8 @@ public class LoginCommandValidatorTests
     {
         var command = new LoginCommand("nao-e-email", "senha123");
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.Email);
+        result.ShouldHaveValidationErrorFor(x => x.Email)
+            .WithErrorMessage(ResourceErrorMessages.USUARIO_EMAIL_INVALIDO);
     }
 
     [Fact]
@@ -36,6 +39,7 @@ public class LoginCommandValidatorTests
     {
         var command = new LoginCommand("joao@example.com", "");
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.Password);
+        result.ShouldHaveValidationErrorFor(x => x.Password)
+            .WithErrorMessage(ResourceErrorMessages.USUARIO_SENHA_OBRIGATORIA);
     }
 }

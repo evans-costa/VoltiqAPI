@@ -7,6 +7,7 @@ using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Errors;
+using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Users;
 
@@ -65,6 +66,7 @@ public class CreateUserCommandHandlerTests
 
         result.IsFailure.ShouldBeTrue();
         result.FirstError.ShouldBeOfType<ConflictError>();
+        result.FirstError.Message.ShouldBe(ResourceErrorMessages.USUARIO_EMAIL_JA_CADASTRADO);
         _userRepoMock.Verify(r => r.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
         _tokenServiceMock.Verify(
             t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
