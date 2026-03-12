@@ -1,14 +1,14 @@
+using System.Reflection;
+using ErrorOr;
 using FluentValidation;
 using MediatR;
-using Voltiq.Domain.Common;
-using Voltiq.Exceptions.Errors;
 
 namespace Voltiq.Application.Common.Behaviors;
 
 public sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
-    where TResponse : Result
+    where TResponse : IErrorOr
 {
     public async Task<TResponse> Handle(
         TRequest request,
@@ -30,7 +30,7 @@ public sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidat
             return await next(cancellationToken);
 
         var errors = failures
-            .Select(Error (f) => new ValidationError(f.PropertyName, f.ErrorMessage))
+            .Select(f => Error.Validation(code: f.PropertyName, description: f.ErrorMessage))
             .ToList();
 
         return CreateFailure(errors);
@@ -40,17 +40,14 @@ public sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidat
     {
         var responseType = typeof(TResponse);
 
-        if (responseType == typeof(Result))
-            return (TResponse)Result.Failure(errors);
-
-        if (responseType.IsGenericType && responseType.GetGenericTypeDefinition() == typeof(Result<>))
+        if (responseType.IsGenericType && responseType.GetGenericTypeDefinition() == typeof(ErrorOr<>))
         {
             var typeArg = responseType.GetGenericArguments()[0];
-            var failureMethod = typeof(Result<>)
+            var implicitOp = typeof(ErrorOr<>)
                 .MakeGenericType(typeArg)
-                .GetMethod(nameof(Result<object>.Failure), [typeof(IReadOnlyList<Error>)])!;
+                .GetMethod("op_Implicit", BindingFlags.Static | BindingFlags.Public, [typeof(List<Error>)])!;
 
-            return (TResponse)failureMethod.Invoke(null, [errors.AsReadOnly()])!;
+            return (TResponse)implicitOp.Invoke(null, [errors])!;
         }
 
         throw new InvalidOperationException($"Unexpected TResponse type: {responseType}");
