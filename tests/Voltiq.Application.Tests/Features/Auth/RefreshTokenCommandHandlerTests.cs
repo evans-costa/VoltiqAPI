@@ -91,6 +91,8 @@ public class RefreshTokenCommandHandlerTests
         await CreateHandler().Handle(new("active-token"), CancellationToken.None);
 
         activeToken.IsRevoked.ShouldBeTrue();
+        activeToken.IsActive.ShouldBeFalse();
+        activeToken.RevokedAt.ShouldNotBeNull();
     }
 
     [Fact]
@@ -111,6 +113,7 @@ public class RefreshTokenCommandHandlerTests
         var result = await CreateHandler().Handle(new("active-token"), CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
+        result.Value.ShouldBeOfType<AuthResponse>();
         result.Value.AccessToken.ShouldBe("new-access-token");
         result.Value.RefreshToken.ShouldBe("new-refresh-token");
     }
