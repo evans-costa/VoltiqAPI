@@ -79,6 +79,25 @@ public class RefreshTokenCommandHandlerTests
     }
 
     [Fact]
+    public async Task Handle_WhenUserNotFoundAfterValidToken_ReturnsUnauthorizedWithInvalidMessage()
+    {
+        var activeToken = RefreshToken.Create("active-token", Guid.NewGuid(), expiresInDays: 7);
+
+        _refreshTokenRepoMock
+            .Setup(r => r.GetByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(activeToken);
+        _userRepoMock
+            .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((User?)null);
+
+        var result = await CreateHandler().Handle(new("active-token"), CancellationToken.None);
+
+        result.IsFailure.ShouldBeTrue();
+        result.FirstError.ShouldBeOfType<UnauthorizedError>();
+        result.FirstError.Message.ShouldBe(ResourceErrorMessages.REFRESH_TOKEN_INVALIDO);
+    }
+
+    [Fact]
     public async Task Handle_WhenTokenValid_RevokesOldToken()
     {
         var user = MakeUser();
