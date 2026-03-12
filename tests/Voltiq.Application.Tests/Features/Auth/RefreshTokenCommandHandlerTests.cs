@@ -1,3 +1,4 @@
+using ErrorOr;
 using Moq;
 using Shouldly;
 using Voltiq.Application.Common.Interfaces;
@@ -7,7 +8,6 @@ using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
-using Voltiq.Exceptions.Errors;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Auth;
@@ -39,9 +39,9 @@ public class RefreshTokenCommandHandlerTests
 
         var result = await CreateHandler().Handle(new("invalid-token"), CancellationToken.None);
 
-        result.IsFailure.ShouldBeTrue();
-        result.FirstError.ShouldBeOfType<UnauthorizedError>();
-        result.FirstError.Message.ShouldBe(ResourceErrorMessages.REFRESH_TOKEN_NAO_ENCONTRADO);
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Type.ShouldBe(ErrorType.Unauthorized);
+        result.FirstError.Description.ShouldBe(ResourceErrorMessages.REFRESH_TOKEN_NAO_ENCONTRADO);
     }
 
     [Fact]
@@ -53,11 +53,11 @@ public class RefreshTokenCommandHandlerTests
             .Setup(r => r.GetByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expiredToken);
 
-        var result = await CreateHandler().Handle(new("expired-token"), CancellationToken.None);
+        var result = await CreateHandler().Handle(new RefreshTokenCommand("expired-token"), CancellationToken.None);
 
-        result.IsFailure.ShouldBeTrue();
-        result.FirstError.ShouldBeOfType<UnauthorizedError>();
-        result.FirstError.Message.ShouldBe(ResourceErrorMessages.REFRESH_TOKEN_EXPIRADO);
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Type.ShouldBe(ErrorType.Unauthorized);
+        result.FirstError.Description.ShouldBe(ResourceErrorMessages.REFRESH_TOKEN_EXPIRADO);
         _userRepoMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
@@ -71,11 +71,11 @@ public class RefreshTokenCommandHandlerTests
             .Setup(r => r.GetByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(revokedToken);
 
-        var result = await CreateHandler().Handle(new("revoked-token"), CancellationToken.None);
+        var result = await CreateHandler().Handle(new RefreshTokenCommand("revoked-token"), CancellationToken.None);
 
-        result.IsFailure.ShouldBeTrue();
-        result.FirstError.ShouldBeOfType<UnauthorizedError>();
-        result.FirstError.Message.ShouldBe(ResourceErrorMessages.REFRESH_TOKEN_INVALIDO);
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Type.ShouldBe(ErrorType.Unauthorized);
+        result.FirstError.Description.ShouldBe(ResourceErrorMessages.REFRESH_TOKEN_INVALIDO);
     }
 
     [Fact]
@@ -90,11 +90,11 @@ public class RefreshTokenCommandHandlerTests
             .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((User?)null);
 
-        var result = await CreateHandler().Handle(new("active-token"), CancellationToken.None);
+        var result = await CreateHandler().Handle(new RefreshTokenCommand("active-token"), CancellationToken.None);
 
-        result.IsFailure.ShouldBeTrue();
-        result.FirstError.ShouldBeOfType<UnauthorizedError>();
-        result.FirstError.Message.ShouldBe(ResourceErrorMessages.REFRESH_TOKEN_INVALIDO);
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Type.ShouldBe(ErrorType.Unauthorized);
+        result.FirstError.Description.ShouldBe(ResourceErrorMessages.REFRESH_TOKEN_INVALIDO);
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public class RefreshTokenCommandHandlerTests
         _tokenServiceMock.Setup(t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>())).Returns("new-access");
         _tokenServiceMock.Setup(t => t.GenerateRefreshToken()).Returns("new-refresh");
 
-        await CreateHandler().Handle(new("active-token"), CancellationToken.None);
+        await CreateHandler().Handle(new RefreshTokenCommand("active-token"), CancellationToken.None);
 
         activeToken.IsRevoked.ShouldBeTrue();
         activeToken.IsActive.ShouldBeFalse();
@@ -134,9 +134,9 @@ public class RefreshTokenCommandHandlerTests
         _tokenServiceMock.Setup(t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>())).Returns("new-access-token");
         _tokenServiceMock.Setup(t => t.GenerateRefreshToken()).Returns("new-refresh-token");
 
-        var result = await CreateHandler().Handle(new("active-token"), CancellationToken.None);
+        var result = await CreateHandler().Handle(new RefreshTokenCommand("active-token"), CancellationToken.None);
 
-        result.IsSuccess.ShouldBeTrue();
+        result.IsError.ShouldBeFalse();
         result.Value.ShouldBeOfType<AuthResponse>();
         result.Value.AccessToken.ShouldBe("new-access-token");
         result.Value.RefreshToken.ShouldBe("new-refresh-token");

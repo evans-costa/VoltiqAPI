@@ -1,3 +1,4 @@
+using ErrorOr;
 using Moq;
 using Shouldly;
 using Voltiq.Application.Common.Interfaces;
@@ -6,7 +7,6 @@ using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
-using Voltiq.Exceptions.Errors;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Users;
@@ -42,7 +42,7 @@ public class CreateUserCommandHandlerTests
         var handler = CreateHandler();
         var result = await handler.Handle(ValidCommand(), CancellationToken.None);
 
-        result.IsSuccess.ShouldBeTrue();
+        result.IsError.ShouldBeFalse();
         result.Value.Id.ShouldNotBe(Guid.Empty);
         result.Value.Token.ShouldBe("jwt.token.here");
         _userRepoMock.Verify(r => r.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -64,9 +64,9 @@ public class CreateUserCommandHandlerTests
         var handler = CreateHandler();
         var result = await handler.Handle(ValidCommand(), CancellationToken.None);
 
-        result.IsFailure.ShouldBeTrue();
-        result.FirstError.ShouldBeOfType<ConflictError>();
-        result.FirstError.Message.ShouldBe(ResourceErrorMessages.USUARIO_EMAIL_JA_CADASTRADO);
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Type.ShouldBe(ErrorType.Conflict);
+        result.FirstError.Description.ShouldBe(ResourceErrorMessages.USUARIO_EMAIL_JA_CADASTRADO);
         _userRepoMock.Verify(r => r.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
         _tokenServiceMock.Verify(
             t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),

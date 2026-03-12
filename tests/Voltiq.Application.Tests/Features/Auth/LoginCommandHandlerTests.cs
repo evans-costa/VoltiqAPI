@@ -1,3 +1,4 @@
+using ErrorOr;
 using Moq;
 using Shouldly;
 using Voltiq.Application.Common.Interfaces;
@@ -7,7 +8,6 @@ using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
-using Voltiq.Exceptions.Errors;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Auth;
@@ -58,7 +58,7 @@ public class LoginCommandHandlerTests
         var handler = CreateHandler();
         var result = await handler.Handle(ValidCommand(), CancellationToken.None);
 
-        result.IsSuccess.ShouldBeTrue();
+        result.IsError.ShouldBeFalse();
         result.Value.AccessToken.ShouldBe("jwt.token.here");
         result.Value.RefreshToken.ShouldBe("refresh.token.here");
     }
@@ -73,9 +73,9 @@ public class LoginCommandHandlerTests
         var handler = CreateHandler();
         var result = await handler.Handle(ValidCommand(), CancellationToken.None);
 
-        result.IsFailure.ShouldBeTrue();
-        result.FirstError.ShouldBeOfType<UnauthorizedError>();
-        result.FirstError.Message.ShouldBe(ResourceErrorMessages.LOGIN_CREDENCIAIS_INVALIDAS);
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Type.ShouldBe(ErrorType.Unauthorized);
+        result.FirstError.Description.ShouldBe(ResourceErrorMessages.LOGIN_CREDENCIAIS_INVALIDAS);
         _tokenServiceMock.Verify(
             t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
             Times.Never);
@@ -97,9 +97,9 @@ public class LoginCommandHandlerTests
         var handler = CreateHandler();
         var result = await handler.Handle(ValidCommand(), CancellationToken.None);
 
-        result.IsFailure.ShouldBeTrue();
-        result.FirstError.ShouldBeOfType<UnauthorizedError>();
-        result.FirstError.Message.ShouldBe(ResourceErrorMessages.LOGIN_CREDENCIAIS_INVALIDAS);
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Type.ShouldBe(ErrorType.Unauthorized);
+        result.FirstError.Description.ShouldBe(ResourceErrorMessages.LOGIN_CREDENCIAIS_INVALIDAS);
         _tokenServiceMock.Verify(
             t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
             Times.Never);
