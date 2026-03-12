@@ -124,6 +124,16 @@
   <data name="LOGIN_CREDENCIAIS_INVALIDAS" xml:space="preserve">
     <value>E-mail ou senha inválidos.</value>
   </data>
+  <data name="REFRESH_TOKEN_INVALIDO" xml:space="preserve">
+    <value>Refresh token inválido.</value>
+  </data>
+
+  <data name="REFRESH_TOKEN_NAO_ENCONTRADO" xml:space="preserve">
+    <value>Refresh token não encontrado.</value>
+  </data>
+  <data name="REFRESH_TOKEN_EXPIRADO" xml:space="preserve">
+    <value>Refresh token expirado.</value>
+  </data>
 
   <!-- ═══════════════════════════════ API — títulos HTTP ════════════════════ -->
 

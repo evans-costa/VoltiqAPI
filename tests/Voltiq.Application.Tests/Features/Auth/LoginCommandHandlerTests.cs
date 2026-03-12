@@ -4,6 +4,7 @@ using Voltiq.Application.Common.Interfaces;
 using Voltiq.Application.Features.Auth.Commands.Login;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
+using Voltiq.Domain.Interfaces.Repositories;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Errors;
@@ -15,9 +16,12 @@ public class LoginCommandHandlerTests
     private readonly Mock<IUserRepository> _userRepoMock = new();
     private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
     private readonly Mock<ITokenService> _tokenServiceMock = new();
+    private readonly Mock<IRefreshTokenRepository> _refreshTokenRepoMock = new();
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
     private LoginCommandHandler CreateHandler() =>
-        new(_userRepoMock.Object, _passwordHasherMock.Object, _tokenServiceMock.Object);
+        new(_userRepoMock.Object, _passwordHasherMock.Object, _tokenServiceMock.Object,
+            _refreshTokenRepoMock.Object, _unitOfWorkMock.Object);
 
     private static LoginCommand ValidCommand() =>
         new("joao@example.com", "S3cur3P@ssw0rd!");
@@ -43,14 +47,19 @@ public class LoginCommandHandlerTests
             .Returns(true);
 
         _tokenServiceMock
-            .Setup(t => t.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()))
+            .Setup(t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()))
             .Returns("jwt.token.here");
+
+        _tokenServiceMock
+            .Setup(t => t.GenerateRefreshToken())
+            .Returns("refresh.token.here");
 
         var handler = CreateHandler();
         var result = await handler.Handle(ValidCommand(), CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
-        result.Value.Token.ShouldBe("jwt.token.here");
+        result.Value.AccessToken.ShouldBe("jwt.token.here");
+        result.Value.RefreshToken.ShouldBe("refresh.token.here");
     }
 
     [Fact]
@@ -66,7 +75,7 @@ public class LoginCommandHandlerTests
         result.IsFailure.ShouldBeTrue();
         result.FirstError.ShouldBeOfType<UnauthorizedError>();
         _tokenServiceMock.Verify(
-            t => t.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
+            t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
             Times.Never);
     }
 
@@ -89,7 +98,7 @@ public class LoginCommandHandlerTests
         result.IsFailure.ShouldBeTrue();
         result.FirstError.ShouldBeOfType<UnauthorizedError>();
         _tokenServiceMock.Verify(
-            t => t.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
+            t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
             Times.Never);
     }
 }

@@ -36,7 +36,7 @@ public sealed class CreateUserCommandHandler(
         await userRepository.AddAsync(user, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var token = tokenService.GenerateToken(user.Id.ToString(), user.Name, []);
+        var token = tokenService.GenerateAccessToken(user.Id.ToString(), user.Name, []);
 
         return Result<CreateUserResponse>.Success(user.ToCreateUserResponse(token));
     }

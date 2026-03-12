@@ -1,4 +1,4 @@
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Voltiq.API.ExceptionHandlers;
 using Voltiq.Application;
 using Voltiq.Infrastructure;
@@ -14,26 +14,44 @@ builder.Services.AddExceptionHandler<UnauthorizedExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddOpenApi("v1", o =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Voltiq API", Version = "v1" });
-
-    var securityScheme = new OpenApiSecurityScheme
+    o.AddDocumentTransformer((document, context, cancellationToken) =>
     {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter your JWT token.",
-        Reference = new OpenApiReference { Id = "Bearer", Type = ReferenceType.SecurityScheme },
-    };
+        document.Info = new OpenApiInfo
+        {
+            Title = "Voltiq API",
+            Description = "API da aplicação Voltiq.",
+            Version = "v1",
+        };
 
-    c.AddSecurityDefinition("Bearer", securityScheme);
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { securityScheme, [] }
+        document.Servers =
+        [
+            new OpenApiServer { Url = "https://localhost:7044/", Description = "Servidor Local" },
+        ];
+
+        document.Components ??= new OpenApiComponents();
+        document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+        document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Enter your JWT token.",
+        };
+
+        document.Security ??= new List<OpenApiSecurityRequirement>();
+        document.Security.Add(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecuritySchemeReference("Bearer", document),
+                []
+            }
+        });
+
+        return Task.CompletedTask;
     });
 });
 
@@ -54,15 +72,18 @@ app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi("/docs/{documentName}.json");
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/docs/v1.json", "Voltiq API - v1");
+    });
 }
 
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers().RequireAuthorization();
+app.MapControllers().RequireAuthorization().WithGroupName("v1");
 
 app.Run();
 

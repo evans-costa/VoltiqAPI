@@ -35,7 +35,7 @@ public class CreateUserCommandHandlerTests
             .Returns("$argon2id$hashed");
 
         _tokenServiceMock
-            .Setup(t => t.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()))
+            .Setup(t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()))
             .Returns("jwt.token.here");
 
         var handler = CreateHandler();
@@ -47,7 +47,7 @@ public class CreateUserCommandHandlerTests
         _userRepoMock.Verify(r => r.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Once);
         _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         _tokenServiceMock.Verify(
-            t => t.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
+            t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
             Times.Once);
     }
 
@@ -67,7 +67,7 @@ public class CreateUserCommandHandlerTests
         result.FirstError.ShouldBeOfType<ConflictError>();
         _userRepoMock.Verify(r => r.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
         _tokenServiceMock.Verify(
-            t => t.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
+            t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
             Times.Never);
     }
 }
