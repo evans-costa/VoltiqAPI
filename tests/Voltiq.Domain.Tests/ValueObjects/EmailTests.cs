@@ -1,3 +1,4 @@
+using ErrorOr;
 using Shouldly;
 using Voltiq.Domain.ValueObjects;
 
@@ -13,7 +14,7 @@ public class EmailTests
     {
         var result = Email.Create(raw);
 
-        result.IsSuccess.ShouldBeTrue();
+        result.IsError.ShouldBeFalse();
         result.Value.Value.ShouldBe(raw.ToLowerInvariant());
     }
 
@@ -24,7 +25,7 @@ public class EmailTests
     {
         var result = Email.Create(raw);
 
-        result.IsFailure.ShouldBeTrue();
+        result.IsError.ShouldBeTrue();
         result.Errors.ShouldNotBeEmpty();
     }
 
@@ -37,7 +38,7 @@ public class EmailTests
     {
         var result = Email.Create(raw);
 
-        result.IsFailure.ShouldBeTrue();
+        result.IsError.ShouldBeTrue();
         result.Errors.ShouldNotBeEmpty();
     }
 
