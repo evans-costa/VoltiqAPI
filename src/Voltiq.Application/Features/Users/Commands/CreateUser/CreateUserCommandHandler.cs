@@ -1,12 +1,11 @@
+using ErrorOr;
 using MediatR;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Application.Mappings.Users;
-using Voltiq.Domain.Common;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
-using Voltiq.Exceptions.Errors;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Features.Users.Commands.CreateUser;
@@ -16,9 +15,9 @@ public sealed class CreateUserCommandHandler(
     IUnitOfWork unitOfWork,
     IPasswordHasher passwordHasher,
     ITokenService tokenService)
-    : IRequestHandler<CreateUserCommand, Result<CreateUserResponse>>
+    : IRequestHandler<CreateUserCommand, ErrorOr<CreateUserResponse>>
 {
-    public async Task<Result<CreateUserResponse>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<CreateUserResponse>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var email = Email.Create(request.Email).Value;
         var document = Document.Create(request.Document).Value;
@@ -27,7 +26,7 @@ public sealed class CreateUserCommandHandler(
             document, email, cancellationToken);
 
         if (userAlreadyExists)
-            return Result<CreateUserResponse>.Failure(new ConflictError(ResourceErrorMessages.USUARIO_EMAIL_JA_CADASTRADO));
+            return Error.Conflict(description: ResourceErrorMessages.USUARIO_EMAIL_JA_CADASTRADO);
 
         var passwordHash = passwordHasher.Hash(request.Password);
 
@@ -38,6 +37,6 @@ public sealed class CreateUserCommandHandler(
 
         var token = tokenService.GenerateAccessToken(user.Id.ToString(), user.Name, []);
 
-        return Result<CreateUserResponse>.Success(user.ToCreateUserResponse(token));
+        return user.ToCreateUserResponse(token);
     }
 }
