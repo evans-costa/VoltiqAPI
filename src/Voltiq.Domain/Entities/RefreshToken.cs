@@ -7,10 +7,10 @@ public sealed class RefreshToken : BaseEntity
     public DateTime ExpiresAt { get; private set; }
     public DateTime? RevokedAt { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public bool IsRevoked { get; private set; }
+    public bool IsActive { get; private set; }
 
     public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
-    public bool IsRevoked => RevokedAt.HasValue;
-    public bool IsActive => !IsExpired && !IsRevoked;
 
     private RefreshToken() { }
 
@@ -21,7 +21,14 @@ public sealed class RefreshToken : BaseEntity
             UserId = userId,
             ExpiresAt = DateTime.UtcNow.AddDays(expiresInDays),
             CreatedAt = DateTime.UtcNow,
+            IsRevoked = false,
+            IsActive = true,
         };
 
-    public void Revoke() => RevokedAt = DateTime.UtcNow;
+    public void Revoke()
+    {
+        RevokedAt = DateTime.UtcNow;
+        IsRevoked = true;
+        IsActive = false;
+    }
 }
