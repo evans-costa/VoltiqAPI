@@ -1,3 +1,4 @@
+using ErrorOr;
 using Moq;
 using Shouldly;
 using Voltiq.Application.Common.Interfaces;
@@ -5,7 +6,6 @@ using Voltiq.Application.Features.Users.Queries.GetCurrentUser;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces.Repositories;
 using Voltiq.Domain.ValueObjects;
-using Voltiq.Exceptions.Errors;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Users;
@@ -38,7 +38,7 @@ public class GetCurrentUserQueryHandlerTests
         var handler = CreateHandler();
         var result = await handler.Handle(new GetCurrentUserQuery(), CancellationToken.None);
 
-        result.IsSuccess.ShouldBeTrue();
+        result.IsError.ShouldBeFalse();
         result.Value.Name.ShouldBe("João Silva");
         result.Value.Email.ShouldBe("joao@example.com");
     }
@@ -51,9 +51,9 @@ public class GetCurrentUserQueryHandlerTests
         var handler = CreateHandler();
         var result = await handler.Handle(new GetCurrentUserQuery(), CancellationToken.None);
 
-        result.IsFailure.ShouldBeTrue();
-        result.FirstError.ShouldBeOfType<NotFoundError>();
-        result.FirstError.Message.ShouldBe(
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Type.ShouldBe(ErrorType.NotFound);
+        result.FirstError.Description.ShouldBe(
             string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), (string?)null));
         _userRepoMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
     }
@@ -70,9 +70,9 @@ public class GetCurrentUserQueryHandlerTests
         var handler = CreateHandler();
         var result = await handler.Handle(new GetCurrentUserQuery(), CancellationToken.None);
 
-        result.IsFailure.ShouldBeTrue();
-        result.FirstError.ShouldBeOfType<NotFoundError>();
-        result.FirstError.Message.ShouldBe(
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Type.ShouldBe(ErrorType.NotFound);
+        result.FirstError.Description.ShouldBe(
             string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), invalidId));
         _userRepoMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
     }
@@ -89,9 +89,9 @@ public class GetCurrentUserQueryHandlerTests
         var handler = CreateHandler();
         var result = await handler.Handle(new GetCurrentUserQuery(), CancellationToken.None);
 
-        result.IsFailure.ShouldBeTrue();
-        result.FirstError.ShouldBeOfType<NotFoundError>();
-        result.FirstError.Message.ShouldBe(
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Type.ShouldBe(ErrorType.NotFound);
+        result.FirstError.Description.ShouldBe(
             string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), id));
     }
 }

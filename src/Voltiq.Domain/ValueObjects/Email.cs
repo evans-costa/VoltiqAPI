@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
-using Voltiq.Domain.Common;
-using Voltiq.Exceptions.Errors;
+using ErrorOr;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Domain.ValueObjects;
@@ -11,17 +10,11 @@ public readonly partial record struct Email
 
     public Email(string value) => Value = value;
 
-    public static Result<Email> Create(string? raw)
+    public static ErrorOr<Email> Create(string? raw)
     {
         return TryParse(raw, out var email, out var errorMessage)
-            ? Result<Email>.Success(email)
-            : Result<Email>.Failure(new Error(errorMessage));
-    }
-    
-    public static Email FromDatabase(string value)
-    {
-        TryParse(value, out var email, out _);
-        return email;
+            ? email
+            : Error.Validation(description: errorMessage);
     }
     
     public static bool TryParse(string? raw, out Email email, out string errorMessage)

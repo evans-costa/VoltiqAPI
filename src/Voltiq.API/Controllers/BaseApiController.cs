@@ -1,8 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Voltiq.Domain.Common;
-using Voltiq.Exceptions.Errors;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.API.Controllers;
@@ -15,29 +14,29 @@ public abstract class BaseApiController : ControllerBase
     protected ISender Sender =>
         field ??= HttpContext.RequestServices.GetRequiredService<ISender>();
 
-    protected IActionResult ToErrorResult(Result result)
+    protected IActionResult ToErrorResult<T>(ErrorOr<T> result)
     {
         var firstError = result.FirstError;
 
-        return firstError switch
+        return firstError.Type switch
         {
-            ValidationError => ValidationProblem(firstError, result),
+            ErrorType.Validation => BuildValidationProblem(result.Errors),
 
-            NotFoundError notFound => Problem(
+            ErrorType.NotFound => Problem(
                 title: ResourceErrorMessages.TITULO_NAO_ENCONTRADO,
-                detail: notFound.Message,
+                detail: firstError.Description,
                 statusCode: StatusCodes.Status404NotFound,
                 instance: HttpContext.Request.Path),
 
-            ConflictError conflict => Problem(
+            ErrorType.Conflict => Problem(
                 title: ResourceErrorMessages.TITULO_CONFLITO,
-                detail: conflict.Message,
+                detail: firstError.Description,
                 statusCode: StatusCodes.Status409Conflict,
                 instance: HttpContext.Request.Path),
 
-            UnauthorizedError unauthorized => Problem(
+            ErrorType.Unauthorized => Problem(
                 title: ResourceErrorMessages.TITULO_NAO_AUTORIZADO,
-                detail: unauthorized.Message,
+                detail: firstError.Description,
                 statusCode: StatusCodes.Status401Unauthorized,
                 instance: HttpContext.Request.Path),
 
@@ -48,19 +47,19 @@ public abstract class BaseApiController : ControllerBase
         };
     }
 
-    private ObjectResult ValidationProblem(Error _, Result result)
+    private ObjectResult BuildValidationProblem(List<Error> errors)
     {
-        var errors = new Dictionary<string, string[]>();
+        var dict = new Dictionary<string, string[]>();
 
-        foreach (var error in result.Errors.OfType<ValidationError>())
+        foreach (var error in errors.Where(e => e.Type == ErrorType.Validation))
         {
-            if (!errors.ContainsKey(error.PropertyName))
-                errors[error.PropertyName] = [];
+            if (!dict.ContainsKey(error.Code))
+                dict[error.Code] = [];
 
-            errors[error.PropertyName] = [.. errors[error.PropertyName], error.Message];
+            dict[error.Code] = [.. dict[error.Code], error.Description];
         }
 
-        var problemDetails = new ValidationProblemDetails(errors)
+        var problemDetails = new ValidationProblemDetails(dict)
         {
             Title = ResourceErrorMessages.TITULO_FALHA_VALIDACAO,
             Status = StatusCodes.Status400BadRequest,
