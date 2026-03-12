@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
-using Voltiq.Domain.Common;
-using Voltiq.Exceptions.Errors;
+using ErrorOr;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Domain.ValueObjects;
@@ -15,19 +14,13 @@ public readonly partial record struct Document
 
     public Document(string value) => Value = value;
 
-    public static Result<Document> Create(string? raw)
+    public static ErrorOr<Document> Create(string? raw)
     {
         return TryParse(raw, out var document, out var errorMessage)
-            ? Result<Document>.Success(document)
-            : Result<Document>.Failure(new Error(errorMessage));
+            ? document
+            : Error.Validation(description: errorMessage);
     }
     
-    public static Document FromDatabase(string value)
-    {
-        TryParse(value, out var doc, out _);
-        return doc;
-    }
-
     public static bool TryParse(string? raw, out Document document, out string errorMessage)
     {
         document = default;
