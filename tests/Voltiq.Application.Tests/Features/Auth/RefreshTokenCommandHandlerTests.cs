@@ -8,6 +8,7 @@ using Voltiq.Domain.Interfaces.Repositories;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Errors;
+using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Auth;
 
@@ -30,7 +31,7 @@ public class RefreshTokenCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenTokenNotFound_ReturnsUnauthorizedFailure()
+    public async Task Handle_WhenTokenNotFound_ReturnsUnauthorizedWithNotFoundMessage()
     {
         _refreshTokenRepoMock
             .Setup(r => r.GetByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -40,10 +41,11 @@ public class RefreshTokenCommandHandlerTests
 
         result.IsFailure.ShouldBeTrue();
         result.FirstError.ShouldBeOfType<UnauthorizedError>();
+        result.FirstError.Message.ShouldBe(ResourceErrorMessages.REFRESH_TOKEN_NAO_ENCONTRADO);
     }
 
     [Fact]
-    public async Task Handle_WhenTokenExpired_ReturnsUnauthorizedFailure()
+    public async Task Handle_WhenTokenExpired_ReturnsUnauthorizedWithExpiredMessage()
     {
         var expiredToken = RefreshToken.Create("expired-token", Guid.NewGuid(), expiresInDays: -1);
 
@@ -55,10 +57,12 @@ public class RefreshTokenCommandHandlerTests
 
         result.IsFailure.ShouldBeTrue();
         result.FirstError.ShouldBeOfType<UnauthorizedError>();
+        result.FirstError.Message.ShouldBe(ResourceErrorMessages.REFRESH_TOKEN_EXPIRADO);
+        _userRepoMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public async Task Handle_WhenTokenRevoked_ReturnsUnauthorizedFailure()
+    public async Task Handle_WhenTokenRevoked_ReturnsUnauthorizedWithInvalidMessage()
     {
         var revokedToken = RefreshToken.Create("revoked-token", Guid.NewGuid(), expiresInDays: 7);
         revokedToken.Revoke();
@@ -71,6 +75,7 @@ public class RefreshTokenCommandHandlerTests
 
         result.IsFailure.ShouldBeTrue();
         result.FirstError.ShouldBeOfType<UnauthorizedError>();
+        result.FirstError.Message.ShouldBe(ResourceErrorMessages.REFRESH_TOKEN_INVALIDO);
     }
 
     [Fact]
