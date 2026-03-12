@@ -1,3 +1,4 @@
+using ErrorOr;
 using Shouldly;
 using Voltiq.Domain.ValueObjects;
 
@@ -13,7 +14,7 @@ public class DocumentTests
     {
         var result = Document.Create(raw);
 
-        result.IsSuccess.ShouldBeTrue();
+        result.IsError.ShouldBeFalse();
         result.Value.Value.ShouldNotBeNullOrWhiteSpace();
     }
 
@@ -25,7 +26,7 @@ public class DocumentTests
     {
         var result = Document.Create(raw);
 
-        result.IsSuccess.ShouldBeTrue();
+        result.IsError.ShouldBeFalse();
         result.Value.Value.ShouldNotBeNullOrWhiteSpace();
     }
 
@@ -37,7 +38,7 @@ public class DocumentTests
     {
         var result = Document.Create(raw!);
 
-        result.IsFailure.ShouldBeTrue();
+        result.IsError.ShouldBeTrue();
         result.Errors.ShouldNotBeEmpty();
     }
 
@@ -50,7 +51,7 @@ public class DocumentTests
     {
         var result = Document.Create(raw);
 
-        result.IsFailure.ShouldBeTrue();
+        result.IsError.ShouldBeTrue();
         result.Errors.ShouldNotBeEmpty();
     }
 
