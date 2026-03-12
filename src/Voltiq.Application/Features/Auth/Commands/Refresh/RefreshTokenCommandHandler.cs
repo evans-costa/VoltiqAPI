@@ -1,6 +1,5 @@
 using MediatR;
 using Voltiq.Application.Common.Interfaces;
-using Voltiq.Application.Features.Auth.Commands.Login;
 using Voltiq.Domain.Common;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
@@ -16,20 +15,20 @@ public sealed class RefreshTokenCommandHandler(
     IUserRepository userRepository,
     ITokenService tokenService,
     IUnitOfWork unitOfWork)
-    : IRequestHandler<RefreshTokenCommand, Result<LoginResponse>>
+    : IRequestHandler<RefreshTokenCommand, Result<AuthResponse>>
 {
-    public async Task<Result<LoginResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public async Task<Result<AuthResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         var refreshToken = await refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
 
         if (refreshToken is null || !refreshToken.IsActive)
-            return Result<LoginResponse>.Failure(
+            return Result<AuthResponse>.Failure(
                 new UnauthorizedError(ResourceErrorMessages.REFRESH_TOKEN_INVALIDO));
 
         var user = await userRepository.GetByIdAsync(refreshToken.UserId, cancellationToken);
 
         if (user is null)
-            return Result<LoginResponse>.Failure(
+            return Result<AuthResponse>.Failure(
                 new UnauthorizedError(ResourceErrorMessages.REFRESH_TOKEN_INVALIDO));
 
         refreshToken.Revoke();
@@ -41,6 +40,6 @@ public sealed class RefreshTokenCommandHandler(
         await refreshTokenRepository.AddAsync(newRefreshToken, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result<LoginResponse>.Success(new LoginResponse(newAccessToken, newRawRefreshToken));
+        return Result<AuthResponse>.Success(new AuthResponse(newAccessToken, newRawRefreshToken));
     }
 }
