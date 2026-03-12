@@ -23,7 +23,7 @@ public sealed class UsersController : BaseApiController
         var command = request.ToCommand();
         var result = await Sender.Send(command, cancellationToken);
 
-        return result.IsFailure ?
+        return result.IsError ?
             ToErrorResult(result) :
             CreatedAtAction(nameof(Create), new { id = result.Value.Id }, result.Value);
     }
