@@ -6,6 +6,7 @@ using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces.Repositories;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Errors;
+using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Users;
 
@@ -52,6 +53,8 @@ public class GetCurrentUserQueryHandlerTests
 
         result.IsFailure.ShouldBeTrue();
         result.FirstError.ShouldBeOfType<NotFoundError>();
+        result.FirstError.Message.ShouldBe(
+            string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), (string?)null));
         _userRepoMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -69,6 +72,8 @@ public class GetCurrentUserQueryHandlerTests
 
         result.IsFailure.ShouldBeTrue();
         result.FirstError.ShouldBeOfType<NotFoundError>();
+        result.FirstError.Message.ShouldBe(
+            string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), invalidId));
         _userRepoMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -86,5 +91,7 @@ public class GetCurrentUserQueryHandlerTests
 
         result.IsFailure.ShouldBeTrue();
         result.FirstError.ShouldBeOfType<NotFoundError>();
+        result.FirstError.Message.ShouldBe(
+            string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), id));
     }
 }
