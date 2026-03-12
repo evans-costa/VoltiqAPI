@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.API.Controllers;
@@ -14,58 +15,54 @@ public abstract class BaseApiController : ControllerBase
     protected ISender Sender =>
         field ??= HttpContext.RequestServices.GetRequiredService<ISender>();
 
-    protected IActionResult ToErrorResult<T>(ErrorOr<T> result)
+    protected IActionResult ToErrorResult(List<Error>? errors)
     {
-        var firstError = result.FirstError;
-
-        return firstError.Type switch
+        if (errors is null || errors.Count == 0)
         {
-            ErrorType.Validation => BuildValidationProblem(result.Errors),
-
-            ErrorType.NotFound => Problem(
-                title: ResourceErrorMessages.TITULO_NAO_ENCONTRADO,
-                detail: firstError.Description,
-                statusCode: StatusCodes.Status404NotFound,
-                instance: HttpContext.Request.Path),
-
-            ErrorType.Conflict => Problem(
-                title: ResourceErrorMessages.TITULO_CONFLITO,
-                detail: firstError.Description,
-                statusCode: StatusCodes.Status409Conflict,
-                instance: HttpContext.Request.Path),
-
-            ErrorType.Unauthorized => Problem(
-                title: ResourceErrorMessages.TITULO_NAO_AUTORIZADO,
-                detail: firstError.Description,
-                statusCode: StatusCodes.Status401Unauthorized,
-                instance: HttpContext.Request.Path),
-
-            _ => Problem(
-                title: ResourceErrorMessages.TITULO_ERRO_INESPERADO,
-                statusCode: StatusCodes.Status500InternalServerError,
-                instance: HttpContext.Request.Path)
-        };
-    }
-
-    private ObjectResult BuildValidationProblem(List<Error> errors)
-    {
-        var dict = new Dictionary<string, string[]>();
-
-        foreach (var error in errors.Where(e => e.Type == ErrorType.Validation))
-        {
-            if (!dict.ContainsKey(error.Code))
-                dict[error.Code] = [];
-
-            dict[error.Code] = [.. dict[error.Code], error.Description];
+            return Problem(title: ResourceErrorMessages.TITULO_ERRO_INESPERADO, statusCode: 500);
         }
 
-        var problemDetails = new ValidationProblemDetails(dict)
+        return errors.All(error => error.Type == ErrorType.Validation) ? 
+            BuildValidationProblem(errors) : 
+            BuildProblem(errors[0]);
+    }
+
+    private ObjectResult BuildProblem(Error error)
+    {
+        var statusCode = error.Type switch
         {
-            Title = ResourceErrorMessages.TITULO_FALHA_VALIDACAO,
-            Status = StatusCodes.Status400BadRequest,
-            Instance = HttpContext.Request.Path,
+            ErrorType.Conflict => StatusCodes.Status409Conflict,
+            ErrorType.Validation => StatusCodes.Status400BadRequest,
+            ErrorType.NotFound => StatusCodes.Status404NotFound,
+            ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
+            _ => StatusCodes.Status500InternalServerError
         };
 
-        return new ObjectResult(problemDetails) { StatusCode = StatusCodes.Status400BadRequest };
+        var title = error.Type switch
+        {
+            ErrorType.Conflict => ResourceErrorMessages.TITULO_CONFLITO,
+            ErrorType.NotFound => ResourceErrorMessages.TITULO_NAO_ENCONTRADO,
+            ErrorType.Unauthorized => ResourceErrorMessages.TITULO_NAO_AUTORIZADO,
+            _ => ResourceErrorMessages.TITULO_ERRO_INESPERADO
+        };
+
+        return Problem(
+            statusCode: statusCode,
+            title: title,
+            detail: error.Description);
+    }
+
+    private ActionResult BuildValidationProblem(List<Error> errors)
+    {
+        var modelStateDictionary = new ModelStateDictionary();
+
+        foreach (var error in errors)
+        {
+            modelStateDictionary.AddModelError(
+                error.Code,
+                error.Description);
+        }
+        
+        return ValidationProblem(modelStateDictionary);
     }
 }

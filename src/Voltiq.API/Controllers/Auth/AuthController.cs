@@ -24,8 +24,10 @@ public sealed class AuthController : BaseApiController
     {
         var command = request.ToCommand();
         var result = await Sender.Send(command, cancellationToken);
-
-        return result.IsError ? ToErrorResult(result) : Ok(result.Value);
+        
+        return result.Match(
+            Ok,
+            ToErrorResult);
     }
 
     /// <summary>Exchanges a valid refresh token for a new access token and refresh token (rotation).</summary>
@@ -43,7 +45,9 @@ public sealed class AuthController : BaseApiController
     {
         var result = await Sender.Send(request.ToCommand(), cancellationToken);
 
-        return result.IsError ? ToErrorResult(result) : Ok(result.Value);
+        return result.Match(
+            Ok,
+            ToErrorResult);
     }
 
     /// <summary>Returns the currently authenticated user.</summary>
@@ -58,6 +62,8 @@ public sealed class AuthController : BaseApiController
     {
         var result = await Sender.Send(new GetCurrentUserQuery(), cancellationToken);
 
-        return result.IsError ? ToErrorResult(result) : Ok(result.Value);
+        return result.Match(
+            Ok,
+            ToErrorResult);
     }
 }

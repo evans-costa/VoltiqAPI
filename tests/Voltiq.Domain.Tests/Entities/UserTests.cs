@@ -8,8 +8,8 @@ namespace Voltiq.Domain.Tests.Entities;
 
 public class UserTests
 {
-    private const string ValidName = "João Silva";
-    private const string ValidPasswordHash = "$argon2id$hashed";
+    private const string VALID_NAME = "João Silva";
+    private const string VALID_PASSWORD_HASH = "$argon2id$hashed";
 
     private static Email ValidEmail() => Email.Create("joao@example.com").Value;
     private static Document ValidDocument() => Document.Create("529.982.247-25").Value;
@@ -17,19 +17,19 @@ public class UserTests
     [Fact]
     public void Create_WithValidData_ShouldCreateUser()
     {
-        var user = User.Create(ValidName, ValidEmail(), ValidDocument(), ValidPasswordHash);
+        var user = User.Create(VALID_NAME, ValidEmail(), ValidDocument(), VALID_PASSWORD_HASH);
 
         user.Id.ShouldNotBe(Guid.Empty);
-        user.Name.ShouldBe(ValidName);
+        user.Name.ShouldBe(VALID_NAME);
         user.Email.Value.ShouldBe("joao@example.com");
         user.Document.Value.ShouldNotBeNullOrWhiteSpace();
-        user.PasswordHash.ShouldBe(ValidPasswordHash);
+        user.PasswordHash.ShouldBe(VALID_PASSWORD_HASH);
     }
 
     [Fact]
     public void Create_ShouldRaise_UserCreatedEvent()
     {
-        var user = User.Create(ValidName, ValidEmail(), ValidDocument(), ValidPasswordHash);
+        var user = User.Create(VALID_NAME, ValidEmail(), ValidDocument(), VALID_PASSWORD_HASH);
 
         user.DomainEvents.ShouldContain(e => e is UserCreatedEvent);
     }
@@ -41,7 +41,7 @@ public class UserTests
     public void Create_WithNullOrEmptyName_ShouldThrowDomainException(string? name)
     {
         Should.Throw<DomainException>(() =>
-            User.Create(name!, ValidEmail(), ValidDocument(), ValidPasswordHash));
+            User.Create(name!, ValidEmail(), ValidDocument(), VALID_PASSWORD_HASH));
     }
 
     [Theory]
@@ -50,6 +50,6 @@ public class UserTests
     public void Create_WithNullOrEmptyPasswordHash_ShouldThrowDomainException(string? hash)
     {
         Should.Throw<DomainException>(() =>
-            User.Create(ValidName, ValidEmail(), ValidDocument(), hash!));
+            User.Create(VALID_NAME, ValidEmail(), ValidDocument(), hash!));
     }
 }
