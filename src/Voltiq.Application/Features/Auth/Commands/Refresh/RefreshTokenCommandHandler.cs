@@ -21,7 +21,15 @@ public sealed class RefreshTokenCommandHandler(
     {
         var refreshToken = await refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
 
-        if (refreshToken is null || !refreshToken.IsActive)
+        if (refreshToken is null)
+            return Result<AuthResponse>.Failure(
+                new UnauthorizedError(ResourceErrorMessages.REFRESH_TOKEN_NAO_ENCONTRADO));
+
+        if (refreshToken.IsExpired)
+            return Result<AuthResponse>.Failure(
+                new UnauthorizedError(ResourceErrorMessages.REFRESH_TOKEN_EXPIRADO));
+
+        if (!refreshToken.IsActive)
             return Result<AuthResponse>.Failure(
                 new UnauthorizedError(ResourceErrorMessages.REFRESH_TOKEN_INVALIDO));
 
