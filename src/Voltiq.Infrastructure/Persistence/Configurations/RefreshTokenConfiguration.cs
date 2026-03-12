@@ -20,10 +20,10 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.Property(r => r.ExpiresAt).IsRequired();
         builder.Property(r => r.CreatedAt).IsRequired();
         builder.Property(r => r.RevokedAt);
+        builder.Property(r => r.IsRevoked).IsRequired();
+        builder.Property(r => r.IsActive).IsRequired();
 
         builder.Ignore(r => r.IsExpired);
-        builder.Ignore(r => r.IsRevoked);
-        builder.Ignore(r => r.IsActive);
 
         builder.HasOne<User>()
             .WithMany()
