@@ -128,6 +128,13 @@
     <value>Refresh token inválido.</value>
   </data>
 
+  <data name="REFRESH_TOKEN_NAO_ENCONTRADO" xml:space="preserve">
+    <value>Refresh token não encontrado.</value>
+  </data>
+  <data name="REFRESH_TOKEN_EXPIRADO" xml:space="preserve">
+    <value>Refresh token expirado.</value>
+  </data>
+
   <!-- ═══════════════════════════════ API — títulos HTTP ════════════════════ -->
 
   <data name="TITULO_FALHA_VALIDACAO" xml:space="preserve">

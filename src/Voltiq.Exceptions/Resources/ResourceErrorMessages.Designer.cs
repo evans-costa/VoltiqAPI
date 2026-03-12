@@ -159,6 +159,12 @@ public static class ResourceErrorMessages
     public static string REFRESH_TOKEN_INVALIDO
         => ResourceManager.GetString(nameof(REFRESH_TOKEN_INVALIDO))!;
 
+    public static string REFRESH_TOKEN_NAO_ENCONTRADO
+        => ResourceManager.GetString(nameof(REFRESH_TOKEN_NAO_ENCONTRADO))!;
+
+    public static string REFRESH_TOKEN_EXPIRADO
+        => ResourceManager.GetString(nameof(REFRESH_TOKEN_EXPIRADO))!;
+
     // ── API — títulos HTTP ─────────────────────────────────────────────────
 
     /// <summary>
