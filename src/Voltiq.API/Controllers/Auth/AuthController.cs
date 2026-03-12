@@ -4,7 +4,6 @@ using Voltiq.Application.Features.Auth.Commands.Login;
 using Voltiq.Application.Features.Auth.Commands.Refresh;
 using Voltiq.Application.Features.Users.Queries.GetCurrentUser;
 using Voltiq.Application.Mappings.Auth;
-
 namespace Voltiq.API.Controllers.Auth;
 
 [Route("auth")]
@@ -35,15 +34,14 @@ public sealed class AuthController : BaseApiController
     /// <response code="401">Refresh token invalid, expired or revoked.</response>
     [AllowAnonymous]
     [HttpPost("refresh")]
-    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Refresh(
         [FromBody] RefreshTokenRequest request,
         CancellationToken cancellationToken)
     {
-        var command = new RefreshTokenCommand(request.RefreshToken);
-        var result = await Sender.Send(command, cancellationToken);
+        var result = await Sender.Send(request.ToCommand(), cancellationToken);
 
         return result.IsFailure ? ToErrorResult(result) : Ok(result.Value);
     }
