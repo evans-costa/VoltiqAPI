@@ -11,4 +11,4 @@ public sealed record UpdateClientCommand(
     string Number,
     string City,
     string State,
-    string ZipCode) : IRequest<ErrorOr<ClientResponse>>;
+    string ZipCode) : IRequest<ErrorOr<Updated>>;

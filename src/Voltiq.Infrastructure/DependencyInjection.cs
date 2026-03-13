@@ -7,10 +7,12 @@ using Microsoft.IdentityModel.Tokens;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories;
+using Voltiq.Domain.Interfaces.Repositories.Client;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Infrastructure.Auth;
 using Voltiq.Infrastructure.Persistence;
 using Voltiq.Infrastructure.Persistence.Repositories;
+using Voltiq.Infrastructure.Persistence.Repositories.Client;
 using Voltiq.Infrastructure.Persistence.Repositories.User;
 
 namespace Voltiq.Infrastructure;
@@ -33,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IClientRepository, ClientRepository>();
 
         services.AddScoped<IPasswordHasher, Argon2PasswordHasher>();
 

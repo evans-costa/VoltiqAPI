@@ -2,7 +2,6 @@ using ErrorOr;
 using Moq;
 using Shouldly;
 using Voltiq.Application.Common.Interfaces;
-using Voltiq.Application.Features.Clients;
 using Voltiq.Application.Features.Clients.Commands.UpdateClient;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
@@ -30,7 +29,7 @@ public class UpdateClientCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WithValidCommand_ShouldUpdateClientAndReturnResponse()
+    public async Task Handle_WithValidCommand_ShouldUpdateClientAndReturnUpdated()
     {
         var client = MakeClient(_userId);
         _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId.ToString());
@@ -46,9 +45,6 @@ public class UpdateClientCommandHandlerTests
         var result = await handler.Handle(command, CancellationToken.None);
 
         result.IsError.ShouldBeFalse();
-        result.Value.Name.ShouldBe("Maria Souza");
-        result.Value.Phone.ShouldBe("(11) 88888-8888");
-        result.Value.Street.ShouldBe("Av. Paulista");
         _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 

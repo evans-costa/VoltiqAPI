@@ -3,6 +3,7 @@ using MediatR;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories.Client;
+using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Features.Clients.Commands.DeleteClient;
 
@@ -12,6 +13,20 @@ public sealed class DeleteClientCommandHandler(
     ICurrentUserService currentUserService)
     : IRequestHandler<DeleteClientCommand, ErrorOr<Deleted>>
 {
-    public Task<ErrorOr<Deleted>> Handle(DeleteClientCommand request, CancellationToken cancellationToken)
-        => throw new NotImplementedException();
+    public async Task<ErrorOr<Deleted>> Handle(DeleteClientCommand request, CancellationToken cancellationToken)
+    {
+        if (!Guid.TryParse(currentUserService.UserId, out var userId) || userId == Guid.Empty)
+            return Error.Unauthorized(description: ResourceErrorMessages.TITULO_NAO_AUTORIZADO);
+
+        var client = await clientRepository.GetByIdAndUserIdAsync(request.Id, userId, cancellationToken);
+
+        if (client is null)
+            return Error.NotFound(description: ResourceErrorMessages.CLIENTE_NAO_ENCONTRADO);
+
+        clientRepository.Remove(client);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result.Deleted;
+    }
 }
+
