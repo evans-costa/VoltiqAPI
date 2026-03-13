@@ -11,6 +11,7 @@ public class ApplicationDbContext(
 {
     public DbSet<User> Users => Set<User>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Domain.Entities.Client> Clients => Set<Domain.Entities.Client>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
