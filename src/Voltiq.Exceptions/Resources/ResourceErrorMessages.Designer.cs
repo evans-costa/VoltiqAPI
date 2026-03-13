@@ -145,6 +145,56 @@ public static class ResourceErrorMessages
     public static string USUARIO_DOCUMENTO_JA_CADASTRADO
         => ResourceManager.GetString(nameof(USUARIO_DOCUMENTO_JA_CADASTRADO))!;
 
+    // ── Aplicação — Cliente ────────────────────────────────────────────────
+
+    /// <summary>
+    ///   Looks up a localized string similar to O nome do cliente é obrigatório.
+    /// </summary>
+    public static string CLIENTE_NOME_OBRIGATORIO
+        => ResourceManager.GetString(nameof(CLIENTE_NOME_OBRIGATORIO))!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to O telefone do cliente é obrigatório.
+    /// </summary>
+    public static string CLIENTE_TELEFONE_OBRIGATORIO
+        => ResourceManager.GetString(nameof(CLIENTE_TELEFONE_OBRIGATORIO))!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to O logradouro é obrigatório.
+    /// </summary>
+    public static string CLIENTE_ENDERECO_LOGRADOURO_OBRIGATORIO
+        => ResourceManager.GetString(nameof(CLIENTE_ENDERECO_LOGRADOURO_OBRIGATORIO))!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to O número é obrigatório.
+    /// </summary>
+    public static string CLIENTE_ENDERECO_NUMERO_OBRIGATORIO
+        => ResourceManager.GetString(nameof(CLIENTE_ENDERECO_NUMERO_OBRIGATORIO))!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to A cidade é obrigatória.
+    /// </summary>
+    public static string CLIENTE_ENDERECO_CIDADE_OBRIGATORIA
+        => ResourceManager.GetString(nameof(CLIENTE_ENDERECO_CIDADE_OBRIGATORIA))!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to O estado é obrigatório.
+    /// </summary>
+    public static string CLIENTE_ENDERECO_ESTADO_OBRIGATORIO
+        => ResourceManager.GetString(nameof(CLIENTE_ENDERECO_ESTADO_OBRIGATORIO))!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to O CEP é obrigatório.
+    /// </summary>
+    public static string CLIENTE_ENDERECO_CEP_OBRIGATORIO
+        => ResourceManager.GetString(nameof(CLIENTE_ENDERECO_CEP_OBRIGATORIO))!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Cliente não encontrado.
+    /// </summary>
+    public static string CLIENTE_NAO_ENCONTRADO
+        => ResourceManager.GetString(nameof(CLIENTE_NAO_ENCONTRADO))!;
+
     // ── Aplicação — Auth ───────────────────────────────────────────────────
 
     /// <summary>
