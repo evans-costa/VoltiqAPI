@@ -15,7 +15,6 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddProblemDetails();
-builder.Services.AddExceptionHandler<UnauthorizedExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddControllers();
@@ -75,8 +74,8 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
         policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+            .AllowAnyHeader()
+            .AllowAnyMethod());
 });
 
 var app = builder.Build();
@@ -90,10 +89,7 @@ app.UseSerilogRequestLogging();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi("/docs/{documentName}.json");
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/docs/v1.json", "Voltiq API - v1");
-    });
+    app.UseSwaggerUI(options => { options.SwaggerEndpoint("/docs/v1.json", "Voltiq API - v1"); });
 }
 
 app.UseHttpsRedirection();
@@ -103,5 +99,3 @@ app.UseAuthorization();
 app.MapControllers().RequireAuthorization();
 
 app.Run();
-
-

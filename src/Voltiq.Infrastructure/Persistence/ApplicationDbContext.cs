@@ -6,12 +6,11 @@ namespace Voltiq.Infrastructure.Persistence;
 
 public class ApplicationDbContext(
     DbContextOptions<ApplicationDbContext> options,
-    ICurrentUserService currentUserService)
-    : DbContext(options), IApplicationDbContext
+    ICurrentUserService currentUserService) : DbContext(options)
 {
     public DbSet<User> Users => Set<User>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
-    public DbSet<Domain.Entities.Client> Clients => Set<Domain.Entities.Client>();
+    public DbSet<Client> Clients => Set<Client>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Voltiq.Exceptions.Resources;
 
+// TODO: Remove this handler
 namespace Voltiq.API.ExceptionHandlers;
 
 internal sealed class UnauthorizedExceptionHandler(IHostEnvironment env) : IExceptionHandler

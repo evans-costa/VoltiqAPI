@@ -22,7 +22,7 @@ namespace Voltiq.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static void AddInfrastructure(this IServiceCollection services, 
+    public static void AddInfrastructure(this IServiceCollection services,
         IConfiguration configuration)
     {
         AddRepositories(services);
@@ -31,19 +31,19 @@ public static class DependencyInjection
         AddAuthServices(services);
         AddCryptography(services);
     }
-    
+
     private static void AddCryptography(IServiceCollection services)
     {
         services.AddScoped<IPasswordHasher, Argon2PasswordHasher>();
     }
-    
+
     private static void AddAuthServices(IServiceCollection services)
     {
         services.AddHttpContextAccessor();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
     }
-    
+
     private static void AddRepositories(IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -52,25 +52,24 @@ public static class DependencyInjection
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IClientRepository, ClientRepository>();
     }
-    
+
     private static void AddDatabase(IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        
+
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(
                 connectionString,
                 b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
-        
-        services.AddScoped<IApplicationDbContext>(sp =>
-            sp.GetRequiredService<ApplicationDbContext>());
     }
-    
-    private static void AddJwtAuthentication(IServiceCollection services, IConfiguration configuration)
+
+    private static void AddJwtAuthentication(IServiceCollection services,
+        IConfiguration configuration)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
         var secretKey = jwtSettings["SecretKey"]
-                        ?? throw new InvalidOperationException("JwtSettings:SecretKey is not configured.");
+                        ?? throw new InvalidOperationException(
+                            "JwtSettings:SecretKey is not configured.");
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
