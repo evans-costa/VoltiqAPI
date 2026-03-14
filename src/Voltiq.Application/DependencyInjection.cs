@@ -8,7 +8,7 @@ namespace Voltiq.Application;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static void AddApplication(this IServiceCollection services)
     {
         services.AddMediatR(cfg =>
         {
@@ -16,8 +16,6 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         });
 
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-
-        return services;
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly()); 
     }
 }

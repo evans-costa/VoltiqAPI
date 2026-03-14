@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Voltiq.Domain.Interfaces.Repositories.Client;
-using Voltiq.Infrastructure.Persistence;
-using Voltiq.Infrastructure.Persistence.Repositories;
 
 namespace Voltiq.Infrastructure.Persistence.Repositories.Client;
 

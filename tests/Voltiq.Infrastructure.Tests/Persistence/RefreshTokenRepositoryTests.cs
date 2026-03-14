@@ -7,6 +7,7 @@ using Voltiq.Domain.Entities;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Infrastructure.Persistence;
 using Voltiq.Infrastructure.Persistence.Repositories;
+using Voltiq.Infrastructure.Persistence.Repositories.TokenRepository;
 
 namespace Voltiq.Infrastructure.Tests.Persistence;
 
