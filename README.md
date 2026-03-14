@@ -565,11 +565,16 @@ Todas as mensagens de erro estão centralizadas em **`src/Voltiq.Exceptions/Reso
 ```
 
 **401 — Unauthorized**
+
+Retornado em dois cenários, ambos com corpo `application/problem+json`:
+- **Challenge JWT** (token ausente, inválido ou expirado) — interceptado via `JwtBearerEvents.OnChallenge`.
+- **`UnauthorizedAccessException`** lançada no código da aplicação — interceptada por `UnauthorizedExceptionHandler`.
+
 ```json
 {
   "title": "Não autorizado",
   "status": 401,
-  "instance": "/api/orders"
+  "instance": "/api/v1/clients"
 }
 ```
 
