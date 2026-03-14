@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using System.Diagnostics.CodeAnalysis;
 using ErrorOr;
 using MediatR;
@@ -8,7 +9,7 @@ using Voltiq.Exceptions.Resources;
 namespace Voltiq.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")]
 public abstract class BaseApiController : ControllerBase
 {
     [field: AllowNull, MaybeNull]
