@@ -2,7 +2,7 @@ using ErrorOr;
 using Moq;
 using Shouldly;
 using Voltiq.Application.Common.Interfaces;
-using Voltiq.Application.Features.Users.Commands.CreateUser;
+using Voltiq.Application.Features.Users.Commands.RegisterUser;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories.User;
@@ -11,17 +11,17 @@ using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Users;
 
-public class CreateUserCommandHandlerTests
+public class RegisterUserCommandHandlerTests
 {
     private readonly Mock<IUserRepository> _userRepoMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
     private readonly Mock<ITokenService> _tokenServiceMock = new();
 
-    private CreateUserCommandHandler CreateHandler() =>
+    private RegisterUserCommandHandler CreateHandler() =>
         new(_userRepoMock.Object, _unitOfWorkMock.Object, _passwordHasherMock.Object, _tokenServiceMock.Object);
 
-    private static CreateUserCommand ValidCommand() =>
+    private static RegisterUserCommand ValidCommand() =>
         new("João Silva", "joao@example.com", "529.982.247-25", "S3cur3P@ssw0rd!");
 
     [Fact]

@@ -1,14 +1,14 @@
 using FluentValidation.TestHelper;
-using Voltiq.Application.Features.Clients.Commands.CreateClient;
+using Voltiq.Application.Features.Clients.Commands.RegisterClient;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Clients.Commands;
 
-public class CreateClientCommandValidatorTests
+public class RegisterClientCommandValidatorTests
 {
-    private readonly CreateClientCommandValidator _validator = new();
+    private readonly RegisterClientCommandValidator _validator = new();
 
-    private static CreateClientCommand ValidCommand() =>
+    private static RegisterClientCommand ValidCommand() =>
         new("João Silva", "(11) 99999-9999", "Rua das Flores", "123", "São Paulo", "SP", "01310-100");
 
     [Fact]

@@ -1,6 +1,6 @@
-namespace Voltiq.Application.Features.Clients.Commands.CreateClient;
+namespace Voltiq.Application.Features.Clients.Commands.RegisterClient;
 
-public sealed record CreateClientRequest(
+public sealed record RegisterClientRequest(
     string Name,
     string Phone,
     string Street,

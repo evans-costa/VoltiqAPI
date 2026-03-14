@@ -2,11 +2,11 @@ using FluentValidation;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Resources;
 
-namespace Voltiq.Application.Features.Users.Commands.CreateUser;
+namespace Voltiq.Application.Features.Users.Commands.RegisterUser;
 
-public sealed class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
+public sealed class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {
-    public CreateUserCommandValidator()
+    public RegisterUserCommandValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage(ResourceErrorMessages.USUARIO_NOME_OBRIGATORIO);

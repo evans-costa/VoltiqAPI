@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Voltiq.Application.Features.Users.Commands.CreateUser;
+using Voltiq.Application.Features.Users.Commands.RegisterUser;
 using Voltiq.Application.Mappings.Users;
 
 namespace Voltiq.API.Controllers.Users;
@@ -10,8 +10,8 @@ namespace Voltiq.API.Controllers.Users;
 
 public sealed class UsersController : BaseApiController
 {
-    /// <summary>Creates a new user account.</summary>
-    /// <response code="201">User created successfully.</response>
+    /// <summary>Registers a new user account.</summary>
+    /// <response code="201">User registered successfully.</response>
     /// <response code="400">Validation error.</response>
     /// <response code="409">Email and/or document already in use.</response>
     [AllowAnonymous]
@@ -19,15 +19,15 @@ public sealed class UsersController : BaseApiController
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Create(
-        [FromBody] CreateUserRequest request,
+    public async Task<IActionResult> Register(
+        [FromBody] RegisterUserRequest request,
         CancellationToken cancellationToken)
     {
         var command = request.ToCommand();
         var result = await Sender.Send(command, cancellationToken);
 
         return result.Match(
-             user => CreatedAtAction(nameof(Create), new { id = user.Id }, user),
+             user => CreatedAtAction(nameof(Register), new { id = user.Id }, user),
              ToErrorResult);
     }
 }

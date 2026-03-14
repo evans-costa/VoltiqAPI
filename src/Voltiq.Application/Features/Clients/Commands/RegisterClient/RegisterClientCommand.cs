@@ -1,9 +1,9 @@
 using ErrorOr;
 using MediatR;
 
-namespace Voltiq.Application.Features.Clients.Commands.CreateClient;
+namespace Voltiq.Application.Features.Clients.Commands.RegisterClient;
 
-public sealed record CreateClientCommand(
+public sealed record RegisterClientCommand(
     string Name,
     string Phone,
     string Street,

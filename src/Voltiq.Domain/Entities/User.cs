@@ -20,10 +20,10 @@ public class User : AuditableEntity
         Email = email;
         Document = document;
         PasswordHash = passwordHash;
-        AddDomainEvent(new UserCreatedEvent(Id));
+        AddDomainEvent(new UserRegisteredEvent(Id));
     }
 
-    public static User Create(string name, Email email, Document document, string passwordHash)
+    public static User Register(string name, Email email, Document document, string passwordHash)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException(ResourceErrorMessages.NOME_OBRIGATORIO);
