@@ -119,6 +119,33 @@
     <value>Já existe um usuário cadastrado com este documento.</value>
   </data>
 
+  <!-- ═══════════════════════════════ Aplicação — Cliente ════════════════ -->
+
+  <data name="CLIENTE_NOME_OBRIGATORIO" xml:space="preserve">
+    <value>O nome do cliente é obrigatório.</value>
+  </data>
+  <data name="CLIENTE_TELEFONE_OBRIGATORIO" xml:space="preserve">
+    <value>O telefone do cliente é obrigatório.</value>
+  </data>
+  <data name="CLIENTE_ENDERECO_LOGRADOURO_OBRIGATORIO" xml:space="preserve">
+    <value>O logradouro é obrigatório.</value>
+  </data>
+  <data name="CLIENTE_ENDERECO_NUMERO_OBRIGATORIO" xml:space="preserve">
+    <value>O número é obrigatório.</value>
+  </data>
+  <data name="CLIENTE_ENDERECO_CIDADE_OBRIGATORIA" xml:space="preserve">
+    <value>A cidade é obrigatória.</value>
+  </data>
+  <data name="CLIENTE_ENDERECO_ESTADO_OBRIGATORIO" xml:space="preserve">
+    <value>O estado é obrigatório.</value>
+  </data>
+  <data name="CLIENTE_ENDERECO_CEP_OBRIGATORIO" xml:space="preserve">
+    <value>O CEP é obrigatório.</value>
+  </data>
+  <data name="CLIENTE_NAO_ENCONTRADO" xml:space="preserve">
+    <value>Cliente não encontrado.</value>
+  </data>
+
   <!-- ═══════════════════════════════ Aplicação — Auth ════════════════════ -->
 
   <data name="LOGIN_CREDENCIAIS_INVALIDAS" xml:space="preserve">

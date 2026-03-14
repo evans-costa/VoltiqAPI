@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces.Repositories;
-using Voltiq.Infrastructure.Persistence.Repositories;
 
-namespace Voltiq.Infrastructure.Persistence.Repositories;
+namespace Voltiq.Infrastructure.Persistence.Repositories.TokenRepository;
 
 public class RefreshTokenRepository(ApplicationDbContext context)
     : Repository<RefreshToken>(context), IRefreshTokenRepository
