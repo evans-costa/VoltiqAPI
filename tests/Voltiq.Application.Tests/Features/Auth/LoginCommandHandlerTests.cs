@@ -31,7 +31,7 @@ public class LoginCommandHandlerTests
     {
         var email = Email.Create("joao@example.com").Value;
         var document = Document.Create("529.982.247-25").Value;
-        return User.Create("João Silva", email, document, "$argon2id$hashed");
+        return User.Register("João Silva", email, document, "$argon2id$hashed");
     }
 
     [Fact]
@@ -48,7 +48,8 @@ public class LoginCommandHandlerTests
             .Returns(true);
 
         _tokenServiceMock
-            .Setup(t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()))
+            .Setup(t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IEnumerable<string>>()))
             .Returns("jwt.token.here");
 
         _tokenServiceMock
@@ -77,7 +78,8 @@ public class LoginCommandHandlerTests
         result.FirstError.Type.ShouldBe(ErrorType.Unauthorized);
         result.FirstError.Description.ShouldBe(ResourceErrorMessages.LOGIN_CREDENCIAIS_INVALIDAS);
         _tokenServiceMock.Verify(
-            t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
+            t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IEnumerable<string>>()),
             Times.Never);
     }
 
@@ -101,7 +103,8 @@ public class LoginCommandHandlerTests
         result.FirstError.Type.ShouldBe(ErrorType.Unauthorized);
         result.FirstError.Description.ShouldBe(ResourceErrorMessages.LOGIN_CREDENCIAIS_INVALIDAS);
         _tokenServiceMock.Verify(
-            t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()),
+            t => t.GenerateAccessToken(It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IEnumerable<string>>()),
             Times.Never);
     }
 }
