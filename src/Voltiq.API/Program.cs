@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.OpenApi;
 using Voltiq.API.ExceptionHandlers;
 using Voltiq.Application;
@@ -14,9 +15,20 @@ builder.Services.AddExceptionHandler<UnauthorizedExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddControllers();
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
 builder.Services.AddOpenApi("v1", o =>
 {
-    o.AddDocumentTransformer((document, context, cancellationToken) =>
+    o.AddDocumentTransformer((document, _, _) =>
     {
         document.Info = new OpenApiInfo
         {
@@ -27,7 +39,7 @@ builder.Services.AddOpenApi("v1", o =>
 
         document.Servers =
         [
-            new OpenApiServer { Url = "https://localhost:7044/", Description = "Servidor Local" },
+            new OpenApiServer { Url = "https://localhost:7085/", Description = "Servidor Local" },
         ];
 
         document.Components ??= new OpenApiComponents();
@@ -83,7 +95,7 @@ app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers().RequireAuthorization().WithGroupName("v1");
+app.MapControllers().RequireAuthorization();
 
 app.Run();
 
