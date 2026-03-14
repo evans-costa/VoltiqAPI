@@ -1,11 +1,15 @@
 using Asp.Versioning;
 using Microsoft.OpenApi;
+using Serilog;
 using Voltiq.API.ExceptionHandlers;
 using Voltiq.Application;
 using Voltiq.Infrastructure;
 using Voltiq.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -81,6 +85,7 @@ if (app.Environment.IsDevelopment())
     await DatabaseMigration.ApplyAsync(app.Services);
 
 app.UseExceptionHandler();
+app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())
 {
