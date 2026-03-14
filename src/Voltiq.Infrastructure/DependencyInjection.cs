@@ -1,9 +1,11 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Voltiq.Exceptions.Resources;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories;
@@ -83,6 +85,24 @@ public static class DependencyInjection
                     ValidAudience = jwtSettings["Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(secretKey)),
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = async context =>
+                    {
+                        context.HandleResponse();
+
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/problem+json";
+
+                        await context.Response.WriteAsJsonAsync(new
+                        {
+                            title = ResourceErrorMessages.TITULO_NAO_AUTORIZADO,
+                            status = StatusCodes.Status401Unauthorized,
+                            instance = context.Request.Path.Value,
+                        });
+                    },
                 };
             });
 
