@@ -1,9 +1,12 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Voltiq.Application.Features.Users.Commands.CreateUser;
 using Voltiq.Application.Mappings.Users;
 
 namespace Voltiq.API.Controllers.Users;
+
+[ApiVersion("1.0")]
 
 public sealed class UsersController : BaseApiController
 {
