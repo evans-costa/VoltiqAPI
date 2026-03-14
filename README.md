@@ -285,6 +285,50 @@ Ponto de entrada da aplicação.
 
 ---
 
+## Logging
+
+O sistema utiliza **[Serilog](https://serilog.net/)** como provider de logging, configurado inteiramente via `appsettings.json` (sem código fixo em `Program.cs`).
+
+### Sinks
+
+| Sink | Destino | Formato |
+|---|---|---|
+| **Console** | Saída padrão | `[HH:mm:ss LVL] SourceContext Mensagem` |
+| **File** | `logs/voltiq-YYYYMMDD.log` | Texto com timestamp completo, rotação diária, retém 30 arquivos |
+
+### Níveis por ambiente
+
+| Ambiente | Default | Microsoft / System | EF Core queries |
+|---|---|---|---|
+| Produção (`appsettings.json`) | `Information` | `Warning` | — |
+| Desenvolvimento (`appsettings.Development.json`) | `Debug` | `Warning` | `Information` |
+
+### Requisições HTTP
+
+`UseSerilogRequestLogging()` loga automaticamente cada requisição com método, path, status code e tempo de resposta:
+
+```
+[10:45:32 INF] HTTP GET /api/v1/clients responded 200 in 42.3 ms
+```
+
+### Personalização
+
+Para ajustar níveis ou adicionar novos sinks (ex.: Seq, Elastic), edite a seção `Serilog` em `appsettings.json`:
+
+```json
+"Serilog": {
+  "MinimumLevel": { "Default": "Information" },
+  "WriteTo": [
+    { "Name": "Console" },
+    { "Name": "File", "Args": { "path": "logs/voltiq-.log", "rollingInterval": "Day" } }
+  ]
+}
+```
+
+> O diretório `logs/` está no `.gitignore` e não é versionado.
+
+---
+
 ## Versionamento
 
 Todos os endpoints seguem o padrão `api/v{N}/...`. A versão atual é **v1**.
