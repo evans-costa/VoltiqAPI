@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Voltiq.Application.Features.Clients;
 using Voltiq.Application.Features.Clients.Commands.CreateClient;
@@ -9,7 +10,8 @@ using Voltiq.Application.Mappings.Clients;
 
 namespace Voltiq.API.Controllers.Clients;
 
-[Route("api/clients")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/clients")]
 public sealed class ClientsController : BaseApiController
 {
     /// <summary>Creates a new client for the authenticated user.</summary>

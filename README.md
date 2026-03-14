@@ -279,9 +279,66 @@ Implementações de infraestrutura.
 
 Ponto de entrada da aplicação.
 
-- **`BaseApiController`** — controller base com `[ApiController]` e `[Route("api/[controller]")]`. Injeta `ISender` via `HttpContext.RequestServices`. Expõe `ToErrorResult(Result)` que converte erros tipados do `Result` em `ProblemDetails` (`ValidationProblemDetails` para 400, `ProblemDetails` para 404/409/500).
+- **`BaseApiController`** — controller base com `[ApiController]` e `[Route("api/v{version:apiVersion}/[controller]")]`. Injeta `ISender` via `HttpContext.RequestServices`. Expõe `ToErrorResult(Result)` que converte erros tipados do `Result` em `ProblemDetails` (`ValidationProblemDetails` para 400, `ProblemDetails` para 404/409/500).
 - **`ExceptionHandlers/`** — tratamento de exceções não esperadas via `IExceptionHandler` (`UnauthorizedExceptionHandler` → 401, `GlobalExceptionHandler` → 500).
 - **`Program.cs`** — registra todos os serviços e configura o pipeline.
+
+---
+
+## Logging
+
+O sistema utiliza **[Serilog](https://serilog.net/)** como provider de logging, configurado inteiramente via `appsettings.json` (sem código fixo em `Program.cs`).
+
+### Sinks
+
+| Sink | Destino | Formato |
+|---|---|---|
+| **Console** | Saída padrão | `[HH:mm:ss LVL] SourceContext Mensagem` |
+| **File** | `logs/voltiq-YYYYMMDD.log` | Texto com timestamp completo, rotação diária, retém 30 arquivos |
+
+### Níveis por ambiente
+
+| Ambiente | Default | Microsoft / System | EF Core queries |
+|---|---|---|---|
+| Produção (`appsettings.json`) | `Information` | `Warning` | — |
+| Desenvolvimento (`appsettings.Development.json`) | `Debug` | `Warning` | `Information` |
+
+### Requisições HTTP
+
+`UseSerilogRequestLogging()` loga automaticamente cada requisição com método, path, status code e tempo de resposta:
+
+```
+[10:45:32 INF] HTTP GET /api/v1/clients responded 200 in 42.3 ms
+```
+
+### Personalização
+
+Para ajustar níveis ou adicionar novos sinks (ex.: Seq, Elastic), edite a seção `Serilog` em `appsettings.json`:
+
+```json
+"Serilog": {
+  "MinimumLevel": { "Default": "Information" },
+  "WriteTo": [
+    { "Name": "Console" },
+    { "Name": "File", "Args": { "path": "logs/voltiq-.log", "rollingInterval": "Day" } }
+  ]
+}
+```
+
+> O diretório `logs/` está no `.gitignore` e não é versionado.
+
+---
+
+## Versionamento
+
+Todos os endpoints seguem o padrão `api/v{N}/...`. A versão atual é **v1**.
+
+O versionamento é implementado via [`Asp.Versioning.Mvc`](https://github.com/dotnet/aspnet-api-versioning):
+- **URL path** — a versão faz parte da URL (ex.: `/api/v1/clients`).
+- **Padrão assumido** — requisições sem versão assumem v1 por padrão (`AssumeDefaultVersionWhenUnspecified = true`).
+- **Cabeçalho de resposta** — `api-supported-versions: 1.0` é retornado em todas as respostas.
+
+Cada controller declara explicitamente sua versão com `[ApiVersion("1.0")]`.
 
 ---
 
@@ -289,7 +346,7 @@ Ponto de entrada da aplicação.
 
 ### Autenticação
 
-#### `POST /auth/login` — Login
+#### `POST /api/v1/auth/login` — Login
 
 Autentica um usuário com e-mail e senha e retorna um JWT token.
 
@@ -320,7 +377,7 @@ Autentica um usuário com e-mail e senha e retorna um JWT token.
 
 ---
 
-#### `GET /auth/me` — Usuário autenticado
+#### `GET /api/v1/auth/me` — Usuário autenticado
 
 Retorna os dados do usuário atualmente autenticado, identificado pelo JWT enviado no cabeçalho `Authorization`.
 
@@ -341,7 +398,7 @@ Authorization: Bearer <token>
 
 ### Usuários
 
-#### `POST /api/users` — Criar usuário
+#### `POST /api/v1/users` — Criar usuário
 
 Cria um novo usuário na plataforma.
 
@@ -521,7 +578,7 @@ Todas as mensagens de erro estão centralizadas em **`src/Voltiq.Exceptions/Reso
   "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
   "title": "Falha de validação",
   "status": 400,
-  "instance": "/api/users",
+  "instance": "/api/v1/users",
   "errors": {
     "Email": ["O e-mail informado não é válido."],
     "Password": ["A senha deve ter pelo menos 8 caracteres."]
@@ -535,7 +592,7 @@ Todas as mensagens de erro estão centralizadas em **`src/Voltiq.Exceptions/Reso
   "type": "https://tools.ietf.org/html/rfc9110#section-15.5.5",
   "title": "Não encontrado",
   "status": 404,
-  "instance": "/api/users/abc",
+  "instance": "/api/v1/users/abc",
   "detail": "A entidade 'User' com a chave 'abc' não foi encontrada."
 }
 ```
@@ -546,17 +603,22 @@ Todas as mensagens de erro estão centralizadas em **`src/Voltiq.Exceptions/Reso
   "type": "https://tools.ietf.org/html/rfc9110#section-15.5.10",
   "title": "Conflito",
   "status": 409,
-  "instance": "/api/users",
+  "instance": "/api/v1/users",
   "detail": "Já existe um usuário cadastrado com este e-mail."
 }
 ```
 
 **401 — Unauthorized**
+
+Retornado em dois cenários, ambos com corpo `application/problem+json`:
+- **Challenge JWT** (token ausente, inválido ou expirado) — interceptado via `JwtBearerEvents.OnChallenge`.
+- **`UnauthorizedAccessException`** lançada no código da aplicação — interceptada por `UnauthorizedExceptionHandler`.
+
 ```json
 {
   "title": "Não autorizado",
   "status": 401,
-  "instance": "/api/orders"
+  "instance": "/api/v1/clients"
 }
 ```
 

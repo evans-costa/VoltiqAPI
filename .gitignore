@@ -66,5 +66,8 @@ appsettings.Production.json
 *.p12
 *.key
 
+# Logs
+logs/
+
 # Copilot instructions
 .github/copilot-instructions.md

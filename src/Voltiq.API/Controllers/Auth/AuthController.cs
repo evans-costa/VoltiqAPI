@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Voltiq.Application.Features.Auth.Commands.Login;
@@ -6,7 +7,8 @@ using Voltiq.Application.Features.Users.Queries.GetCurrentUser;
 using Voltiq.Application.Mappings.Auth;
 namespace Voltiq.API.Controllers.Auth;
 
-[Route("auth")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/auth")]
 public sealed class AuthController : BaseApiController
 {
     /// <summary>Authenticates a user and returns an access token and a refresh token.</summary>
