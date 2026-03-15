@@ -1,3 +1,4 @@
+using Voltiq.Domain.Enums;
 using Voltiq.Exceptions.Exceptions;
 using Voltiq.Exceptions.Resources;
 
@@ -8,7 +9,7 @@ public sealed class BudgetItem : BaseEntity
     public Guid BudgetId { get; private set; }
     public Guid? MaterialId { get; private set; }
     public string MaterialName { get; private set; } = null!;
-    public string? Unit { get; private set; }
+    public MaterialUnit? Unit { get; private set; }
     public int Quantity { get; private set; }
     public decimal UnitPrice { get; private set; }
     public decimal TotalPrice { get; private set; }
@@ -19,7 +20,7 @@ public sealed class BudgetItem : BaseEntity
         Guid budgetId,
         Guid? materialId,
         string materialName,
-        string? unit,
+        MaterialUnit? unit,
         int quantity,
         decimal unitPrice)
     {
@@ -36,7 +37,7 @@ public sealed class BudgetItem : BaseEntity
         Guid budgetId,
         Guid? materialId,
         string materialName,
-        string? unit,
+        MaterialUnit? unit,
         int quantity,
         decimal unitPrice)
     {
@@ -49,6 +50,6 @@ public sealed class BudgetItem : BaseEntity
         if (unitPrice <= 0)
             throw new DomainException(ResourceErrorMessages.ORCAMENTO_ITEM_PRECO_INVALIDO);
 
-        return new BudgetItem(budgetId, materialId, materialName.Trim(), unit?.Trim(), quantity, unitPrice);
+        return new BudgetItem(budgetId, materialId, materialName.Trim(), unit, quantity, unitPrice);
     }
 }
