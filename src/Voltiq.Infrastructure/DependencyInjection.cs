@@ -9,12 +9,16 @@ using Voltiq.Exceptions.Resources;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories;
+using Voltiq.Domain.Interfaces.Repositories.Budget;
 using Voltiq.Domain.Interfaces.Repositories.Client;
+using Voltiq.Domain.Interfaces.Repositories.Material;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Infrastructure.Auth;
 using Voltiq.Infrastructure.Persistence;
 using Voltiq.Infrastructure.Persistence.Repositories;
+using Voltiq.Infrastructure.Persistence.Repositories.Budget;
 using Voltiq.Infrastructure.Persistence.Repositories.Client;
+using Voltiq.Infrastructure.Persistence.Repositories.Material;
 using Voltiq.Infrastructure.Persistence.Repositories.TokenRepository;
 using Voltiq.Infrastructure.Persistence.Repositories.User;
 
@@ -51,6 +55,8 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IClientRepository, ClientRepository>();
+        services.AddScoped<IMaterialRepository, MaterialRepository>();
+        services.AddScoped<IBudgetRepository, BudgetRepository>();
     }
 
     private static void AddDatabase(IServiceCollection services, IConfiguration configuration)
