@@ -146,6 +146,39 @@
     <value>Cliente não encontrado.</value>
   </data>
 
+  <!-- ═══════════════════════════════ Domínio — Material ══════════════════ -->
+
+  <data name="MATERIAL_NOME_OBRIGATORIO" xml:space="preserve">
+    <value>O nome do material é obrigatório.</value>
+  </data>
+  <data name="MATERIAL_UNIDADE_OBRIGATORIA" xml:space="preserve">
+    <value>A unidade do material é obrigatória.</value>
+  </data>
+  <data name="MATERIAL_PRECO_INVALIDO" xml:space="preserve">
+    <value>O preço padrão deve ser maior que zero.</value>
+  </data>
+  <data name="MATERIAL_NAO_ENCONTRADO" xml:space="preserve">
+    <value>Material não encontrado.</value>
+  </data>
+
+  <!-- ═══════════════════════════════ Domínio — Orçamento ══════════════════ -->
+
+  <data name="ORCAMENTO_CLIENTE_OBRIGATORIO" xml:space="preserve">
+    <value>O cliente do orçamento é obrigatório.</value>
+  </data>
+  <data name="ORCAMENTO_ITEM_NOME_OBRIGATORIO" xml:space="preserve">
+    <value>O nome do material no item é obrigatório.</value>
+  </data>
+  <data name="ORCAMENTO_ITEM_QUANTIDADE_INVALIDA" xml:space="preserve">
+    <value>A quantidade deve ser maior que zero.</value>
+  </data>
+  <data name="ORCAMENTO_ITEM_PRECO_INVALIDO" xml:space="preserve">
+    <value>O preço unitário deve ser maior que zero.</value>
+  </data>
+  <data name="ORCAMENTO_NAO_ENCONTRADO" xml:space="preserve">
+    <value>Orçamento não encontrado.</value>
+  </data>
+
   <!-- ═══════════════════════════════ Aplicação — Auth ════════════════════ -->
 
   <data name="LOGIN_CREDENCIAIS_INVALIDAS" xml:space="preserve">

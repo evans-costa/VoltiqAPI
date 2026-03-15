@@ -195,6 +195,37 @@ public static class ResourceErrorMessages
     public static string CLIENTE_NAO_ENCONTRADO
         => ResourceManager.GetString(nameof(CLIENTE_NAO_ENCONTRADO))!;
 
+    // ── Domínio — Material ─────────────────────────────────────────────────
+
+    public static string MATERIAL_NOME_OBRIGATORIO
+        => ResourceManager.GetString(nameof(MATERIAL_NOME_OBRIGATORIO))!;
+
+    public static string MATERIAL_UNIDADE_OBRIGATORIA
+        => ResourceManager.GetString(nameof(MATERIAL_UNIDADE_OBRIGATORIA))!;
+
+    public static string MATERIAL_PRECO_INVALIDO
+        => ResourceManager.GetString(nameof(MATERIAL_PRECO_INVALIDO))!;
+
+    public static string MATERIAL_NAO_ENCONTRADO
+        => ResourceManager.GetString(nameof(MATERIAL_NAO_ENCONTRADO))!;
+
+    // ── Domínio — Orçamento ────────────────────────────────────────────────
+
+    public static string ORCAMENTO_CLIENTE_OBRIGATORIO
+        => ResourceManager.GetString(nameof(ORCAMENTO_CLIENTE_OBRIGATORIO))!;
+
+    public static string ORCAMENTO_ITEM_NOME_OBRIGATORIO
+        => ResourceManager.GetString(nameof(ORCAMENTO_ITEM_NOME_OBRIGATORIO))!;
+
+    public static string ORCAMENTO_ITEM_QUANTIDADE_INVALIDA
+        => ResourceManager.GetString(nameof(ORCAMENTO_ITEM_QUANTIDADE_INVALIDA))!;
+
+    public static string ORCAMENTO_ITEM_PRECO_INVALIDO
+        => ResourceManager.GetString(nameof(ORCAMENTO_ITEM_PRECO_INVALIDO))!;
+
+    public static string ORCAMENTO_NAO_ENCONTRADO
+        => ResourceManager.GetString(nameof(ORCAMENTO_NAO_ENCONTRADO))!;
+
     // ── Aplicação — Auth ───────────────────────────────────────────────────
 
     /// <summary>
