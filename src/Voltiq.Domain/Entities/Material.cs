@@ -1,3 +1,4 @@
+using Voltiq.Domain.Enums;
 using Voltiq.Domain.Events;
 using Voltiq.Exceptions.Exceptions;
 using Voltiq.Exceptions.Resources;
@@ -8,12 +9,12 @@ public sealed class Material : AuditableEntity
 {
     public string Name { get; private set; } = null!;
     public decimal DefaultPrice { get; private set; }
-    public string Unit { get; private set; } = null!;
+    public MaterialUnit Unit { get; private set; }
     public bool IsActive { get; private set; }
 
     private Material() { }
 
-    private Material(string name, decimal defaultPrice, string unit)
+    private Material(string name, decimal defaultPrice, MaterialUnit unit)
     {
         Name = name;
         DefaultPrice = defaultPrice;
@@ -22,18 +23,18 @@ public sealed class Material : AuditableEntity
         AddDomainEvent(new MaterialRegisteredEvent(Id));
     }
 
-    public static Material Register(string name, decimal defaultPrice, string unit)
+    public static Material Register(string name, decimal defaultPrice, MaterialUnit unit)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException(ResourceErrorMessages.MATERIAL_NOME_OBRIGATORIO);
 
-        if (string.IsNullOrWhiteSpace(unit))
-            throw new DomainException(ResourceErrorMessages.MATERIAL_UNIDADE_OBRIGATORIA);
+        if (!Enum.IsDefined(unit))
+            throw new DomainException(ResourceErrorMessages.MATERIAL_UNIDADE_INVALIDA);
 
         if (defaultPrice <= 0)
             throw new DomainException(ResourceErrorMessages.MATERIAL_PRECO_INVALIDO);
 
-        return new Material(name.Trim(), defaultPrice, unit.Trim());
+        return new Material(name.Trim(), defaultPrice, unit);
     }
 
     public void Deactivate() => IsActive = false;
