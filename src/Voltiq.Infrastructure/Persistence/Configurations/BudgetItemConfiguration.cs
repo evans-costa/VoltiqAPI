@@ -19,7 +19,7 @@ public sealed class BudgetItemConfiguration : IEntityTypeConfiguration<BudgetIte
             .HasMaxLength(100);
 
         builder.Property(i => i.Unit)
-            .HasMaxLength(20);
+            .HasConversion<int?>();
 
         builder.Property(i => i.Quantity).IsRequired();
 

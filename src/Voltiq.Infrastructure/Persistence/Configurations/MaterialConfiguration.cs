@@ -20,7 +20,7 @@ public sealed class MaterialConfiguration : IEntityTypeConfiguration<Material>
 
         builder.Property(m => m.Unit)
             .IsRequired()
-            .HasMaxLength(20);
+            .HasConversion<int>();
 
         builder.Property(m => m.IsActive)
             .IsRequired()
