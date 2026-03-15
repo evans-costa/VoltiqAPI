@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
-builder.Services.AddApplication();
+builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddProblemDetails();
@@ -37,12 +37,12 @@ builder.Services.AddOpenApi("v1", o =>
         {
             Title = "Voltiq API",
             Description = "API da aplicação Voltiq.",
-            Version = "v1",
+            Version = "v1"
         };
 
         document.Servers =
         [
-            new OpenApiServer { Url = "https://localhost:7085/", Description = "Servidor Local" },
+            new OpenApiServer { Url = "https://localhost:7085/", Description = "Servidor Local" }
         ];
 
         document.Components ??= new OpenApiComponents();
@@ -54,7 +54,7 @@ builder.Services.AddOpenApi("v1", o =>
             Scheme = "bearer",
             BearerFormat = "JWT",
             In = ParameterLocation.Header,
-            Description = "Enter your JWT token.",
+            Description = "Enter your JWT token."
         };
 
         document.Security ??= new List<OpenApiSecurityRequirement>();
@@ -98,4 +98,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireAuthorization();
 
-app.Run();
+await app.RunAsync();

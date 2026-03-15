@@ -10,7 +10,7 @@ namespace Voltiq.Domain.ValueObjects;
 /// </summary>
 public readonly partial record struct Document
 {
-    public string Value { get; } 
+    public string Value { get; }
 
     public Document(string value) => Value = value;
 
@@ -20,7 +20,7 @@ public readonly partial record struct Document
             ? document
             : Error.Validation(description: errorMessage);
     }
-    
+
     public static bool TryParse(string? raw, out Document document, out string errorMessage)
     {
         document = default;
@@ -31,7 +31,7 @@ public readonly partial record struct Document
             errorMessage = ResourceErrorMessages.DOCUMENTO_OBRIGATORIO;
             return false;
         }
-        
+
         var digits = OnlyDigits().Replace(raw.Trim(), "");
 
         var isValid = digits.Length switch
@@ -40,7 +40,7 @@ public readonly partial record struct Document
             14 => ValidateCnpj(digits),
             _ => false
         };
-        
+
         if (!isValid)
         {
             errorMessage = ResourceErrorMessages.DOCUMENTO_FORMATO_INVALIDO;
@@ -69,7 +69,7 @@ public readonly partial record struct Document
     private static bool ValidateCnpj(string d)
     {
         if (d.All(c => c == d[0])) return false;
-        
+
         ReadOnlySpan<int> peso1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
         ReadOnlySpan<int> peso2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 

@@ -17,7 +17,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Email)
             .HasConversion(
-                e => e.Value, 
+                e => e.Value,
                 v => new Email(v))
             .HasColumnName("Email")
             .IsRequired()

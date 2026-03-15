@@ -1,28 +1,77 @@
 name: CI
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    types: [ opened, synchronize, reopened ]
+    branches: [ main ]
 
 jobs:
-  test:
-    name: Build & Test
+  linting:
+    name: Code Formatting Check
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore
+        run: dotnet restore Voltiq.slnx
+      - name: Check Formatting
+        run: dotnet format Voltiq.slnx --verify-no-changes --verbosity normal
+
+  build-and-test:
+    name: Build and Unit Tests
+    needs: linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
 
-      - name: Restore dependencies
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu'
+
+      - name: Install SonarScanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Restore
         run: dotnet restore Voltiq.slnx
 
+      - name: Sonar Begin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          dotnet-sonarscanner begin /k:"evans-costa_VoltiqAPI" \
+            /o:"evans-costa" \
+            /d:sonar.token="$SONAR_TOKEN" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml"
+
       - name: Build
+        env:
+          MEDIATR__LICENSEKEY: ${{ secrets.MEDIATR_LICENSE_KEY }}
         run: dotnet build Voltiq.slnx --no-restore --configuration Release
 
-      - name: Run tests
-        run: dotnet test Voltiq.slnx --no-build --configuration Release --verbosity normal
+      - name: Run Tests
+        run: |
+          dotnet test Voltiq.slnx --no-build --configuration Release --verbosity normal \
+            --collect:"XPlat Code Coverage" --results-directory ./TestResults \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+      - name: Sonar End (Quality Analysis)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"

@@ -16,7 +16,7 @@ public readonly partial record struct Email
             ? email
             : Error.Validation(description: errorMessage);
     }
-    
+
     public static bool TryParse(string? raw, out Email email, out string errorMessage)
     {
         email = default;
@@ -27,7 +27,7 @@ public readonly partial record struct Email
             errorMessage = ResourceErrorMessages.EMAIL_OBRIGATORIO;
             return false;
         }
-        
+
         var normalised = raw.Trim().ToLowerInvariant();
 
         if (!EmailFormat().IsMatch(normalised))
