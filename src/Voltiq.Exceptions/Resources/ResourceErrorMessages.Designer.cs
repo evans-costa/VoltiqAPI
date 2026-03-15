@@ -200,8 +200,8 @@ public static class ResourceErrorMessages
     public static string MATERIAL_NOME_OBRIGATORIO
         => ResourceManager.GetString(nameof(MATERIAL_NOME_OBRIGATORIO))!;
 
-    public static string MATERIAL_UNIDADE_OBRIGATORIA
-        => ResourceManager.GetString(nameof(MATERIAL_UNIDADE_OBRIGATORIA))!;
+    public static string MATERIAL_UNIDADE_INVALIDA
+        => ResourceManager.GetString(nameof(MATERIAL_UNIDADE_INVALIDA))!;
 
     public static string MATERIAL_PRECO_INVALIDO
         => ResourceManager.GetString(nameof(MATERIAL_PRECO_INVALIDO))!;

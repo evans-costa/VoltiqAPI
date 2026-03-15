@@ -151,8 +151,8 @@
   <data name="MATERIAL_NOME_OBRIGATORIO" xml:space="preserve">
     <value>O nome do material é obrigatório.</value>
   </data>
-  <data name="MATERIAL_UNIDADE_OBRIGATORIA" xml:space="preserve">
-    <value>A unidade do material é obrigatória.</value>
+  <data name="MATERIAL_UNIDADE_INVALIDA" xml:space="preserve">
+    <value>Unidade de medida inválida.</value>
   </data>
   <data name="MATERIAL_PRECO_INVALIDO" xml:space="preserve">
     <value>O preço padrão deve ser maior que zero.</value>
