@@ -10,24 +10,9 @@ namespace Voltiq.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<int>(
-                name: "Unit",
-                table: "Materials",
-                type: "integer",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "character varying(20)",
-                oldMaxLength: 20);
+            migrationBuilder.Sql(@"ALTER TABLE ""Materials"" ALTER COLUMN ""Unit"" TYPE integer USING 1;");
 
-            migrationBuilder.AlterColumn<int>(
-                name: "Unit",
-                table: "BudgetItem",
-                type: "integer",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "character varying(20)",
-                oldMaxLength: 20,
-                oldNullable: true);
+            migrationBuilder.Sql(@"ALTER TABLE ""BudgetItem"" ALTER COLUMN ""Unit"" TYPE integer USING NULL;");
         }
 
         /// <inheritdoc />
