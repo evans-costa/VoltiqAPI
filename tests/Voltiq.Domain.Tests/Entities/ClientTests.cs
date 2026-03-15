@@ -15,9 +15,9 @@ public class ClientTests
         Address.Create("Rua das Flores", "123", "São Paulo", "SP", "01310-100");
 
     [Fact]
-    public void Create_WithValidData_ShouldCreateClient()
+    public void Register_WithValidData_ShouldRegisterClient()
     {
-        var client = Client.Create(ValidUserId, "João Silva", "(11) 99999-9999", ValidAddress());
+        var client = Client.Register(ValidUserId, "João Silva", "(11) 99999-9999", ValidAddress());
 
         client.Id.ShouldNotBe(Guid.Empty);
         client.UserId.ShouldBe(ValidUserId);
@@ -32,21 +32,21 @@ public class ClientTests
     }
 
     [Fact]
-    public void Create_ShouldRaise_ClientCreatedEvent()
+    public void Create_ShouldRaise_ClientRegisteredEvent()
     {
-        var client = Client.Create(ValidUserId, "João Silva", "(11) 99999-9999", ValidAddress());
+        var client = Client.Register(ValidUserId, "João Silva", "(11) 99999-9999", ValidAddress());
 
-        client.DomainEvents.ShouldContain(e => e is ClientCreatedEvent);
+        client.DomainEvents.ShouldContain(e => e is ClientRegisteredEvent);
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
     [InlineData(null)]
-    public void Create_WithNullOrEmptyName_ShouldThrowDomainException(string? name)
+    public void Register_WithNullOrEmptyName_ShouldThrowDomainException(string? name)
     {
         Should.Throw<DomainException>(() =>
-            Client.Create(ValidUserId, name!, "(11) 99999-9999", ValidAddress()))
+            Client.Register(ValidUserId, name!, "(11) 99999-9999", ValidAddress()))
             .Message.ShouldBe(ResourceErrorMessages.CLIENTE_NOME_OBRIGATORIO);
     }
 
@@ -54,17 +54,17 @@ public class ClientTests
     [InlineData("")]
     [InlineData("   ")]
     [InlineData(null)]
-    public void Create_WithNullOrEmptyPhone_ShouldThrowDomainException(string? phone)
+    public void Register_WithNullOrEmptyPhone_ShouldThrowDomainException(string? phone)
     {
         Should.Throw<DomainException>(() =>
-            Client.Create(ValidUserId, "João Silva", phone!, ValidAddress()))
+            Client.Register(ValidUserId, "João Silva", phone!, ValidAddress()))
             .Message.ShouldBe(ResourceErrorMessages.CLIENTE_TELEFONE_OBRIGATORIO);
     }
 
     [Fact]
-    public void Create_TrimsName()
+    public void Register_TrimsName()
     {
-        var client = Client.Create(ValidUserId, "  João Silva  ", "(11) 99999-9999", ValidAddress());
+        var client = Client.Register(ValidUserId, "  João Silva  ", "(11) 99999-9999", ValidAddress());
 
         client.Name.ShouldBe("João Silva");
     }
@@ -72,7 +72,7 @@ public class ClientTests
     [Fact]
     public void Update_WithValidData_ShouldUpdateFields()
     {
-        var client = Client.Create(ValidUserId, "João Silva", "(11) 99999-9999", ValidAddress());
+        var client = Client.Register(ValidUserId, "João Silva", "(11) 99999-9999", ValidAddress());
         var newAddress = Address.Create("Av. Paulista", "1000", "São Paulo", "SP", "01311-100");
 
         client.Update("Maria Souza", "(11) 88888-8888", newAddress);
@@ -87,7 +87,7 @@ public class ClientTests
     [InlineData(null)]
     public void Update_WithNullOrEmptyName_ShouldThrowDomainException(string? name)
     {
-        var client = Client.Create(ValidUserId, "João Silva", "(11) 99999-9999", ValidAddress());
+        var client = Client.Register(ValidUserId, "João Silva", "(11) 99999-9999", ValidAddress());
 
         Should.Throw<DomainException>(() =>
             client.Update(name!, "(11) 99999-9999", ValidAddress()))
@@ -99,7 +99,7 @@ public class ClientTests
     [InlineData(null)]
     public void Update_WithNullOrEmptyPhone_ShouldThrowDomainException(string? phone)
     {
-        var client = Client.Create(ValidUserId, "João Silva", "(11) 99999-9999", ValidAddress());
+        var client = Client.Register(ValidUserId, "João Silva", "(11) 99999-9999", ValidAddress());
 
         Should.Throw<DomainException>(() =>
             client.Update("João Silva", phone!, ValidAddress()))

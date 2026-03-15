@@ -21,7 +21,7 @@ public class GetClientsQueryHandlerTests
         new(_clientRepoMock.Object, _currentUserServiceMock.Object);
 
     private static Client MakeClient(Guid userId, string name = "João Silva") =>
-        Client.Create(userId, name, "(11) 99999-9999",
+        Client.Register(userId, name, "(11) 99999-9999",
             Address.Create("Rua das Flores", "123", "São Paulo", "SP", "01310-100"));
 
     [Fact]

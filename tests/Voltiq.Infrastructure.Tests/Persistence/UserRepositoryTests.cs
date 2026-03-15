@@ -51,7 +51,7 @@ public class UserRepositoryTests : IAsyncLifetime
     {
         var email = Email.Create("joao@example.com").Value;
         var document = Document.Create("529.982.247-25").Value;
-        var user = User.Create("João Silva", email, document, "$argon2id$hash");
+        var user = User.Register("João Silva", email, document, "$argon2id$hash");
 
         await _repository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
@@ -69,7 +69,7 @@ public class UserRepositoryTests : IAsyncLifetime
     {
         var email = Email.Create("maria@example.com").Value;
         var document = Document.Create("11222333000181").Value;
-        var user = User.Create("Maria Santos", email, document, "$argon2id$hash");
+        var user = User.Register("Maria Santos", email, document, "$argon2id$hash");
 
         await _repository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
@@ -84,7 +84,7 @@ public class UserRepositoryTests : IAsyncLifetime
     {
         var email = Email.Create("carlos@example.com").Value;
         var document = Document.Create("153.509.460-56").Value;
-        var user = User.Create("Carlos Souza", email, document, "$argon2id$hash");
+        var user = User.Register("Carlos Souza", email, document, "$argon2id$hash");
 
         await _repository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();

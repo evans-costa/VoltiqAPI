@@ -1,11 +1,11 @@
 using FluentValidation;
 using Voltiq.Exceptions.Resources;
 
-namespace Voltiq.Application.Features.Clients.Commands.CreateClient;
+namespace Voltiq.Application.Features.Clients.Commands.RegisterClient;
 
-public sealed class CreateClientCommandValidator : AbstractValidator<CreateClientCommand>
+public sealed class RegisterClientCommandValidator : AbstractValidator<RegisterClientCommand>
 {
-    public CreateClientCommandValidator()
+    public RegisterClientCommandValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage(ResourceErrorMessages.CLIENTE_NOME_OBRIGATORIO);

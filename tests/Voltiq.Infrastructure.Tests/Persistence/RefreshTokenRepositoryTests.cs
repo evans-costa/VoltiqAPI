@@ -48,7 +48,7 @@ public class RefreshTokenRepositoryTests : IAsyncLifetime
     {
         var email = Email.Create($"{Guid.NewGuid()}@example.com").Value;
         var document = Document.Create("529.982.247-25").Value;
-        var user = User.Create("Test User", email, document, "$argon2id$hash");
+        var user = User.Register("Test User", email, document, "$argon2id$hash");
 
         await _dbContext.Users.AddAsync(user);
 

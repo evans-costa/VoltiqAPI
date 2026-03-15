@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Voltiq.Application.Features.Clients;
-using Voltiq.Application.Features.Clients.Commands.CreateClient;
+using Voltiq.Application.Features.Clients.Commands.RegisterClient;
 using Voltiq.Application.Features.Clients.Commands.DeleteClient;
 using Voltiq.Application.Features.Clients.Commands.UpdateClient;
 using Voltiq.Application.Features.Clients.Queries.GetClientById;
@@ -14,13 +14,13 @@ namespace Voltiq.API.Controllers.Clients;
 [Route("api/v{version:apiVersion}/clients")]
 public sealed class ClientsController : BaseApiController
 {
-    /// <summary>Creates a new client for the authenticated user.</summary>
+    /// <summary>Registers a new client for the authenticated user.</summary>
     [HttpPost]
     [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Create(
-        [FromBody] CreateClientRequest request,
+    public async Task<IActionResult> Register(
+        [FromBody] RegisterClientRequest request,
         CancellationToken cancellationToken)
     {
         var result = await Sender.Send(request.ToCommand(), cancellationToken);

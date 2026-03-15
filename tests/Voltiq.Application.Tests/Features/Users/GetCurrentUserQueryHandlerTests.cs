@@ -22,7 +22,7 @@ public class GetCurrentUserQueryHandlerTests
     {
         var email = Email.Create("joao@example.com").Value;
         var document = Document.Create("529.982.247-25").Value;
-        return User.Create("João Silva", email, document, "$argon2id$hash");
+        return User.Register("João Silva", email, document, "$argon2id$hash");
     }
 
     [Fact]

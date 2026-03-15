@@ -1,5 +1,5 @@
 using Voltiq.Application.Features.Clients;
-using Voltiq.Application.Features.Clients.Commands.CreateClient;
+using Voltiq.Application.Features.Clients.Commands.RegisterClient;
 using Voltiq.Application.Features.Clients.Commands.UpdateClient;
 using Voltiq.Domain.Entities;
 
@@ -7,9 +7,9 @@ namespace Voltiq.Application.Mappings.Clients;
 
 public static class ClientMappingExtensions
 {
-    extension(CreateClientRequest request)
+    extension(RegisterClientRequest request)
     {
-        public CreateClientCommand ToCommand() =>
+        public RegisterClientCommand ToCommand() =>
             new(request.Name, request.Phone, request.Street, request.Number,
                 request.City, request.State, request.ZipCode);
     }

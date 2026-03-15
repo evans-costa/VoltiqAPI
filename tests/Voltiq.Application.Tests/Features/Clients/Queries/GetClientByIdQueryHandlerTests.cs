@@ -24,7 +24,7 @@ public class GetClientByIdQueryHandlerTests
     private static Client MakeClient(Guid userId)
     {
         var address = Address.Create("Rua das Flores", "123", "São Paulo", "SP", "01310-100");
-        return Client.Create(userId, "João Silva", "(11) 99999-9999", address);
+        return Client.Register(userId, "João Silva", "(11) 99999-9999", address);
     }
 
     [Fact]

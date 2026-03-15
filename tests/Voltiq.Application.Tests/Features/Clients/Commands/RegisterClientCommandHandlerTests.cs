@@ -3,7 +3,7 @@ using Moq;
 using Shouldly;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Application.Features.Clients;
-using Voltiq.Application.Features.Clients.Commands.CreateClient;
+using Voltiq.Application.Features.Clients.Commands.RegisterClient;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories.Client;
@@ -12,7 +12,7 @@ using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Clients.Commands;
 
-public class CreateClientCommandHandlerTests
+public class RegisterClientCommandHandlerTests
 {
     private readonly Mock<IClientRepository> _clientRepoMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
@@ -20,14 +20,14 @@ public class CreateClientCommandHandlerTests
 
     private readonly Guid _userId = Guid.NewGuid();
 
-    private CreateClientCommandHandler CreateHandler() =>
+    private RegisterClientCommandHandler CreateHandler() =>
         new(_clientRepoMock.Object, _unitOfWorkMock.Object, _currentUserServiceMock.Object);
 
-    private static CreateClientCommand ValidCommand() =>
+    private static RegisterClientCommand ValidCommand() =>
         new("João Silva", "(11) 99999-9999", "Rua das Flores", "123", "São Paulo", "SP", "01310-100");
 
     [Fact]
-    public async Task Handle_WithValidCommand_ShouldCreateClientAndReturnResponse()
+    public async Task Handle_WithValidCommand_ShouldRegisterClientAndReturnResponse()
     {
         _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId.ToString());
 

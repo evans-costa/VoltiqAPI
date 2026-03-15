@@ -52,11 +52,11 @@ public class ClientRepositoryTests : IAsyncLifetime
     {
         var email = Email.Create("joao@example.com").Value;
         var document = Document.Create("529.982.247-25").Value;
-        return User.Create("João Silva", email, document, "$argon2id$hash");
+        return User.Register("João Silva", email, document, "$argon2id$hash");
     }
 
     private static Client MakeClient(Guid userId, string name = "Cliente Teste") =>
-        Client.Create(userId, name, "(11) 99999-9999",
+        Client.Register(userId, name, "(11) 99999-9999",
             Address.Create("Rua das Flores", "123", "São Paulo", "SP", "01310-100"));
 
     private async Task<User> CreateAndSaveUserAsync()
@@ -94,7 +94,7 @@ public class ClientRepositoryTests : IAsyncLifetime
 
         var email2 = Email.Create("maria@example.com").Value;
         var doc2 = Document.Create("11222333000181").Value;
-        var user2 = User.Create("Maria Santos", email2, doc2, "$argon2id$hash2");
+        var user2 = User.Register("Maria Santos", email2, doc2, "$argon2id$hash2");
         await _userRepository.AddAsync(user2);
         await _unitOfWork.SaveChangesAsync();
 
@@ -135,7 +135,7 @@ public class ClientRepositoryTests : IAsyncLifetime
 
         var email2 = Email.Create("outro@example.com").Value;
         var doc2 = Document.Create("11222333000181").Value;
-        var user2 = User.Create("Outro User", email2, doc2, "$argon2id$hash2");
+        var user2 = User.Register("Outro User", email2, doc2, "$argon2id$hash2");
         await _userRepository.AddAsync(user2);
         await _unitOfWork.SaveChangesAsync();
 

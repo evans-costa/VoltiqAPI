@@ -20,10 +20,10 @@ public sealed class Client : AuditableEntity
         Name = name;
         Phone = phone;
         Address = address;
-        AddDomainEvent(new ClientCreatedEvent(Id));
+        AddDomainEvent(new ClientRegisteredEvent(Id));
     }
 
-    public static Client Create(Guid userId, string name, string phone, Address address)
+    public static Client Register(Guid userId, string name, string phone, Address address)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException(ResourceErrorMessages.CLIENTE_NOME_OBRIGATORIO);

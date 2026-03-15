@@ -15,9 +15,9 @@ public class UserTests
     private static Document ValidDocument() => Document.Create("529.982.247-25").Value;
 
     [Fact]
-    public void Create_WithValidData_ShouldCreateUser()
+    public void Register_WithValidData_ShouldRegisterUser()
     {
-        var user = User.Create(VALID_NAME, ValidEmail(), ValidDocument(), VALID_PASSWORD_HASH);
+        var user = User.Register(VALID_NAME, ValidEmail(), ValidDocument(), VALID_PASSWORD_HASH);
 
         user.Id.ShouldNotBe(Guid.Empty);
         user.Name.ShouldBe(VALID_NAME);
@@ -27,29 +27,29 @@ public class UserTests
     }
 
     [Fact]
-    public void Create_ShouldRaise_UserCreatedEvent()
+    public void Create_ShouldRaise_UserRegisteredEvent()
     {
-        var user = User.Create(VALID_NAME, ValidEmail(), ValidDocument(), VALID_PASSWORD_HASH);
+        var user = User.Register(VALID_NAME, ValidEmail(), ValidDocument(), VALID_PASSWORD_HASH);
 
-        user.DomainEvents.ShouldContain(e => e is UserCreatedEvent);
+        user.DomainEvents.ShouldContain(e => e is UserRegisteredEvent);
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
     [InlineData(null)]
-    public void Create_WithNullOrEmptyName_ShouldThrowDomainException(string? name)
+    public void Register_WithNullOrEmptyName_ShouldThrowDomainException(string? name)
     {
         Should.Throw<DomainException>(() =>
-            User.Create(name!, ValidEmail(), ValidDocument(), VALID_PASSWORD_HASH));
+            User.Register(name!, ValidEmail(), ValidDocument(), VALID_PASSWORD_HASH));
     }
 
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-    public void Create_WithNullOrEmptyPasswordHash_ShouldThrowDomainException(string? hash)
+    public void Register_WithNullOrEmptyPasswordHash_ShouldThrowDomainException(string? hash)
     {
         Should.Throw<DomainException>(() =>
-            User.Create(VALID_NAME, ValidEmail(), ValidDocument(), hash!));
+            User.Register(VALID_NAME, ValidEmail(), ValidDocument(), hash!));
     }
 }

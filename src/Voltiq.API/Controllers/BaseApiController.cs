@@ -1,4 +1,3 @@
-using Asp.Versioning;
 using System.Diagnostics.CodeAnalysis;
 using ErrorOr;
 using MediatR;
@@ -23,9 +22,9 @@ public abstract class BaseApiController : ControllerBase
             return Problem(title: ResourceErrorMessages.TITULO_ERRO_INESPERADO, statusCode: 500);
         }
 
-        return errors.All(error => error.Type == ErrorType.Validation) ? 
-            BuildValidationProblem(errors) : 
-            BuildProblem(errors[0]);
+        return errors.All(error => error.Type == ErrorType.Validation)
+            ? BuildValidationProblem(errors)
+            : BuildProblem(errors[0]);
     }
 
     private ObjectResult BuildProblem(Error error)
@@ -63,7 +62,7 @@ public abstract class BaseApiController : ControllerBase
                 error.Code,
                 error.Description);
         }
-        
+
         return ValidationProblem(modelStateDictionary);
     }
 }
