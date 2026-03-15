@@ -5,6 +5,7 @@ using Voltiq.Application.Features.Auth.Commands.Login;
 using Voltiq.Application.Features.Auth.Commands.Refresh;
 using Voltiq.Application.Features.Users.Queries.GetCurrentUser;
 using Voltiq.Application.Mappings.Auth;
+
 namespace Voltiq.API.Controllers.Auth;
 
 [ApiVersion("1.0")]
@@ -26,7 +27,7 @@ public sealed class AuthController : BaseApiController
     {
         var command = request.ToCommand();
         var result = await Sender.Send(command, cancellationToken);
-        
+
         return result.Match(
             Ok,
             ToErrorResult);
