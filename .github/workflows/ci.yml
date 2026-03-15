@@ -2,43 +2,51 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
     types: [ opened, synchronize, reopened ]
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-  build-and-test:
-    name: Build, Test & Sonar
+  linting:
+    name: Code Formatting Check
     runs-on: ubuntu-latest
-
     steps:
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          java-version: 17
-          distribution: 'zulu'
+          dotnet-version: '10.0.x'
+      - name: Restore
+        run: dotnet restore Voltiq.slnx
+      - name: Check Formatting
+        run: dotnet format Voltiq.slnx --verify-no-changes --verbosity normal
 
+  build-and-test:
+    name: Build and Unit Tests
+    needs: linting
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Necessário para análise de PR do Sonar
+          fetch-depth: 0 # Necessário para o Sonar mais adiante
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu'
+
       - name: Install SonarScanner
-        run: |
-          dotnet tool install --global dotnet-sonarscanner
+        run: dotnet tool install --global dotnet-sonarscanner
 
-      - name: Restore dependencies
+      - name: Restore
         run: dotnet restore Voltiq.slnx
-
-      - name: Check formatting (Lint)
-        run: dotnet format Voltiq.slnx --verify-no-changes --verbosity normal
 
       - name: Sonar Begin
         env:
@@ -56,13 +64,13 @@ jobs:
           MEDIATR__LICENSEKEY: ${{ secrets.MEDIATR_LICENSE_KEY }}
         run: dotnet build Voltiq.slnx --no-restore --configuration Release
 
-      - name: Run tests
+      - name: Run Tests
         run: |
           dotnet test Voltiq.slnx --no-build --configuration Release --verbosity normal \
             --collect:"XPlat Code Coverage" --results-directory ./TestResults \
             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
-      - name: Sonar End
+      - name: Sonar End (Quality Analysis)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
