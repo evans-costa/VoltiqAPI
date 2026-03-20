@@ -32,7 +32,7 @@ public class GetClientsQueryHandlerTests
             MakeClient(_userId, "João Silva"),
             MakeClient(_userId, "Maria Santos"),
         };
-        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId.ToString());
+        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId);
         _clientRepoMock
             .Setup(r => r.GetByUserIdAsync(_userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(clients);
@@ -49,7 +49,7 @@ public class GetClientsQueryHandlerTests
     [Fact]
     public async Task Handle_WhenNoClients_ShouldReturnEmptyList()
     {
-        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId.ToString());
+        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId);
         _clientRepoMock
             .Setup(r => r.GetByUserIdAsync(_userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
@@ -64,7 +64,7 @@ public class GetClientsQueryHandlerTests
     [Fact]
     public async Task Handle_WhenUserIdIsInvalid_ShouldReturnUnauthorizedError()
     {
-        _currentUserServiceMock.Setup(s => s.UserId).Returns((string?)null);
+        _currentUserServiceMock.Setup(s => s.UserId).Returns(Guid.Empty);
 
         var handler = CreateHandler();
         var result = await handler.Handle(new GetClientsQuery(), CancellationToken.None);

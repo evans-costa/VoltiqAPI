@@ -30,7 +30,7 @@ public class GetCurrentUserQueryHandlerTests
     {
         var user = MakeUser();
 
-        _currentUserServiceMock.Setup(s => s.UserId).Returns(user.Id.ToString());
+        _currentUserServiceMock.Setup(s => s.UserId).Returns(user.Id);
         _userRepoMock
             .Setup(r => r.GetByIdAsync(user.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
@@ -44,9 +44,9 @@ public class GetCurrentUserQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIdIsNull_ShouldReturnNotFoundError()
+    public async Task Handle_WhenUserIdIsEmpty_ShouldReturnNotFoundError()
     {
-        _currentUserServiceMock.Setup(s => s.UserId).Returns((string?)null);
+        _currentUserServiceMock.Setup(s => s.UserId).Returns(Guid.Empty);
 
         var handler = CreateHandler();
         var result = await handler.Handle(new GetCurrentUserQuery(), CancellationToken.None);
@@ -54,26 +54,7 @@ public class GetCurrentUserQueryHandlerTests
         result.IsError.ShouldBeTrue();
         result.FirstError.Type.ShouldBe(ErrorType.NotFound);
         result.FirstError.Description.ShouldBe(
-            string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), (string?)null));
-        _userRepoMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Theory]
-    [InlineData("not-a-guid")]
-    [InlineData("")]
-    [InlineData("12345")]
-    [InlineData("00000000-0000-0000-0000-000000000000")]
-    public async Task Handle_WhenUserIdIsInvalidGuid_ShouldReturnNotFoundError(string invalidId)
-    {
-        _currentUserServiceMock.Setup(s => s.UserId).Returns(invalidId);
-
-        var handler = CreateHandler();
-        var result = await handler.Handle(new GetCurrentUserQuery(), CancellationToken.None);
-
-        result.IsError.ShouldBeTrue();
-        result.FirstError.Type.ShouldBe(ErrorType.NotFound);
-        result.FirstError.Description.ShouldBe(
-            string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), invalidId));
+            string.Format(ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), Guid.Empty));
         _userRepoMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -81,7 +62,7 @@ public class GetCurrentUserQueryHandlerTests
     public async Task Handle_WhenUserNotFoundInDb_ShouldReturnNotFoundError()
     {
         var id = Guid.NewGuid();
-        _currentUserServiceMock.Setup(s => s.UserId).Returns(id.ToString());
+        _currentUserServiceMock.Setup(s => s.UserId).Returns(id);
         _userRepoMock
             .Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>()))
             .ReturnsAsync((User?)null);

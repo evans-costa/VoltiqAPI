@@ -29,7 +29,7 @@ public class RefreshTokenRepositoryTests : IAsyncLifetime
             .Options;
 
         var currentUser = new Mock<ICurrentUserService>();
-        currentUser.Setup(s => s.UserId).Returns((string?)null);
+        currentUser.Setup(s => s.UserId).Returns(Guid.Empty);
 
         _dbContext = new ApplicationDbContext(options, currentUser.Object);
         await _dbContext.Database.MigrateAsync();
@@ -52,7 +52,7 @@ public class RefreshTokenRepositoryTests : IAsyncLifetime
 
         await _dbContext.Users.AddAsync(user);
 
-        var token = RefreshToken.Create(rawToken, user.Id, expiresInDays: 7);
+        var token = RefreshToken.Create(rawToken, user.Id, 7);
         await _repository.AddAsync(token);
         await _unitOfWork.SaveChangesAsync();
 
@@ -67,7 +67,7 @@ public class RefreshTokenRepositoryTests : IAsyncLifetime
         var found = await _repository.GetByTokenAsync("my-raw-token-abc");
 
         found.ShouldNotBeNull();
-        found!.Id.ShouldBe(expected.Id);
+        found.Id.ShouldBe(expected.Id);
         found.IsActive.ShouldBeTrue();
     }
 

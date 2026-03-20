@@ -31,7 +31,7 @@ public class GetClientByIdQueryHandlerTests
     public async Task Handle_WhenClientExists_ShouldReturnClientResponse()
     {
         var client = MakeClient(_userId);
-        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId.ToString());
+        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId);
         _clientRepoMock
             .Setup(r => r.GetByIdAndUserIdAsync(client.Id, _userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(client);
@@ -49,7 +49,7 @@ public class GetClientByIdQueryHandlerTests
     [Fact]
     public async Task Handle_WhenClientNotFound_ShouldReturnNotFoundError()
     {
-        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId.ToString());
+        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId);
         _clientRepoMock
             .Setup(r => r.GetByIdAndUserIdAsync(It.IsAny<Guid>(), _userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Client?)null);
@@ -65,7 +65,7 @@ public class GetClientByIdQueryHandlerTests
     [Fact]
     public async Task Handle_WhenUserIdIsInvalid_ShouldReturnUnauthorizedError()
     {
-        _currentUserServiceMock.Setup(s => s.UserId).Returns((string?)null);
+        _currentUserServiceMock.Setup(s => s.UserId).Returns(Guid.Empty);
 
         var handler = CreateHandler();
         var result = await handler.Handle(new GetClientByIdQuery(Guid.NewGuid()), CancellationToken.None);
