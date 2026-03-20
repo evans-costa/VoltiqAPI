@@ -26,17 +26,15 @@ public class ApplicationDbContext(
         var actor = currentUserService.UserId;
 
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
-        {
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.CreatedAt = now;
-                entry.Entity.CreatedBy = actor;
+                entry.Entity.CreatedBy = actor.ToString();
             }
             else if (entry.State == EntityState.Modified)
             {
                 entry.Entity.UpdatedAt = now;
             }
-        }
 
         return await base.SaveChangesAsync(cancellationToken);
     }

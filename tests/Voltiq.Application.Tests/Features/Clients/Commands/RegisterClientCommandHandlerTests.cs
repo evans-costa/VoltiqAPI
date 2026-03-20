@@ -29,7 +29,7 @@ public class RegisterClientCommandHandlerTests
     [Fact]
     public async Task Handle_WithValidCommand_ShouldRegisterClientAndReturnResponse()
     {
-        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId.ToString());
+        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId);
 
         var handler = CreateHandler();
         var result = await handler.Handle(ValidCommand(), CancellationToken.None);
@@ -47,7 +47,7 @@ public class RegisterClientCommandHandlerTests
     [Fact]
     public async Task Handle_WhenUserIdIsInvalid_ShouldReturnUnauthorizedError()
     {
-        _currentUserServiceMock.Setup(s => s.UserId).Returns((string?)null);
+        _currentUserServiceMock.Setup(s => s.UserId).Returns(Guid.Empty);
 
         var handler = CreateHandler();
         var result = await handler.Handle(ValidCommand(), CancellationToken.None);

@@ -13,12 +13,16 @@ public sealed class DeleteClientCommandHandler(
     ICurrentUserService currentUserService)
     : IRequestHandler<DeleteClientCommand, ErrorOr<Deleted>>
 {
-    public async Task<ErrorOr<Deleted>> Handle(DeleteClientCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Deleted>> Handle(DeleteClientCommand request,
+        CancellationToken cancellationToken)
     {
-        if (!Guid.TryParse(currentUserService.UserId, out var userId) || userId == Guid.Empty)
+        var userId = currentUserService.UserId;
+
+        if (userId == Guid.Empty)
             return Error.Unauthorized(description: ResourceErrorMessages.TITULO_NAO_AUTORIZADO);
 
-        var client = await clientRepository.GetByIdAndUserIdAsync(request.Id, userId, cancellationToken);
+        var client =
+            await clientRepository.GetByIdAndUserIdAsync(request.Id, userId, cancellationToken);
 
         if (client is null)
             return Error.NotFound(description: ResourceErrorMessages.CLIENTE_NAO_ENCONTRADO);
@@ -29,4 +33,3 @@ public sealed class DeleteClientCommandHandler(
         return Result.Deleted;
     }
 }
-

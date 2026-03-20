@@ -18,8 +18,8 @@ public class UserRepositoryTests : IAsyncLifetime
 
     private ApplicationDbContext _dbContext = null!;
     private Repository<User> _repository = null!;
-    private UserRepository _userRepository = null!;
     private UnitOfWork _unitOfWork = null!;
+    private UserRepository _userRepository = null!;
 
     public async Task InitializeAsync()
     {
@@ -30,7 +30,7 @@ public class UserRepositoryTests : IAsyncLifetime
             .Options;
 
         var currentUser = new Mock<ICurrentUserService>();
-        currentUser.Setup(s => s.UserId).Returns((string?)null);
+        currentUser.Setup(s => s.UserId).Returns(Guid.Empty);
 
         _dbContext = new ApplicationDbContext(options, currentUser.Object);
         await _dbContext.Database.MigrateAsync();
@@ -59,7 +59,7 @@ public class UserRepositoryTests : IAsyncLifetime
         var found = await _repository.GetByIdAsync(user.Id);
 
         found.ShouldNotBeNull();
-        found!.Id.ShouldBe(user.Id);
+        found.Id.ShouldBe(user.Id);
         found.Name.ShouldBe("João Silva");
         found.Email.Value.ShouldBe("joao@example.com");
     }
@@ -92,7 +92,7 @@ public class UserRepositoryTests : IAsyncLifetime
         var found = await _userRepository.GetByEmailAsync(email);
 
         found.ShouldNotBeNull();
-        found!.Id.ShouldBe(user.Id);
+        found.Id.ShouldBe(user.Id);
         found.Name.ShouldBe("Carlos Souza");
         found.Email.Value.ShouldBe("carlos@example.com");
     }

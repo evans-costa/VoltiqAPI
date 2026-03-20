@@ -15,7 +15,9 @@ public sealed class GetCurrentUserQueryHandler(
 {
     public async Task<ErrorOr<GetUserResponse>> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)
     {
-        if (!Guid.TryParse(currentUserService.UserId, out var userId) || userId == Guid.Empty)
+        var userId = currentUserService.UserId;
+
+        if (userId == Guid.Empty)
             return Error.NotFound(description: string.Format(
                 ResourceErrorMessages.ENTIDADE_NAO_ENCONTRADA, nameof(User), currentUserService.UserId));
 

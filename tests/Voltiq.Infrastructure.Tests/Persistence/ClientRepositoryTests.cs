@@ -13,15 +13,16 @@ namespace Voltiq.Infrastructure.Tests.Persistence;
 
 public class ClientRepositoryTests : IAsyncLifetime
 {
+    private static readonly Guid UserId = Guid.NewGuid();
+
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:16-alpine")
         .Build();
 
-    private ApplicationDbContext _dbContext = null!;
-    private Repository<User> _userRepository = null!;
     private ClientRepository _clientRepository = null!;
-    private UnitOfWork _unitOfWork = null!;
 
-    private static readonly Guid UserId = Guid.NewGuid();
+    private ApplicationDbContext _dbContext = null!;
+    private UnitOfWork _unitOfWork = null!;
+    private Repository<User> _userRepository = null!;
 
     public async Task InitializeAsync()
     {
@@ -32,7 +33,7 @@ public class ClientRepositoryTests : IAsyncLifetime
             .Options;
 
         var currentUser = new Mock<ICurrentUserService>();
-        currentUser.Setup(s => s.UserId).Returns(UserId.ToString());
+        currentUser.Setup(s => s.UserId).Returns(UserId);
 
         _dbContext = new ApplicationDbContext(options, currentUser.Object);
         await _dbContext.Database.MigrateAsync();
@@ -55,9 +56,11 @@ public class ClientRepositoryTests : IAsyncLifetime
         return User.Register("João Silva", email, document, "$argon2id$hash");
     }
 
-    private static Client MakeClient(Guid userId, string name = "Cliente Teste") =>
-        Client.Register(userId, name, "(11) 99999-9999",
+    private static Client MakeClient(Guid userId, string name = "Cliente Teste")
+    {
+        return Client.Register(userId, name, "(11) 99999-9999",
             Address.Create("Rua das Flores", "123", "São Paulo", "SP", "01310-100"));
+    }
 
     private async Task<User> CreateAndSaveUserAsync()
     {
