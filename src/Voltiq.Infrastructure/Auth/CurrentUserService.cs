@@ -8,8 +8,16 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
 {
     private ClaimsPrincipal? User => httpContextAccessor.HttpContext?.User;
 
-    public string? UserId => User?.FindFirstValue(ClaimTypes.NameIdentifier)
-        ?? User?.FindFirstValue("sub");
+    public Guid UserId
+    {
+        get
+        {
+            var id = User?.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? User?.FindFirstValue("sub");
+
+            return Guid.TryParse(id, out var result) ? result : Guid.Empty;
+        }
+    }
 
     public string? UserName => User?.FindFirstValue(ClaimTypes.Name)
         ?? User?.FindFirstValue("unique_name");
