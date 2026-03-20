@@ -16,12 +16,16 @@ public sealed class RegisterClientCommandHandler(
     ICurrentUserService currentUserService)
     : IRequestHandler<RegisterClientCommand, ErrorOr<ClientResponse>>
 {
-    public async Task<ErrorOr<ClientResponse>> Handle(RegisterClientCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<ClientResponse>> Handle(RegisterClientCommand request,
+        CancellationToken cancellationToken)
     {
-        if (!Guid.TryParse(currentUserService.UserId, out var userId) || userId == Guid.Empty)
+        var userId = currentUserService.UserId;
+
+        if (userId == Guid.Empty)
             return Error.Unauthorized(description: ResourceErrorMessages.TITULO_NAO_AUTORIZADO);
 
-        var address = Address.Create(request.Street, request.Number, request.City, request.State, request.ZipCode);
+        var address = Address.Create(request.Street, request.Number, request.City, request.State,
+            request.ZipCode);
         var client = Client.Register(userId, request.Name, request.Phone, address);
 
         await clientRepository.AddAsync(client, cancellationToken);
@@ -30,4 +34,3 @@ public sealed class RegisterClientCommandHandler(
         return client.ToResponse();
     }
 }
-

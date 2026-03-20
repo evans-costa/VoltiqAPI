@@ -14,7 +14,9 @@ public sealed class GetClientByIdQueryHandler(
 {
     public async Task<ErrorOr<ClientResponse>> Handle(GetClientByIdQuery request, CancellationToken cancellationToken)
     {
-        if (!Guid.TryParse(currentUserService.UserId, out var userId) || userId == Guid.Empty)
+        var userId = currentUserService.UserId;
+
+        if (userId == Guid.Empty)
             return Error.Unauthorized(description: ResourceErrorMessages.TITULO_NAO_AUTORIZADO);
 
         var client = await clientRepository.GetByIdAndUserIdAsync(request.Id, userId, cancellationToken);

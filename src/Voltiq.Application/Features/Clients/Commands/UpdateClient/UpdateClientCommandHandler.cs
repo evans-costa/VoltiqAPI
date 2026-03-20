@@ -16,7 +16,9 @@ public sealed class UpdateClientCommandHandler(
 {
     public async Task<ErrorOr<Updated>> Handle(UpdateClientCommand request, CancellationToken cancellationToken)
     {
-        if (!Guid.TryParse(currentUserService.UserId, out var userId) || userId == Guid.Empty)
+        var userId = currentUserService.UserId;
+
+        if (userId == Guid.Empty)
             return Error.Unauthorized(description: ResourceErrorMessages.TITULO_NAO_AUTORIZADO);
 
         var client = await clientRepository.GetByIdAndUserIdAsync(request.Id, userId, cancellationToken);
