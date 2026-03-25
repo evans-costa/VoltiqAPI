@@ -22,6 +22,13 @@ public sealed class MaterialConfiguration : IEntityTypeConfiguration<Material>
             .IsRequired()
             .HasConversion<int>();
 
+        builder.Property(m => m.UserId).IsRequired();
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(m => m.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Property(m => m.IsActive)
             .IsRequired()
             .HasDefaultValue(true);
@@ -32,6 +39,9 @@ public sealed class MaterialConfiguration : IEntityTypeConfiguration<Material>
 
         builder.HasIndex(m => m.Name)
             .HasDatabaseName("IX_Materials_Name");
+
+        builder.HasIndex(m => m.UserId)
+            .HasDatabaseName("IX_Materials_UserId");
 
         builder.HasIndex(m => m.IsActive)
             .HasDatabaseName("IX_Materials_IsActive");
