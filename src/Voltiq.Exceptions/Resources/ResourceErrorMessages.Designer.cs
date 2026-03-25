@@ -197,6 +197,9 @@ public static class ResourceErrorMessages
 
     // ── Domínio — Material ─────────────────────────────────────────────────
 
+    public static string MATERIAL_USUARIO_OBRIGATORIO
+        => ResourceManager.GetString(nameof(MATERIAL_USUARIO_OBRIGATORIO))!;
+
     public static string MATERIAL_NOME_OBRIGATORIO
         => ResourceManager.GetString(nameof(MATERIAL_NOME_OBRIGATORIO))!;
 
@@ -210,6 +213,9 @@ public static class ResourceErrorMessages
         => ResourceManager.GetString(nameof(MATERIAL_NAO_ENCONTRADO))!;
 
     // ── Domínio — Orçamento ────────────────────────────────────────────────
+
+    public static string ORCAMENTO_USUARIO_OBRIGATORIO
+        => ResourceManager.GetString(nameof(ORCAMENTO_USUARIO_OBRIGATORIO))!;
 
     public static string ORCAMENTO_CLIENTE_OBRIGATORIO
         => ResourceManager.GetString(nameof(ORCAMENTO_CLIENTE_OBRIGATORIO))!;
