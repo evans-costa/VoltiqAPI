@@ -8,6 +8,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Voltiq.Application.Tests/Voltiq.Application.Tests.csproj" />
+    <Project Path="tests/Voltiq.CommonTestUtilities/Voltiq.CommonTestUtilities.csproj" />
     <Project Path="tests/Voltiq.Domain.Tests/Voltiq.Domain.Tests.csproj" />
     <Project Path="tests/Voltiq.Infrastructure.Tests/Voltiq.Infrastructure.Tests.csproj" />
   </Folder>
