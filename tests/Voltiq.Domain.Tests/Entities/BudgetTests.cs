@@ -52,7 +52,7 @@ public class BudgetTests
     public void AddItem_ShouldRecalculateTotalAmount()
     {
         var budget = Budget.Register(ValidUserId, ValidClientId);
-        var item = BudgetItem.Create(budget.Id, null, "Cabo 10mm", MaterialUnit.Meter, 2, 15.50m);
+        var item = BudgetItem.Create(budget.Id, null, "Cabo 10mm", MaterialUnit.Metro, 2, 15.50m);
 
         budget.AddItem(item);
 
@@ -64,8 +64,8 @@ public class BudgetTests
     public void AddMultipleItems_ShouldSumAllTotals()
     {
         var budget = Budget.Register(ValidUserId, ValidClientId);
-        var item1 = BudgetItem.Create(budget.Id, null, "Cabo 10mm", MaterialUnit.Meter, 2, 10m);
-        var item2 = BudgetItem.Create(budget.Id, null, "Disjuntor", MaterialUnit.Unit, 1, 50m);
+        var item1 = BudgetItem.Create(budget.Id, null, "Cabo 10mm", MaterialUnit.Metro, 2, 10m);
+        var item2 = BudgetItem.Create(budget.Id, null, "Disjuntor", MaterialUnit.Unidade, 1, 50m);
 
         budget.AddItem(item1);
         budget.AddItem(item2);
