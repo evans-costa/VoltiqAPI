@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Shouldly;
-using Testcontainers.PostgreSql;
-using Voltiq.Application.Common.Interfaces;
+using Voltiq.CommonTestUtilities.Database;
+using Voltiq.CommonTestUtilities.Fixtures;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Infrastructure.Persistence;
@@ -11,12 +10,10 @@ using Voltiq.Infrastructure.Persistence.Repositories.Client;
 
 namespace Voltiq.Infrastructure.Tests.Persistence;
 
-public class ClientRepositoryTests : IAsyncLifetime
+public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
+    : IClassFixture<PostgreSqlContainerFixture>, IAsyncLifetime
 {
     private static readonly Guid UserId = Guid.NewGuid();
-
-    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:16-alpine")
-        .Build();
 
     private ClientRepository _clientRepository = null!;
 
@@ -24,29 +21,20 @@ public class ClientRepositoryTests : IAsyncLifetime
     private UnitOfWork _unitOfWork = null!;
     private Repository<User> _userRepository = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await _postgres.StartAsync();
-
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseNpgsql(_postgres.GetConnectionString())
-            .Options;
-
-        var currentUser = new Mock<ICurrentUserService>();
-        currentUser.Setup(s => s.UserId).Returns(UserId);
-
-        _dbContext = new ApplicationDbContext(options, currentUser.Object);
+        _dbContext = ApplicationDbContextFactory.Create(fixture.Container.GetConnectionString(), UserId);
         await _dbContext.Database.MigrateAsync();
+        await DatabaseHelper.CleanAsync(_dbContext);
 
         _userRepository = new Repository<User>(_dbContext);
         _clientRepository = new ClientRepository(_dbContext);
         _unitOfWork = new UnitOfWork(_dbContext);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _dbContext.DisposeAsync();
-        await _postgres.DisposeAsync();
     }
 
     private static User MakeUser()
@@ -76,13 +64,14 @@ public class ClientRepositoryTests : IAsyncLifetime
         var user = await CreateAndSaveUserAsync();
         var client = MakeClient(user.Id);
 
-        await _clientRepository.AddAsync(client);
-        await _unitOfWork.SaveChangesAsync();
+        await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var found = await _clientRepository.GetByIdAsync(client.Id);
+        var found =
+            await _clientRepository.GetByIdAsync(client.Id, TestContext.Current.CancellationToken);
 
         found.ShouldNotBeNull();
-        found!.Id.ShouldBe(client.Id);
+        found.Id.ShouldBe(client.Id);
         found.Name.ShouldBe("Cliente Teste");
         found.Phone.ShouldBe("(11) 99999-9999");
         found.Address.Street.ShouldBe("Rua das Flores");
@@ -98,19 +87,21 @@ public class ClientRepositoryTests : IAsyncLifetime
         var email2 = Email.Create("maria@example.com").Value;
         var doc2 = Document.Create("11222333000181").Value;
         var user2 = User.Register("Maria Santos", email2, doc2, "$argon2id$hash2");
-        await _userRepository.AddAsync(user2);
-        await _unitOfWork.SaveChangesAsync();
+        await _userRepository.AddAsync(user2, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var client1 = MakeClient(user1.Id, "Cliente User1");
         var client2 = MakeClient(user1.Id, "Cliente User1 B");
         var client3 = MakeClient(user2.Id, "Cliente User2");
 
-        await _clientRepository.AddAsync(client1);
-        await _clientRepository.AddAsync(client2);
-        await _clientRepository.AddAsync(client3);
-        await _unitOfWork.SaveChangesAsync();
+        await _clientRepository.AddAsync(client1, TestContext.Current.CancellationToken);
+        await _clientRepository.AddAsync(client2, TestContext.Current.CancellationToken);
+        await _clientRepository.AddAsync(client3, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var user1Clients = await _clientRepository.GetByUserIdAsync(user1.Id);
+        var user1Clients =
+            await _clientRepository.GetByUserIdAsync(user1.Id,
+                TestContext.Current.CancellationToken);
 
         user1Clients.Count.ShouldBe(2);
         user1Clients.ShouldAllBe(c => c.UserId == user1.Id);
@@ -122,13 +113,14 @@ public class ClientRepositoryTests : IAsyncLifetime
         var user = await CreateAndSaveUserAsync();
         var client = MakeClient(user.Id);
 
-        await _clientRepository.AddAsync(client);
-        await _unitOfWork.SaveChangesAsync();
+        await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var found = await _clientRepository.GetByIdAndUserIdAsync(client.Id, user.Id);
+        var found = await _clientRepository.GetByIdAndUserIdAsync(client.Id, user.Id,
+            TestContext.Current.CancellationToken);
 
         found.ShouldNotBeNull();
-        found!.Id.ShouldBe(client.Id);
+        found.Id.ShouldBe(client.Id);
     }
 
     [Fact]
@@ -139,14 +131,15 @@ public class ClientRepositoryTests : IAsyncLifetime
         var email2 = Email.Create("outro@example.com").Value;
         var doc2 = Document.Create("11222333000181").Value;
         var user2 = User.Register("Outro User", email2, doc2, "$argon2id$hash2");
-        await _userRepository.AddAsync(user2);
-        await _unitOfWork.SaveChangesAsync();
+        await _userRepository.AddAsync(user2, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var client = MakeClient(user1.Id);
-        await _clientRepository.AddAsync(client);
-        await _unitOfWork.SaveChangesAsync();
+        await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var found = await _clientRepository.GetByIdAndUserIdAsync(client.Id, user2.Id);
+        var found = await _clientRepository.GetByIdAndUserIdAsync(client.Id, user2.Id,
+            TestContext.Current.CancellationToken);
 
         found.ShouldBeNull();
     }
