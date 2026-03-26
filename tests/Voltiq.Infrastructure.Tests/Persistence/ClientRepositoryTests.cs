@@ -44,9 +44,10 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
         return User.Register("João Silva", email, document, "$argon2id$hash");
     }
 
-    private static Client MakeClient(Guid userId, string name = "Cliente Teste")
+    private static Client MakeClient(Guid userId, string name = "Cliente Teste", string email = "cliente@example.com")
     {
-        return Client.Register(userId, name, "(11) 99999-9999",
+        var emailVo = Email.Create(email).Value;
+        return Client.Register(userId, name, "(11) 99999-9999", emailVo,
             Address.Create("Rua das Flores", "123", "São Paulo", "SP", "01310-100"));
     }
 
@@ -74,6 +75,7 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
         found.Id.ShouldBe(client.Id);
         found.Name.ShouldBe("Cliente Teste");
         found.Phone.ShouldBe("(11) 99999-9999");
+        found.Email.Value.ShouldBe("cliente@example.com");
         found.Address.Street.ShouldBe("Rua das Flores");
         found.Address.City.ShouldBe("São Paulo");
         found.UserId.ShouldBe(user.Id);
@@ -90,9 +92,9 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
         await _userRepository.AddAsync(user2, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var client1 = MakeClient(user1.Id, "Cliente User1");
-        var client2 = MakeClient(user1.Id, "Cliente User1 B");
-        var client3 = MakeClient(user2.Id, "Cliente User2");
+        var client1 = MakeClient(user1.Id, "Cliente User1", "user1a@example.com");
+        var client2 = MakeClient(user1.Id, "Cliente User1 B", "user1b@example.com");
+        var client3 = MakeClient(user2.Id, "Cliente User2", "user2@example.com");
 
         await _clientRepository.AddAsync(client1, TestContext.Current.CancellationToken);
         await _clientRepository.AddAsync(client2, TestContext.Current.CancellationToken);
@@ -142,5 +144,65 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
             TestContext.Current.CancellationToken);
 
         found.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task ExistsWithEmailForUserAsync_ShouldReturnTrue_WhenEmailExistsForUser()
+    {
+        var user = await CreateAndSaveUserAsync();
+        var client = MakeClient(user.Id, email: "ocupado@example.com");
+        await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var exists = await _clientRepository.ExistsWithEmailForUserAsync(
+            "ocupado@example.com", user.Id, cancellationToken: TestContext.Current.CancellationToken);
+
+        exists.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task ExistsWithEmailForUserAsync_ShouldReturnFalse_WhenEmailDoesNotExistForUser()
+    {
+        var user = await CreateAndSaveUserAsync();
+
+        var exists = await _clientRepository.ExistsWithEmailForUserAsync(
+            "inexistente@example.com", user.Id, cancellationToken: TestContext.Current.CancellationToken);
+
+        exists.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task ExistsWithEmailForUserAsync_ShouldReturnFalse_WhenExcludeIdMatchesExistingClient()
+    {
+        var user = await CreateAndSaveUserAsync();
+        var client = MakeClient(user.Id, email: "meu@example.com");
+        await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var exists = await _clientRepository.ExistsWithEmailForUserAsync(
+            "meu@example.com", user.Id, client.Id, TestContext.Current.CancellationToken);
+
+        exists.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task ExistsWithEmailForUserAsync_ShouldReturnFalse_WhenEmailBelongsToAnotherUser()
+    {
+        var user1 = await CreateAndSaveUserAsync();
+
+        var email2 = Email.Create("outro@example.com").Value;
+        var doc2 = Document.Create("11222333000181").Value;
+        var user2 = User.Register("Outro User", email2, doc2, "$argon2id$hash2");
+        await _userRepository.AddAsync(user2, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = MakeClient(user1.Id, email: "compartilhado@example.com");
+        await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var exists = await _clientRepository.ExistsWithEmailForUserAsync(
+            "compartilhado@example.com", user2.Id, cancellationToken: TestContext.Current.CancellationToken);
+
+        exists.ShouldBeFalse();
     }
 }

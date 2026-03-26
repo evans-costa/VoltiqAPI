@@ -25,7 +25,8 @@ public class DeleteClientCommandHandlerTests
     private static Client MakeClient(Guid userId)
     {
         var address = Address.Create("Rua das Flores", "123", "São Paulo", "SP", "01310-100");
-        return Client.Register(userId, "João Silva", "(11) 99999-9999", address);
+        var email = Email.Create("joao@example.com").Value;
+        return Client.Register(userId, "João Silva", "(11) 99999-9999", email, address);
     }
 
     [Fact]
