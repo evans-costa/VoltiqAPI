@@ -18,4 +18,13 @@ public sealed class ClientRepository(ApplicationDbContext context)
         => await Context.Clients
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId, cancellationToken);
+
+    public async Task<bool> ExistsWithEmailForUserAsync(
+        string email, Guid userId, Guid? excludeId = null, CancellationToken cancellationToken = default)
+        => await Context.Clients
+            .AsNoTracking()
+            .AnyAsync(c => c.UserId == userId
+                           && c.Email.Value == email
+                           && (excludeId == null || c.Id != excludeId),
+                cancellationToken);
 }
