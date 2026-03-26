@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Domain.Entities;
+using Voltiq.Domain.Interfaces;
 
 namespace Voltiq.Infrastructure.Persistence;
 
@@ -26,6 +27,7 @@ public class ApplicationDbContext(
         var actor = currentUserService.UserId;
 
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+        {
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.CreatedAt = now;
@@ -35,6 +37,13 @@ public class ApplicationDbContext(
             {
                 entry.Entity.UpdatedAt = now;
             }
+            else if (entry is { State: EntityState.Deleted, Entity: ISoftDeletable softDeletable })
+            {
+                entry.State = EntityState.Modified;
+                softDeletable.SoftDelete();
+                entry.Entity.UpdatedAt = now;
+            }
+        }
 
         return await base.SaveChangesAsync(cancellationToken);
     }
