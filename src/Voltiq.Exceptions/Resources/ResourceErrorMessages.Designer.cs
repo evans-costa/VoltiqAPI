@@ -195,6 +195,24 @@ public static class ResourceErrorMessages
     public static string CLIENTE_NAO_ENCONTRADO
         => ResourceManager.GetString(nameof(CLIENTE_NAO_ENCONTRADO))!;
 
+    /// <summary>
+    ///   Looks up a localized string similar to O e-mail do cliente é obrigatório.
+    /// </summary>
+    public static string CLIENTE_EMAIL_OBRIGATORIO
+        => ResourceManager.GetString(nameof(CLIENTE_EMAIL_OBRIGATORIO))!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to O e-mail informado não é válido.
+    /// </summary>
+    public static string CLIENTE_EMAIL_INVALIDO
+        => ResourceManager.GetString(nameof(CLIENTE_EMAIL_INVALIDO))!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Já existe um cliente cadastrado com este e-mail.
+    /// </summary>
+    public static string CLIENTE_EMAIL_JA_CADASTRADO
+        => ResourceManager.GetString(nameof(CLIENTE_EMAIL_JA_CADASTRADO))!;
+
     // ── Domínio — Material ─────────────────────────────────────────────────
 
     public static string MATERIAL_USUARIO_OBRIGATORIO

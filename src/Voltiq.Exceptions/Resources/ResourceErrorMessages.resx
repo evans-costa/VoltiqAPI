@@ -145,6 +145,15 @@
   <data name="CLIENTE_NAO_ENCONTRADO" xml:space="preserve">
     <value>Cliente não encontrado.</value>
   </data>
+  <data name="CLIENTE_EMAIL_OBRIGATORIO" xml:space="preserve">
+    <value>O e-mail do cliente é obrigatório.</value>
+  </data>
+  <data name="CLIENTE_EMAIL_INVALIDO" xml:space="preserve">
+    <value>O e-mail informado não é válido.</value>
+  </data>
+  <data name="CLIENTE_EMAIL_JA_CADASTRADO" xml:space="preserve">
+    <value>Já existe um cliente cadastrado com este e-mail.</value>
+  </data>
 
   <!-- ═══════════════════════════════ Domínio — Material ══════════════════ -->
 
