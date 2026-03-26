@@ -41,6 +41,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.CreatedBy).HasMaxLength(200);
         builder.Property(u => u.UpdatedAt);
 
+        builder.Property(u => u.IsDeleted).IsRequired().HasDefaultValue(false);
+        builder.Property(u => u.DeletedAt);
+
+        builder.HasIndex(u => u.IsDeleted)
+            .HasDatabaseName("IX_Users_IsDeleted");
+
+        builder.HasQueryFilter(u => !u.IsDeleted);
+
         builder.Ignore(u => u.DomainEvents);
     }
 }
