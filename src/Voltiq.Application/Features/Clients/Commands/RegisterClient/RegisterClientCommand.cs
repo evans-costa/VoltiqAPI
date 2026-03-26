@@ -6,6 +6,7 @@ namespace Voltiq.Application.Features.Clients.Commands.RegisterClient;
 public sealed record RegisterClientCommand(
     string Name,
     string Phone,
+    string Email,
     string Street,
     string Number,
     string City,

@@ -26,8 +26,15 @@ public sealed class UpdateClientCommandHandler(
         if (client is null)
             return Error.NotFound(description: ResourceErrorMessages.CLIENTE_NAO_ENCONTRADO);
 
+        var emailExists = await clientRepository.ExistsWithEmailForUserAsync(
+            request.Email, userId, request.Id, cancellationToken);
+
+        if (emailExists)
+            return Error.Conflict(description: ResourceErrorMessages.CLIENTE_EMAIL_JA_CADASTRADO);
+
+        var email = Email.Create(request.Email).Value;
         var address = Address.Create(request.Street, request.Number, request.City, request.State, request.ZipCode);
-        client.Update(request.Name, request.Phone, address);
+        client.Update(request.Name, request.Phone, email, address);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
