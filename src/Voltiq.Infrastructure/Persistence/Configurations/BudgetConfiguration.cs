@@ -44,6 +44,9 @@ public sealed class BudgetConfiguration : IEntityTypeConfiguration<Budget>
         builder.Property(b => b.CreatedBy).HasMaxLength(200);
         builder.Property(b => b.UpdatedAt);
 
+        builder.Property(b => b.IsDeleted).IsRequired().HasDefaultValue(false);
+        builder.Property(b => b.DeletedAt);
+
         builder.HasIndex(b => b.UserId)
             .HasDatabaseName("IX_Budgets_UserId");
 
@@ -52,6 +55,11 @@ public sealed class BudgetConfiguration : IEntityTypeConfiguration<Budget>
 
         builder.HasIndex(b => b.Status)
             .HasDatabaseName("IX_Budgets_Status");
+
+        builder.HasIndex(b => b.IsDeleted)
+            .HasDatabaseName("IX_Budgets_IsDeleted");
+
+        builder.HasQueryFilter(b => !b.IsDeleted);
 
         builder.Ignore(b => b.DomainEvents);
     }
