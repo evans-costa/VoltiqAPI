@@ -57,6 +57,14 @@ public sealed class ClientConfiguration : IEntityTypeConfiguration<Client>
         builder.Property(c => c.CreatedBy).HasMaxLength(200);
         builder.Property(c => c.UpdatedAt);
 
+        builder.Property(c => c.IsDeleted).IsRequired().HasDefaultValue(false);
+        builder.Property(c => c.DeletedAt);
+
+        builder.HasIndex(c => c.IsDeleted)
+            .HasDatabaseName("IX_Clients_IsDeleted");
+
+        builder.HasQueryFilter(c => !c.IsDeleted);
+
         builder.Ignore(c => c.DomainEvents);
     }
 }
