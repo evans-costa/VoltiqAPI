@@ -36,8 +36,24 @@ builder.Services.AddOpenApi("v1", o =>
         document.Info = new OpenApiInfo
         {
             Title = "Voltiq API",
-            Description = "API da aplicação Voltiq.",
-            Version = "v1"
+            Description = "API da aplicação Voltiq",
+            Version = "v1",
+            License = new OpenApiLicense
+            {
+                Name = "GNU AFFERO GENERAL PUBLIC LICENSE Version 3 (AGPL-3.0)",
+                Url = new Uri("https://www.gnu.org/licenses/agpl-3.0.pt-br.html")
+            },
+            Summary =
+                """
+                Voltiq é uma aplicação para gerir orçamentos, clientes e materiais para
+                profissionais autônomos, principalmente eletricistas, oferecendo uma maneira
+                prática e eficiente de gerir seus clientes e orçamentos.
+                """,
+            Contact = new OpenApiContact
+            {
+                Name = "Team Voltiq",
+                Email = "suporte@voltiq.com.br"
+            }
         };
 
         document.Servers =
@@ -54,7 +70,7 @@ builder.Services.AddOpenApi("v1", o =>
             Scheme = "bearer",
             BearerFormat = "JWT",
             In = ParameterLocation.Header,
-            Description = "Enter your JWT token."
+            Description = "Autenticação via _token_ JWT. Insira-o no campo abaixo"
         };
 
         document.Security ??= new List<OpenApiSecurityRequirement>();

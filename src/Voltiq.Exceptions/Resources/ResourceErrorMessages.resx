@@ -148,6 +148,9 @@
 
   <!-- ═══════════════════════════════ Domínio — Material ══════════════════ -->
 
+  <data name="MATERIAL_USUARIO_OBRIGATORIO" xml:space="preserve">
+    <value>O usuário do material é obrigatório.</value>
+  </data>
   <data name="MATERIAL_NOME_OBRIGATORIO" xml:space="preserve">
     <value>O nome do material é obrigatório.</value>
   </data>
@@ -163,6 +166,9 @@
 
   <!-- ═══════════════════════════════ Domínio — Orçamento ══════════════════ -->
 
+  <data name="ORCAMENTO_USUARIO_OBRIGATORIO" xml:space="preserve">
+    <value>O usuário do orçamento é obrigatório.</value>
+  </data>
   <data name="ORCAMENTO_CLIENTE_OBRIGATORIO" xml:space="preserve">
     <value>O cliente do orçamento é obrigatório.</value>
   </data>

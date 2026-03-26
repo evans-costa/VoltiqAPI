@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Shouldly;
-using Testcontainers.PostgreSql;
-using Voltiq.Application.Common.Interfaces;
+using Voltiq.CommonTestUtilities.Database;
+using Voltiq.CommonTestUtilities.Fixtures;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Infrastructure.Persistence;
@@ -11,37 +10,26 @@ using Voltiq.Infrastructure.Persistence.Repositories.TokenRepository;
 
 namespace Voltiq.Infrastructure.Tests.Persistence;
 
-public class RefreshTokenRepositoryTests : IAsyncLifetime
+public class RefreshTokenRepositoryTests(PostgreSqlContainerFixture fixture)
+    : IClassFixture<PostgreSqlContainerFixture>, IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:16-alpine")
-        .Build();
-
     private ApplicationDbContext _dbContext = null!;
     private RefreshTokenRepository _repository = null!;
     private UnitOfWork _unitOfWork = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await _postgres.StartAsync();
-
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseNpgsql(_postgres.GetConnectionString())
-            .Options;
-
-        var currentUser = new Mock<ICurrentUserService>();
-        currentUser.Setup(s => s.UserId).Returns(Guid.Empty);
-
-        _dbContext = new ApplicationDbContext(options, currentUser.Object);
+        _dbContext = ApplicationDbContextFactory.Create(fixture.Container.GetConnectionString(), Guid.Empty);
         await _dbContext.Database.MigrateAsync();
+        await DatabaseHelper.CleanAsync(_dbContext);
 
         _repository = new RefreshTokenRepository(_dbContext);
         _unitOfWork = new UnitOfWork(_dbContext);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _dbContext.DisposeAsync();
-        await _postgres.DisposeAsync();
     }
 
     private async Task<(User user, RefreshToken token)> SeedUserAndTokenAsync(string rawToken)
@@ -64,7 +52,8 @@ public class RefreshTokenRepositoryTests : IAsyncLifetime
     {
         var (_, expected) = await SeedUserAndTokenAsync("my-raw-token-abc");
 
-        var found = await _repository.GetByTokenAsync("my-raw-token-abc");
+        var found = await _repository.GetByTokenAsync("my-raw-token-abc",
+            TestContext.Current.CancellationToken);
 
         found.ShouldNotBeNull();
         found.Id.ShouldBe(expected.Id);
@@ -74,7 +63,8 @@ public class RefreshTokenRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task GetByTokenAsync_WhenTokenNotFound_ReturnsNull()
     {
-        var found = await _repository.GetByTokenAsync("token-que-nao-existe");
+        var found = await _repository.GetByTokenAsync("token-que-nao-existe",
+            TestContext.Current.CancellationToken);
 
         found.ShouldBeNull();
     }
