@@ -14,26 +14,30 @@ public sealed class UpdateClientCommandHandler(
     ICurrentUserService currentUserService)
     : IRequestHandler<UpdateClientCommand, ErrorOr<Updated>>
 {
-    public async Task<ErrorOr<Updated>> Handle(UpdateClientCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Updated>> Handle(UpdateClientCommand request,
+        CancellationToken cancellationToken)
     {
         var userId = currentUserService.UserId;
 
         if (userId == Guid.Empty)
             return Error.Unauthorized(description: ResourceErrorMessages.TITULO_NAO_AUTORIZADO);
 
-        var client = await clientRepository.GetByIdAndUserIdAsync(request.Id, userId, cancellationToken);
+        var client =
+            await clientRepository.GetByIdAndUserIdAsync(request.Id, userId, cancellationToken);
 
         if (client is null)
             return Error.NotFound(description: ResourceErrorMessages.CLIENTE_NAO_ENCONTRADO);
 
+        var email = Email.Create(request.Email).Value;
+
         var emailExists = await clientRepository.ExistsWithEmailForUserAsync(
-            request.Email, userId, request.Id, cancellationToken);
+            email, userId, request.Id, cancellationToken);
 
         if (emailExists)
             return Error.Conflict(description: ResourceErrorMessages.CLIENTE_EMAIL_JA_CADASTRADO);
 
-        var email = Email.Create(request.Email).Value;
-        var address = Address.Create(request.Street, request.Number, request.City, request.State, request.ZipCode);
+        var address = Address.Create(request.Street, request.Number, request.City, request.State,
+            request.ZipCode);
         client.Update(request.Name, request.Phone, email, address);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -41,4 +45,3 @@ public sealed class UpdateClientCommandHandler(
         return Result.Updated;
     }
 }
-
