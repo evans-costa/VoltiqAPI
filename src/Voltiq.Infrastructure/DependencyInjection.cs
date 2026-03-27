@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Voltiq.Exceptions.Resources;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories;
@@ -13,8 +12,10 @@ using Voltiq.Domain.Interfaces.Repositories.Budget;
 using Voltiq.Domain.Interfaces.Repositories.Client;
 using Voltiq.Domain.Interfaces.Repositories.Material;
 using Voltiq.Domain.Interfaces.Repositories.User;
+using Voltiq.Exceptions.Resources;
 using Voltiq.Infrastructure.Auth;
 using Voltiq.Infrastructure.Persistence;
+using Voltiq.Infrastructure.Persistence.Interceptors;
 using Voltiq.Infrastructure.Persistence.Repositories;
 using Voltiq.Infrastructure.Persistence.Repositories.Budget;
 using Voltiq.Infrastructure.Persistence.Repositories.Client;
@@ -63,10 +64,11 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(
-                connectionString,
-                b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+        services.AddSingleton<SoftDeleteInterceptor>();
+        services.AddDbContext<ApplicationDbContext>((sp, options) => options
+            .UseNpgsql(connectionString,
+                b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName))
+            .AddInterceptors(sp.GetRequiredService<SoftDeleteInterceptor>()));
     }
 
     private static void AddJwtAuthentication(IServiceCollection services,
@@ -89,7 +91,7 @@ public static class DependencyInjection
                     ValidIssuer = jwtSettings["Issuer"],
                     ValidAudience = jwtSettings["Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(secretKey)),
+                        Encoding.UTF8.GetBytes(secretKey))
                 };
 
                 options.Events = new JwtBearerEvents
@@ -105,9 +107,9 @@ public static class DependencyInjection
                         {
                             title = ResourceErrorMessages.TITULO_NAO_AUTORIZADO,
                             status = StatusCodes.Status401Unauthorized,
-                            instance = context.Request.Path.Value,
+                            instance = context.Request.Path.Value
                         });
-                    },
+                    }
                 };
             });
 
