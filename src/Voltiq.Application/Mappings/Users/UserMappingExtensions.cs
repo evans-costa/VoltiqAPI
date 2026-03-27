@@ -14,8 +14,8 @@ public static class UserMappingExtensions
 
     extension(User user)
     {
-        public RegisterUserResponse ToRegisterUserResponse(string token) =>
-            new(user.Id, token);
+        public RegisterUserResponse ToRegisterUserResponse(string accessToken, string refreshToken) =>
+            new(user.Id, accessToken, refreshToken);
 
         public GetUserResponse ToGetUserResponse() =>
             new(user.Name, user.Email.Value);
