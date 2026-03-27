@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Infrastructure.Persistence;
+using Voltiq.Infrastructure.Persistence.Interceptors;
 
 namespace Voltiq.CommonTestUtilities.Database;
 
@@ -15,7 +15,7 @@ public static class ApplicationDbContextFactory
 
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseNpgsql(connectionString)
-            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
+            .AddInterceptors(new SoftDeleteInterceptor())
             .Options;
 
         return new ApplicationDbContext(options, currentUser.Object);

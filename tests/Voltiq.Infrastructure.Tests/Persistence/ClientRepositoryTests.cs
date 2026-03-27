@@ -23,7 +23,8 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
 
     public async ValueTask InitializeAsync()
     {
-        _dbContext = ApplicationDbContextFactory.Create(fixture.Container.GetConnectionString(), UserId);
+        _dbContext =
+            ApplicationDbContextFactory.Create(fixture.Container.GetConnectionString(), UserId);
         await _dbContext.Database.MigrateAsync();
         await DatabaseHelper.CleanAsync(_dbContext);
 
@@ -44,7 +45,8 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
         return User.Register("João Silva", email, document, "$argon2id$hash");
     }
 
-    private static Client MakeClient(Guid userId, string name = "Cliente Teste", string email = "cliente@example.com")
+    private static Client MakeClient(Guid userId, string name = "Cliente Teste",
+        string email = "cliente@example.com")
     {
         var emailVo = Email.Create(email).Value;
         return Client.Register(userId, name, "(11) 99999-9999", emailVo,
@@ -154,8 +156,10 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
         await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
+        var existingEmail = Email.Create("ocupado@example.com").Value;
+
         var exists = await _clientRepository.ExistsWithEmailForUserAsync(
-            "ocupado@example.com", user.Id, cancellationToken: TestContext.Current.CancellationToken);
+            existingEmail, user.Id, cancellationToken: TestContext.Current.CancellationToken);
 
         exists.ShouldBeTrue();
     }
@@ -164,23 +168,27 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
     public async Task ExistsWithEmailForUserAsync_ShouldReturnFalse_WhenEmailDoesNotExistForUser()
     {
         var user = await CreateAndSaveUserAsync();
+        var email = Email.Create("inexistente@example.co").Value;
 
         var exists = await _clientRepository.ExistsWithEmailForUserAsync(
-            "inexistente@example.com", user.Id, cancellationToken: TestContext.Current.CancellationToken);
+            email, user.Id, cancellationToken: TestContext.Current.CancellationToken);
 
         exists.ShouldBeFalse();
     }
 
     [Fact]
-    public async Task ExistsWithEmailForUserAsync_ShouldReturnFalse_WhenExcludeIdMatchesExistingClient()
+    public async Task
+        ExistsWithEmailForUserAsync_ShouldReturnFalse_WhenExcludeIdMatchesExistingClient()
     {
         var user = await CreateAndSaveUserAsync();
         var client = MakeClient(user.Id, email: "meu@example.com");
         await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
+        var email = Email.Create("meu@example.com").Value;
+
         var exists = await _clientRepository.ExistsWithEmailForUserAsync(
-            "meu@example.com", user.Id, client.Id, TestContext.Current.CancellationToken);
+            email, user.Id, client.Id, TestContext.Current.CancellationToken);
 
         exists.ShouldBeFalse();
     }
@@ -200,8 +208,10 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
         await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
+        var clientEmail = Email.Create("compartilhado@example.com").Value;
+
         var exists = await _clientRepository.ExistsWithEmailForUserAsync(
-            "compartilhado@example.com", user2.Id, cancellationToken: TestContext.Current.CancellationToken);
+            clientEmail, user2.Id, cancellationToken: TestContext.Current.CancellationToken);
 
         exists.ShouldBeFalse();
     }
