@@ -3,15 +3,38 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Voltiq.Application.Features.Auth.Commands.Login;
 using Voltiq.Application.Features.Auth.Commands.Refresh;
-using Voltiq.Application.Features.Users.Queries.GetCurrentUser;
+using Voltiq.Application.Features.Users.Commands.RegisterUser;
 using Voltiq.Application.Mappings.Auth;
+using Voltiq.Application.Mappings.Users;
 
 namespace Voltiq.API.Controllers.Auth;
 
 [ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/auth")]
+[Route("api/v{version:apiVersion}")]
 public sealed class AuthController : BaseApiController
 {
+    /// <summary>Registers a new user account.</summary>
+    /// <response code="201">User registered successfully.</response>
+    /// <response code="400">Validation error.</response>
+    /// <response code="409">Email and/or document already in use.</response>
+    [AllowAnonymous]
+    [HttpPost("register")]
+    [ProducesResponseType(typeof(RegisterUserResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Register(
+        [FromBody] RegisterUserRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = request.ToCommand();
+        var result = await Sender.Send(command, cancellationToken);
+
+        return result.Match(
+            user => CreatedAtAction(nameof(Register), new { id = user.Id }, user),
+            ToErrorResult);
+    }
+
+
     /// <summary>Authenticates a user and returns an access token and a refresh token.</summary>
     /// <response code="200">Authentication successful.</response>
     /// <response code="400">Validation error.</response>
@@ -47,23 +70,6 @@ public sealed class AuthController : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await Sender.Send(request.ToCommand(), cancellationToken);
-
-        return result.Match(
-            Ok,
-            ToErrorResult);
-    }
-
-    /// <summary>Returns the currently authenticated user.</summary>
-    /// <response code="200">Current user data.</response>
-    /// <response code="401">Token missing or invalid.</response>
-    /// <response code="404">User no longer exists.</response>
-    [HttpGet("me")]
-    [ProducesResponseType(typeof(GetUserResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Me(CancellationToken cancellationToken)
-    {
-        var result = await Sender.Send(new GetCurrentUserQuery(), cancellationToken);
 
         return result.Match(
             Ok,
