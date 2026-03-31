@@ -1,7 +1,6 @@
 using ErrorOr;
 using Moq;
 using Shouldly;
-using Voltiq.Application.Common.Interfaces;
 using Voltiq.Application.Features.Clients.Commands.UpdateClient;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
@@ -14,15 +13,13 @@ namespace Voltiq.Application.Tests.Features.Clients.Commands;
 public class UpdateClientCommandHandlerTests
 {
     private readonly Mock<IClientRepository> _clientRepoMock = new();
-    private readonly Mock<ICurrentUserService> _currentUserServiceMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
     private readonly Guid _userId = Guid.NewGuid();
 
     private UpdateClientCommandHandler CreateHandler()
     {
-        return new UpdateClientCommandHandler(_clientRepoMock.Object, _unitOfWorkMock.Object,
-            _currentUserServiceMock.Object);
+        return new UpdateClientCommandHandler(_clientRepoMock.Object, _unitOfWorkMock.Object);
     }
 
     private static Client MakeClient(Guid userId)
@@ -36,7 +33,6 @@ public class UpdateClientCommandHandlerTests
     public async Task Handle_WithValidCommand_ShouldUpdateClientAndReturnUpdated()
     {
         var client = MakeClient(_userId);
-        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId);
         _clientRepoMock
             .Setup(r => r.GetByIdAndUserIdAsync(client.Id, _userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(client);
@@ -47,7 +43,7 @@ public class UpdateClientCommandHandlerTests
 
         var command = new UpdateClientCommand(
             client.Id, "Maria Souza", "(11) 88888-8888", "maria@example.com",
-            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100");
+            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100") { UserId = _userId };
 
         var handler = CreateHandler();
         var result = await handler.Handle(command, CancellationToken.None);
@@ -60,7 +56,6 @@ public class UpdateClientCommandHandlerTests
     public async Task Handle_WhenEmailAlreadyExistsForAnotherClient_ShouldReturnConflictError()
     {
         var client = MakeClient(_userId);
-        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId);
         _clientRepoMock
             .Setup(r => r.GetByIdAndUserIdAsync(client.Id, _userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(client);
@@ -71,7 +66,7 @@ public class UpdateClientCommandHandlerTests
 
         var command = new UpdateClientCommand(
             client.Id, "Maria Souza", "(11) 88888-8888", "outro@example.com",
-            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100");
+            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100") { UserId = _userId };
 
         var handler = CreateHandler();
         var result = await handler.Handle(command, CancellationToken.None);
@@ -85,7 +80,6 @@ public class UpdateClientCommandHandlerTests
     [Fact]
     public async Task Handle_WhenClientNotFound_ShouldReturnNotFoundError()
     {
-        _currentUserServiceMock.Setup(s => s.UserId).Returns(_userId);
         _clientRepoMock
             .Setup(r =>
                 r.GetByIdAndUserIdAsync(It.IsAny<Guid>(), _userId, It.IsAny<CancellationToken>()))
@@ -93,7 +87,7 @@ public class UpdateClientCommandHandlerTests
 
         var command = new UpdateClientCommand(
             Guid.NewGuid(), "Maria Souza", "(11) 88888-8888", "maria@example.com",
-            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100");
+            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100") { UserId = _userId };
 
         var handler = CreateHandler();
         var result = await handler.Handle(command, CancellationToken.None);
@@ -102,21 +96,5 @@ public class UpdateClientCommandHandlerTests
         result.FirstError.Type.ShouldBe(ErrorType.NotFound);
         result.FirstError.Description.ShouldBe(ResourceErrorMessages.CLIENTE_NAO_ENCONTRADO);
         _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task Handle_WhenUserIdIsInvalid_ShouldReturnUnauthorizedError()
-    {
-        _currentUserServiceMock.Setup(s => s.UserId).Returns(Guid.Empty);
-
-        var command = new UpdateClientCommand(
-            Guid.NewGuid(), "Maria Souza", "(11) 88888-8888", "maria@example.com",
-            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100");
-
-        var handler = CreateHandler();
-        var result = await handler.Handle(command, CancellationToken.None);
-
-        result.IsError.ShouldBeTrue();
-        result.FirstError.Type.ShouldBe(ErrorType.Unauthorized);
     }
 }
