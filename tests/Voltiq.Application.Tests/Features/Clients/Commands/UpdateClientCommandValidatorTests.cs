@@ -9,7 +9,7 @@ public class UpdateClientCommandValidatorTests
     private readonly UpdateClientCommandValidator _validator = new();
 
     private static UpdateClientCommand ValidCommand() =>
-        new(Guid.NewGuid(), "João Silva", "(11) 99999-9999", "Rua das Flores", "123", "São Paulo", "SP", "01310-100");
+        new(Guid.NewGuid(), "João Silva", "(11) 99999-9999", "joao@example.com", "Rua das Flores", "123", "São Paulo", "SP", "01310-100");
 
     [Fact]
     public void Validate_WithValidData_ShouldHaveNoErrors()
@@ -37,6 +37,29 @@ public class UpdateClientCommandValidatorTests
         _validator.TestValidate(command)
             .ShouldHaveValidationErrorFor(x => x.Phone)
             .WithErrorMessage(ResourceErrorMessages.CLIENTE_TELEFONE_OBRIGATORIO);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    public void Validate_WithEmptyEmail_ShouldHaveError(string? email)
+    {
+        var command = ValidCommand() with { Email = email! };
+        _validator.TestValidate(command)
+            .ShouldHaveValidationErrorFor(x => x.Email)
+            .WithErrorMessage(ResourceErrorMessages.CLIENTE_EMAIL_OBRIGATORIO);
+    }
+
+    [Theory]
+    [InlineData("nao-e-email")]
+    [InlineData("sem-arroba")]
+    [InlineData("@semlocal.com")]
+    public void Validate_WithInvalidEmailFormat_ShouldHaveError(string email)
+    {
+        var command = ValidCommand() with { Email = email };
+        _validator.TestValidate(command)
+            .ShouldHaveValidationErrorFor(x => x.Email)
+            .WithErrorMessage(ResourceErrorMessages.CLIENTE_EMAIL_INVALIDO);
     }
 
     [Theory]

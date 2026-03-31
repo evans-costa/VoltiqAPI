@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Voltiq.Domain.Entities;
+using Voltiq.Domain.ValueObjects;
 
 namespace Voltiq.Infrastructure.Persistence.Configurations;
 
@@ -17,6 +18,18 @@ public sealed class ClientConfiguration : IEntityTypeConfiguration<Client>
         builder.Property(c => c.Phone)
             .IsRequired()
             .HasMaxLength(20);
+
+        builder.Property(c => c.Email)
+            .HasConversion(
+                e => e.Value,
+                v => new Email(v))
+            .HasColumnName("Email")
+            .IsRequired()
+            .HasMaxLength(320);
+
+        builder.HasIndex(c => new { c.UserId, c.Email })
+            .IsUnique()
+            .HasDatabaseName("IX_Clients_UserId_Email");
 
         builder.OwnsOne(c => c.Address, address =>
         {
@@ -56,6 +69,14 @@ public sealed class ClientConfiguration : IEntityTypeConfiguration<Client>
         builder.Property(c => c.CreatedAt).IsRequired();
         builder.Property(c => c.CreatedBy).HasMaxLength(200);
         builder.Property(c => c.UpdatedAt);
+
+        builder.Property(c => c.IsDeleted).IsRequired().HasDefaultValue(false);
+        builder.Property(c => c.DeletedAt);
+
+        builder.HasIndex(c => c.IsDeleted)
+            .HasDatabaseName("IX_Clients_IsDeleted");
+
+        builder.HasQueryFilter(c => !c.IsDeleted);
 
         builder.Ignore(c => c.DomainEvents);
     }

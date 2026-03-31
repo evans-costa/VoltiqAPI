@@ -37,6 +37,9 @@ public sealed class MaterialConfiguration : IEntityTypeConfiguration<Material>
         builder.Property(m => m.CreatedBy).HasMaxLength(200);
         builder.Property(m => m.UpdatedAt);
 
+        builder.Property(m => m.IsDeleted).IsRequired().HasDefaultValue(false);
+        builder.Property(m => m.DeletedAt);
+
         builder.HasIndex(m => m.Name)
             .HasDatabaseName("IX_Materials_Name");
 
@@ -45,6 +48,11 @@ public sealed class MaterialConfiguration : IEntityTypeConfiguration<Material>
 
         builder.HasIndex(m => m.IsActive)
             .HasDatabaseName("IX_Materials_IsActive");
+
+        builder.HasIndex(m => m.IsDeleted)
+            .HasDatabaseName("IX_Materials_IsDeleted");
+
+        builder.HasQueryFilter(m => !m.IsDeleted);
 
         builder.Ignore(m => m.DomainEvents);
     }

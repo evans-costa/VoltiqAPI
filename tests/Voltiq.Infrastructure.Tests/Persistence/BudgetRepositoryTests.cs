@@ -25,7 +25,8 @@ public class BudgetRepositoryTests(PostgreSqlContainerFixture fixture)
 
     public async ValueTask InitializeAsync()
     {
-        _dbContext = ApplicationDbContextFactory.Create(fixture.Container.GetConnectionString(), UserId);
+        _dbContext =
+            ApplicationDbContextFactory.Create(fixture.Container.GetConnectionString(), UserId);
         await _dbContext.Database.MigrateAsync();
         await DatabaseHelper.CleanAsync(_dbContext);
 
@@ -42,19 +43,25 @@ public class BudgetRepositoryTests(PostgreSqlContainerFixture fixture)
 
     private static User MakeUser(string email = "joao@example.com", string doc = "529.982.247-25")
     {
-        var e = Email.Create(email).Value;
-        var d = Document.Create(doc).Value;
-        return User.Register("João Silva", e, d, "$argon2id$hash");
+        var userEmail = Email.Create(email).Value;
+        var userDocument = Document.Create(doc).Value;
+        return User.Register("João Silva", userEmail, userDocument, "$argon2id$hash");
     }
 
-    private static Client MakeClient(Guid userId)
-        => Client.Register(userId, "Cliente Teste", "(11) 99999-9999",
+    private static Client MakeClient(Guid userId, string email = "cliente@example.com")
+    {
+        var clientEmail = Email.Create(email).Value;
+        return Client.Register(userId, "Cliente Teste", "(11) 99999-9999", clientEmail,
             Address.Create("Rua das Flores", "123", "São Paulo", "SP", "01310-100"));
+    }
 
     private static Budget MakeBudget(Guid userId, Guid clientId)
-        => Budget.Register(userId, clientId);
+    {
+        return Budget.Register(userId, clientId);
+    }
 
-    private async Task<User> CreateAndSaveUserAsync(string email = "joao@example.com", string doc = "529.982.247-25")
+    private async Task<User> CreateAndSaveUserAsync(string email = "joao@example.com",
+        string doc = "529.982.247-25")
     {
         var user = MakeUser(email, doc);
         await _userRepository.AddAsync(user);
@@ -80,7 +87,8 @@ public class BudgetRepositoryTests(PostgreSqlContainerFixture fixture)
         await _budgetRepository.AddAsync(budget, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var found = await _budgetRepository.GetByIdAsync(budget.Id, TestContext.Current.CancellationToken);
+        var found =
+            await _budgetRepository.GetByIdAsync(budget.Id, TestContext.Current.CancellationToken);
 
         found.ShouldNotBeNull();
         found.Id.ShouldBe(budget.Id);
@@ -99,12 +107,17 @@ public class BudgetRepositoryTests(PostgreSqlContainerFixture fixture)
         var client1 = await CreateAndSaveClientAsync(user1.Id);
         var client2 = await CreateAndSaveClientAsync(user2.Id);
 
-        await _budgetRepository.AddAsync(MakeBudget(user1.Id, client1.Id), TestContext.Current.CancellationToken);
-        await _budgetRepository.AddAsync(MakeBudget(user1.Id, client1.Id), TestContext.Current.CancellationToken);
-        await _budgetRepository.AddAsync(MakeBudget(user2.Id, client2.Id), TestContext.Current.CancellationToken);
+        await _budgetRepository.AddAsync(MakeBudget(user1.Id, client1.Id),
+            TestContext.Current.CancellationToken);
+        await _budgetRepository.AddAsync(MakeBudget(user1.Id, client1.Id),
+            TestContext.Current.CancellationToken);
+        await _budgetRepository.AddAsync(MakeBudget(user2.Id, client2.Id),
+            TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var user1Budgets = await _budgetRepository.GetByUserIdAsync(user1.Id, TestContext.Current.CancellationToken);
+        var user1Budgets =
+            await _budgetRepository.GetByUserIdAsync(user1.Id,
+                TestContext.Current.CancellationToken);
 
         user1Budgets.Count.ShouldBe(2);
         user1Budgets.ShouldAllBe(b => b.UserId == user1.Id);
@@ -120,7 +133,8 @@ public class BudgetRepositoryTests(PostgreSqlContainerFixture fixture)
         await _budgetRepository.AddAsync(budget, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var found = await _budgetRepository.GetByIdAndUserIdAsync(budget.Id, user.Id, TestContext.Current.CancellationToken);
+        var found = await _budgetRepository.GetByIdAndUserIdAsync(budget.Id, user.Id,
+            TestContext.Current.CancellationToken);
 
         found.ShouldNotBeNull();
         found.Id.ShouldBe(budget.Id);
@@ -138,7 +152,8 @@ public class BudgetRepositoryTests(PostgreSqlContainerFixture fixture)
         await _budgetRepository.AddAsync(budget, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var found = await _budgetRepository.GetByIdAndUserIdAsync(budget.Id, user2.Id, TestContext.Current.CancellationToken);
+        var found = await _budgetRepository.GetByIdAndUserIdAsync(budget.Id, user2.Id,
+            TestContext.Current.CancellationToken);
 
         found.ShouldBeNull();
     }
@@ -155,7 +170,8 @@ public class BudgetRepositoryTests(PostgreSqlContainerFixture fixture)
         await _budgetRepository.AddAsync(budget, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var found = await _budgetRepository.GetByIdWithItemsAndUserIdAsync(budget.Id, user.Id, TestContext.Current.CancellationToken);
+        var found = await _budgetRepository.GetByIdWithItemsAndUserIdAsync(budget.Id, user.Id,
+            TestContext.Current.CancellationToken);
 
         found.ShouldNotBeNull();
         found.Items.Count.ShouldBe(1);
@@ -173,7 +189,8 @@ public class BudgetRepositoryTests(PostgreSqlContainerFixture fixture)
         await _budgetRepository.AddAsync(budget, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var found = await _budgetRepository.GetByIdWithItemsAndUserIdAsync(budget.Id, user2.Id, TestContext.Current.CancellationToken);
+        var found = await _budgetRepository.GetByIdWithItemsAndUserIdAsync(budget.Id, user2.Id,
+            TestContext.Current.CancellationToken);
 
         found.ShouldBeNull();
     }

@@ -10,21 +10,21 @@ public static class ClientMappingExtensions
     extension(RegisterClientRequest request)
     {
         public RegisterClientCommand ToCommand() =>
-            new(request.Name, request.Phone, request.Street, request.Number,
+            new(request.Name, request.Phone, request.Email, request.Street, request.Number,
                 request.City, request.State, request.ZipCode);
     }
 
     extension(UpdateClientRequest request)
     {
         public UpdateClientCommand ToCommand(Guid id) =>
-            new(id, request.Name, request.Phone, request.Street, request.Number,
+            new(id, request.Name, request.Phone, request.Email, request.Street, request.Number,
                 request.City, request.State, request.ZipCode);
     }
 
     extension(Client client)
     {
         public ClientResponse ToResponse() =>
-            new(client.Id, client.Name, client.Phone,
+            new(client.Id, client.Name, client.Phone, client.Email.Value,
                 client.Address.Street, client.Address.Number,
                 client.Address.City, client.Address.State, client.Address.ZipCode);
     }

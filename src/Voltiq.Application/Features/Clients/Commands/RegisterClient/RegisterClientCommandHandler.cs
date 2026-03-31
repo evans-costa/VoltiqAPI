@@ -24,9 +24,17 @@ public sealed class RegisterClientCommandHandler(
         if (userId == Guid.Empty)
             return Error.Unauthorized(description: ResourceErrorMessages.TITULO_NAO_AUTORIZADO);
 
+        var email = Email.Create(request.Email).Value;
+
+        var emailExists = await clientRepository.ExistsWithEmailForUserAsync(
+            email, userId, cancellationToken: cancellationToken);
+
+        if (emailExists)
+            return Error.Conflict(description: ResourceErrorMessages.CLIENTE_EMAIL_JA_CADASTRADO);
+
         var address = Address.Create(request.Street, request.Number, request.City, request.State,
             request.ZipCode);
-        var client = Client.Register(userId, request.Name, request.Phone, address);
+        var client = Client.Register(userId, request.Name, request.Phone, email, address);
 
         await clientRepository.AddAsync(client, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);

@@ -24,7 +24,8 @@ public class GetClientByIdQueryHandlerTests
     private static Client MakeClient(Guid userId)
     {
         var address = Address.Create("Rua das Flores", "123", "São Paulo", "SP", "01310-100");
-        return Client.Register(userId, "João Silva", "(11) 99999-9999", address);
+        var email = Email.Create("joao@example.com").Value;
+        return Client.Register(userId, "João Silva", "(11) 99999-9999", email, address);
     }
 
     [Fact]
@@ -43,6 +44,7 @@ public class GetClientByIdQueryHandlerTests
         result.Value.Id.ShouldBe(client.Id);
         result.Value.Name.ShouldBe("João Silva");
         result.Value.Phone.ShouldBe("(11) 99999-9999");
+        result.Value.Email.ShouldBe("joao@example.com");
         result.Value.Street.ShouldBe("Rua das Flores");
     }
 

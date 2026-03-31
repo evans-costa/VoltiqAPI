@@ -4,6 +4,7 @@ using Voltiq.Application.Common.Interfaces;
 using Voltiq.Application.Mappings.Users;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
+using Voltiq.Domain.Interfaces.Repositories;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Resources;
@@ -14,7 +15,8 @@ public sealed class RegisterUserCommandHandler(
     IUserRepository userRepository,
     IUnitOfWork unitOfWork,
     IPasswordHasher passwordHasher,
-    ITokenService tokenService)
+    ITokenService tokenService,
+    IRefreshTokenRepository refreshTokenRepository)
     : IRequestHandler<RegisterUserCommand, ErrorOr<RegisterUserResponse>>
 {
     public async Task<ErrorOr<RegisterUserResponse>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -33,10 +35,15 @@ public sealed class RegisterUserCommandHandler(
         var user = User.Register(request.Name, email, document, passwordHash);
 
         await userRepository.AddAsync(user, cancellationToken);
+
+        var accessToken = tokenService.GenerateAccessToken(user.Id.ToString(), user.Name, []);
+        var rawRefreshToken = tokenService.GenerateRefreshToken();
+
+        var refreshToken = RefreshToken.Create(rawRefreshToken, user.Id, expiresInDays: 7);
+        await refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var token = tokenService.GenerateAccessToken(user.Id.ToString(), user.Name, []);
-
-        return user.ToRegisterUserResponse(token);
+        return user.ToRegisterUserResponse(accessToken, rawRefreshToken);
     }
 }

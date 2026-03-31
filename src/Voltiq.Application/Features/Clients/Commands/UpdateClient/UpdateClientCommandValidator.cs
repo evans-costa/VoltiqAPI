@@ -13,6 +13,10 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
         RuleFor(x => x.Phone)
             .NotEmpty().WithMessage(ResourceErrorMessages.CLIENTE_TELEFONE_OBRIGATORIO);
 
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage(ResourceErrorMessages.CLIENTE_EMAIL_OBRIGATORIO)
+            .EmailAddress().WithMessage(ResourceErrorMessages.CLIENTE_EMAIL_INVALIDO);
+
         RuleFor(x => x.Street)
             .NotEmpty().WithMessage(ResourceErrorMessages.CLIENTE_ENDERECO_LOGRADOURO_OBRIGATORIO);
 

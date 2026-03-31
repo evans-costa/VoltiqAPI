@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Voltiq.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using Voltiq.Infrastructure.Persistence;
 namespace Voltiq.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260326004825_AddSoftDeleteColumns")]
+    partial class AddSoftDeleteColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -138,12 +141,6 @@ namespace Voltiq.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(320)
-                        .HasColumnType("character varying(320)")
-                        .HasColumnName("Email");
-
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -170,9 +167,7 @@ namespace Voltiq.Infrastructure.Migrations
                     b.HasIndex("IsDeleted")
                         .HasDatabaseName("IX_Clients_IsDeleted");
 
-                    b.HasIndex("UserId", "Email")
-                        .IsUnique()
-                        .HasDatabaseName("IX_Clients_UserId_Email");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Clients");
                 });

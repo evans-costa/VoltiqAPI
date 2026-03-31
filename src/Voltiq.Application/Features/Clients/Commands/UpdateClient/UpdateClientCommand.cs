@@ -7,6 +7,7 @@ public sealed record UpdateClientCommand(
     Guid Id,
     string Name,
     string Phone,
+    string Email,
     string Street,
     string Number,
     string City,
