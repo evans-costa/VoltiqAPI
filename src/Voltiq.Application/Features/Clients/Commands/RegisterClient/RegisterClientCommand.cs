@@ -1,5 +1,5 @@
 using ErrorOr;
-using MediatR;
+using Voltiq.Application.Common.Interfaces;
 
 namespace Voltiq.Application.Features.Clients.Commands.RegisterClient;
 
@@ -11,4 +11,7 @@ public sealed record RegisterClientCommand(
     string Number,
     string City,
     string State,
-    string ZipCode) : IRequest<ErrorOr<ClientResponse>>;
+    string ZipCode) : IAuthenticatedRequest<ErrorOr<ClientResponse>>
+{
+    public Guid UserId { get; set; }
+}
