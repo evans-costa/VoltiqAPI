@@ -44,7 +44,8 @@ public class UpdateClientCommandHandlerTests
 
         var command = new UpdateClientCommand(
             client.Id, "Maria Souza", "(11) 88888-8888", "maria@example.com",
-            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100") { UserId = _userId };
+            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100")
+        { UserId = _userId };
 
         var handler = CreateHandler();
         var result = await handler.Handle(command, CancellationToken.None);
@@ -67,7 +68,8 @@ public class UpdateClientCommandHandlerTests
 
         var command = new UpdateClientCommand(
             client.Id, "Maria Souza", "(11) 88888-8888", "outro@example.com",
-            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100") { UserId = _userId };
+            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100")
+        { UserId = _userId };
 
         var handler = CreateHandler();
         var result = await handler.Handle(command, CancellationToken.None);
@@ -88,7 +90,8 @@ public class UpdateClientCommandHandlerTests
 
         var command = new UpdateClientCommand(
             Guid.NewGuid(), "Maria Souza", "(11) 88888-8888", "maria@example.com",
-            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100") { UserId = _userId };
+            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100")
+        { UserId = _userId };
 
         var handler = CreateHandler();
         var result = await handler.Handle(command, CancellationToken.None);

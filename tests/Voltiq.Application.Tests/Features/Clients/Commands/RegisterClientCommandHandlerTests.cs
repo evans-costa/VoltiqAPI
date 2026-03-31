@@ -26,7 +26,8 @@ public class RegisterClientCommandHandlerTests
     private RegisterClientCommand ValidCommand() =>
         new("João Silva", "(11) 99999-9999", "joao@example.com",
             "Rua das Flores", "123",
-            "São Paulo", "SP", "01310-100") { UserId = _userId };
+            "São Paulo", "SP", "01310-100")
+        { UserId = _userId };
 
     [Fact]
     public async Task Handle_WithValidCommand_ShouldRegisterClientAndReturnResponse()
