@@ -8,7 +8,8 @@ using Voltiq.Exceptions.Resources;
 namespace Voltiq.Application.Features.Clients.Commands.UpdateClient;
 
 public sealed class UpdateClientCommandHandler(
-    IClientRepository clientRepository,
+    IClientReadOnlyRepository clientReadOnlyRepository,
+    IClientUpdateOnlyRepository clientUpdateOnlyRepository,
     IUnitOfWork unitOfWork)
     : IRequestHandler<UpdateClientCommand, ErrorOr<Updated>>
 {
@@ -16,14 +17,14 @@ public sealed class UpdateClientCommandHandler(
         CancellationToken cancellationToken)
     {
         var client =
-            await clientRepository.GetByIdAndUserIdAsync(request.Id, request.UserId, cancellationToken);
+            await clientUpdateOnlyRepository.GetByIdAndUserIdAsync(request.Id, request.UserId, cancellationToken);
 
         if (client is null)
             return Error.NotFound(description: ResourceErrorMessages.CLIENTE_NAO_ENCONTRADO);
 
         var email = Email.Create(request.Email).Value;
 
-        var emailExists = await clientRepository.ExistsWithEmailForUserAsync(
+        var emailExists = await clientReadOnlyRepository.ExistsWithEmailForUserAsync(
             email, request.UserId, request.Id, cancellationToken);
 
         if (emailExists)

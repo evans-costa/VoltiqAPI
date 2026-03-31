@@ -2,12 +2,12 @@ using ErrorOr;
 using MediatR;
 using Voltiq.Application.Mappings.Users;
 using Voltiq.Domain.Entities;
-using Voltiq.Domain.Interfaces.Repositories;
+using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Features.Users.Queries.GetCurrentUser;
 
-public sealed class GetCurrentUserQueryHandler(IRepository<User> userRepository)
+public sealed class GetCurrentUserQueryHandler(IUserReadOnlyRepository userRepository)
     : IRequestHandler<GetCurrentUserQuery, ErrorOr<GetUserResponse>>
 {
     public async Task<ErrorOr<GetUserResponse>> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)

@@ -3,7 +3,7 @@ using MediatR;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
-using Voltiq.Domain.Interfaces.Repositories;
+using Voltiq.Domain.Interfaces.Repositories.RefreshToken;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Resources;
@@ -11,10 +11,10 @@ using Voltiq.Exceptions.Resources;
 namespace Voltiq.Application.Features.Auth.Commands.Login;
 
 public sealed class LoginCommandHandler(
-    IUserRepository userRepository,
+    IUserReadOnlyRepository userRepository,
     IPasswordHasher passwordHasher,
     ITokenService tokenService,
-    IRefreshTokenRepository refreshTokenRepository,
+    IRefreshTokenWriteOnlyRepository refreshTokenRepository,
     IUnitOfWork unitOfWork)
     : IRequestHandler<LoginCommand, ErrorOr<LoginResponse>>
 {

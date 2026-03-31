@@ -6,7 +6,7 @@ using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Features.Clients.Queries.GetClientById;
 
-public sealed class GetClientByIdQueryHandler(IClientRepository clientRepository)
+public sealed class GetClientByIdQueryHandler(IClientReadOnlyRepository clientRepository)
     : IRequestHandler<GetClientByIdQuery, ErrorOr<ClientResponse>>
 {
     public async Task<ErrorOr<ClientResponse>> Handle(GetClientByIdQuery request, CancellationToken cancellationToken)

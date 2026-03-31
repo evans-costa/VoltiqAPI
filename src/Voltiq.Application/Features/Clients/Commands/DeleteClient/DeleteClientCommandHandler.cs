@@ -7,7 +7,7 @@ using Voltiq.Exceptions.Resources;
 namespace Voltiq.Application.Features.Clients.Commands.DeleteClient;
 
 public sealed class DeleteClientCommandHandler(
-    IClientRepository clientRepository,
+    IClientUpdateOnlyRepository clientRepository,
     IUnitOfWork unitOfWork)
     : IRequestHandler<DeleteClientCommand, ErrorOr<Deleted>>
 {

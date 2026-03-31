@@ -10,7 +10,8 @@ using Voltiq.Exceptions.Resources;
 namespace Voltiq.Application.Features.Clients.Commands.RegisterClient;
 
 public sealed class RegisterClientCommandHandler(
-    IClientRepository clientRepository,
+    IClientReadOnlyRepository clientReadOnlyRepository,
+    IClientWriteOnlyRepository clientWriteOnlyRepository,
     IUnitOfWork unitOfWork)
     : IRequestHandler<RegisterClientCommand, ErrorOr<ClientResponse>>
 {
@@ -19,7 +20,7 @@ public sealed class RegisterClientCommandHandler(
     {
         var email = Email.Create(request.Email).Value;
 
-        var emailExists = await clientRepository.ExistsWithEmailForUserAsync(
+        var emailExists = await clientReadOnlyRepository.ExistsWithEmailForUserAsync(
             email, request.UserId, cancellationToken: cancellationToken);
 
         if (emailExists)
@@ -29,7 +30,7 @@ public sealed class RegisterClientCommandHandler(
             request.ZipCode);
         var client = Client.Register(request.UserId, request.Name, request.Phone, email, address);
 
-        await clientRepository.AddAsync(client, cancellationToken);
+        await clientWriteOnlyRepository.AddAsync(client, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return client.ToResponse();
