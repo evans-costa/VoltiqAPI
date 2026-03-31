@@ -231,7 +231,7 @@ namespace Voltiq.Exceptions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to E-mail ou senha inválidos..
+        ///   Looks up a localized string similar to E-mail e/ou senha inválidos..
         /// </summary>
         public static string LOGIN_CREDENCIAIS_INVALIDAS {
             get {
