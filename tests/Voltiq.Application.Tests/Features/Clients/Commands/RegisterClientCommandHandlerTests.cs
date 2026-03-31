@@ -12,14 +12,15 @@ namespace Voltiq.Application.Tests.Features.Clients.Commands;
 
 public class RegisterClientCommandHandlerTests
 {
-    private readonly Mock<IClientRepository> _clientRepoMock = new();
+    private readonly Mock<IClientReadOnlyRepository> _clientReadRepoMock = new();
+    private readonly Mock<IClientWriteOnlyRepository> _clientWriteRepoMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
     private readonly Guid _userId = Guid.NewGuid();
 
     private RegisterClientCommandHandler CreateHandler()
     {
-        return new RegisterClientCommandHandler(_clientRepoMock.Object, _unitOfWorkMock.Object);
+        return new RegisterClientCommandHandler(_clientReadRepoMock.Object, _clientWriteRepoMock.Object, _unitOfWorkMock.Object);
     }
 
     private RegisterClientCommand ValidCommand() =>
@@ -30,7 +31,7 @@ public class RegisterClientCommandHandlerTests
     [Fact]
     public async Task Handle_WithValidCommand_ShouldRegisterClientAndReturnResponse()
     {
-        _clientRepoMock
+        _clientReadRepoMock
             .Setup(r => r.ExistsWithEmailForUserAsync(It.IsAny<Email>(), _userId, null,
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
@@ -45,7 +46,7 @@ public class RegisterClientCommandHandlerTests
         result.Value.Email.ShouldBe("joao@example.com");
         result.Value.Street.ShouldBe("Rua das Flores");
         result.Value.City.ShouldBe("São Paulo");
-        _clientRepoMock.Verify(r => r.AddAsync(It.IsAny<Client>(), It.IsAny<CancellationToken>()),
+        _clientWriteRepoMock.Verify(r => r.AddAsync(It.IsAny<Client>(), It.IsAny<CancellationToken>()),
             Times.Once);
         _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -53,7 +54,7 @@ public class RegisterClientCommandHandlerTests
     [Fact]
     public async Task Handle_WhenEmailAlreadyExistsForUser_ShouldReturnConflictError()
     {
-        _clientRepoMock
+        _clientReadRepoMock
             .Setup(r => r.ExistsWithEmailForUserAsync(It.IsAny<Email>(), _userId, null,
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
@@ -64,7 +65,7 @@ public class RegisterClientCommandHandlerTests
         result.IsError.ShouldBeTrue();
         result.FirstError.Type.ShouldBe(ErrorType.Conflict);
         result.FirstError.Description.ShouldBe(ResourceErrorMessages.CLIENTE_EMAIL_JA_CADASTRADO);
-        _clientRepoMock.Verify(r => r.AddAsync(It.IsAny<Client>(), It.IsAny<CancellationToken>()),
+        _clientWriteRepoMock.Verify(r => r.AddAsync(It.IsAny<Client>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 }

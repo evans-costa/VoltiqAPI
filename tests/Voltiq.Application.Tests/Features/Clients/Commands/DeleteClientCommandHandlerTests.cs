@@ -12,7 +12,7 @@ namespace Voltiq.Application.Tests.Features.Clients.Commands;
 
 public class DeleteClientCommandHandlerTests
 {
-    private readonly Mock<IClientRepository> _clientRepoMock = new();
+    private readonly Mock<IClientUpdateOnlyRepository> _clientRepoMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
     private readonly Guid _userId = Guid.NewGuid();

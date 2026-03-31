@@ -10,7 +10,7 @@ namespace Voltiq.Application.Tests.Features.Clients.Queries;
 
 public class GetClientsQueryHandlerTests
 {
-    private readonly Mock<IClientRepository> _clientRepoMock = new();
+    private readonly Mock<IClientReadOnlyRepository> _clientRepoMock = new();
 
     private readonly Guid _userId = Guid.NewGuid();
 

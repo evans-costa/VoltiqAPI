@@ -12,14 +12,15 @@ namespace Voltiq.Application.Tests.Features.Clients.Commands;
 
 public class UpdateClientCommandHandlerTests
 {
-    private readonly Mock<IClientRepository> _clientRepoMock = new();
+    private readonly Mock<IClientReadOnlyRepository> _clientReadRepoMock = new();
+    private readonly Mock<IClientUpdateOnlyRepository> _clientUpdateRepoMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
     private readonly Guid _userId = Guid.NewGuid();
 
     private UpdateClientCommandHandler CreateHandler()
     {
-        return new UpdateClientCommandHandler(_clientRepoMock.Object, _unitOfWorkMock.Object);
+        return new UpdateClientCommandHandler(_clientReadRepoMock.Object, _clientUpdateRepoMock.Object, _unitOfWorkMock.Object);
     }
 
     private static Client MakeClient(Guid userId)
@@ -33,10 +34,10 @@ public class UpdateClientCommandHandlerTests
     public async Task Handle_WithValidCommand_ShouldUpdateClientAndReturnUpdated()
     {
         var client = MakeClient(_userId);
-        _clientRepoMock
+        _clientUpdateRepoMock
             .Setup(r => r.GetByIdAndUserIdAsync(client.Id, _userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(client);
-        _clientRepoMock
+        _clientReadRepoMock
             .Setup(r => r.ExistsWithEmailForUserAsync(It.IsAny<Email>(), _userId, client.Id, It
                 .IsAny<CancellationToken>()))
             .ReturnsAsync(false);
@@ -56,10 +57,10 @@ public class UpdateClientCommandHandlerTests
     public async Task Handle_WhenEmailAlreadyExistsForAnotherClient_ShouldReturnConflictError()
     {
         var client = MakeClient(_userId);
-        _clientRepoMock
+        _clientUpdateRepoMock
             .Setup(r => r.GetByIdAndUserIdAsync(client.Id, _userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(client);
-        _clientRepoMock
+        _clientReadRepoMock
             .Setup(r => r.ExistsWithEmailForUserAsync(It.IsAny<Email>(), _userId, client.Id, It
                 .IsAny<CancellationToken>()))
             .ReturnsAsync(true);
@@ -80,7 +81,7 @@ public class UpdateClientCommandHandlerTests
     [Fact]
     public async Task Handle_WhenClientNotFound_ShouldReturnNotFoundError()
     {
-        _clientRepoMock
+        _clientUpdateRepoMock
             .Setup(r =>
                 r.GetByIdAndUserIdAsync(It.IsAny<Guid>(), _userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Client?)null);

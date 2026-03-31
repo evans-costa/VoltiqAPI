@@ -3,7 +3,7 @@ using Moq;
 using Shouldly;
 using Voltiq.Application.Features.Users.Queries.GetCurrentUser;
 using Voltiq.Domain.Entities;
-using Voltiq.Domain.Interfaces.Repositories;
+using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Resources;
 
@@ -11,7 +11,7 @@ namespace Voltiq.Application.Tests.Features.Users;
 
 public class GetCurrentUserQueryHandlerTests
 {
-    private readonly Mock<IRepository<User>> _userRepoMock = new();
+    private readonly Mock<IUserReadOnlyRepository> _userRepoMock = new();
 
     private GetCurrentUserQueryHandler CreateHandler() =>
         new(_userRepoMock.Object);
