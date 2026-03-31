@@ -3,22 +3,23 @@ using MediatR;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
-using Voltiq.Domain.Interfaces.Repositories;
+using Voltiq.Domain.Interfaces.Repositories.RefreshToken;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Features.Auth.Commands.Refresh;
 
 public sealed class RefreshTokenCommandHandler(
-    IRefreshTokenRepository refreshTokenRepository,
-    IUserRepository userRepository,
+    IRefreshTokenReadOnlyRepository refreshTokenReadOnlyRepository,
+    IRefreshTokenWriteOnlyRepository refreshTokenWriteOnlyRepository,
+    IUserReadOnlyRepository userRepository,
     ITokenService tokenService,
     IUnitOfWork unitOfWork)
     : IRequestHandler<RefreshTokenCommand, ErrorOr<AuthResponse>>
 {
     public async Task<ErrorOr<AuthResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        var refreshToken = await refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
+        var refreshToken = await refreshTokenReadOnlyRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
 
         if (refreshToken is null)
             return Error.Unauthorized(description: ResourceErrorMessages.REFRESH_TOKEN_NAO_ENCONTRADO);
@@ -40,7 +41,7 @@ public sealed class RefreshTokenCommandHandler(
         var newRawRefreshToken = tokenService.GenerateRefreshToken();
 
         var newRefreshToken = RefreshToken.Create(newRawRefreshToken, user.Id, expiresInDays: 7);
-        await refreshTokenRepository.AddAsync(newRefreshToken, cancellationToken);
+        await refreshTokenWriteOnlyRepository.AddAsync(newRefreshToken, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new AuthResponse(newAccessToken, newRawRefreshToken);

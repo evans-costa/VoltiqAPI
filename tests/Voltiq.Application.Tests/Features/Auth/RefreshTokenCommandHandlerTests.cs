@@ -5,7 +5,7 @@ using Voltiq.Application.Common.Interfaces;
 using Voltiq.Application.Features.Auth.Commands.Refresh;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
-using Voltiq.Domain.Interfaces.Repositories;
+using Voltiq.Domain.Interfaces.Repositories.RefreshToken;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Resources;
@@ -14,14 +14,15 @@ namespace Voltiq.Application.Tests.Features.Auth;
 
 public class RefreshTokenCommandHandlerTests
 {
-    private readonly Mock<IRefreshTokenRepository> _refreshTokenRepoMock = new();
-    private readonly Mock<IUserRepository> _userRepoMock = new();
+    private readonly Mock<IRefreshTokenReadOnlyRepository> _refreshTokenReadRepoMock = new();
+    private readonly Mock<IRefreshTokenWriteOnlyRepository> _refreshTokenWriteRepoMock = new();
+    private readonly Mock<IUserReadOnlyRepository> _userRepoMock = new();
     private readonly Mock<ITokenService> _tokenServiceMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
     private RefreshTokenCommandHandler CreateHandler() =>
-        new(_refreshTokenRepoMock.Object, _userRepoMock.Object,
-            _tokenServiceMock.Object, _unitOfWorkMock.Object);
+        new(_refreshTokenReadRepoMock.Object, _refreshTokenWriteRepoMock.Object,
+            _userRepoMock.Object, _tokenServiceMock.Object, _unitOfWorkMock.Object);
 
     private static User MakeUser()
     {
@@ -33,7 +34,7 @@ public class RefreshTokenCommandHandlerTests
     [Fact]
     public async Task Handle_WhenTokenNotFound_ReturnsUnauthorizedWithNotFoundMessage()
     {
-        _refreshTokenRepoMock
+        _refreshTokenReadRepoMock
             .Setup(r => r.GetByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((RefreshToken?)null);
 
@@ -49,7 +50,7 @@ public class RefreshTokenCommandHandlerTests
     {
         var expiredToken = RefreshToken.Create("expired-token", Guid.NewGuid(), expiresInDays: -1);
 
-        _refreshTokenRepoMock
+        _refreshTokenReadRepoMock
             .Setup(r => r.GetByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expiredToken);
 
@@ -69,7 +70,7 @@ public class RefreshTokenCommandHandlerTests
         var revokedToken = RefreshToken.Create("revoked-token", Guid.NewGuid(), expiresInDays: 7);
         revokedToken.Revoke();
 
-        _refreshTokenRepoMock
+        _refreshTokenReadRepoMock
             .Setup(r => r.GetByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(revokedToken);
 
@@ -86,7 +87,7 @@ public class RefreshTokenCommandHandlerTests
     {
         var activeToken = RefreshToken.Create("active-token", Guid.NewGuid(), expiresInDays: 7);
 
-        _refreshTokenRepoMock
+        _refreshTokenReadRepoMock
             .Setup(r => r.GetByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(activeToken);
         _userRepoMock
@@ -107,7 +108,7 @@ public class RefreshTokenCommandHandlerTests
         var user = MakeUser();
         var activeToken = RefreshToken.Create("active-token", user.Id, expiresInDays: 7);
 
-        _refreshTokenRepoMock
+        _refreshTokenReadRepoMock
             .Setup(r => r.GetByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(activeToken);
         _userRepoMock
@@ -132,7 +133,7 @@ public class RefreshTokenCommandHandlerTests
         var user = MakeUser();
         var activeToken = RefreshToken.Create("active-token", user.Id, expiresInDays: 7);
 
-        _refreshTokenRepoMock
+        _refreshTokenReadRepoMock
             .Setup(r => r.GetByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(activeToken);
         _userRepoMock

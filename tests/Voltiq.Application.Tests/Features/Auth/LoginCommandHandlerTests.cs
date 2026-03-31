@@ -5,7 +5,7 @@ using Voltiq.Application.Common.Interfaces;
 using Voltiq.Application.Features.Auth.Commands.Login;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
-using Voltiq.Domain.Interfaces.Repositories;
+using Voltiq.Domain.Interfaces.Repositories.RefreshToken;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Resources;
@@ -14,10 +14,10 @@ namespace Voltiq.Application.Tests.Features.Auth;
 
 public class LoginCommandHandlerTests
 {
-    private readonly Mock<IUserRepository> _userRepoMock = new();
+    private readonly Mock<IUserReadOnlyRepository> _userRepoMock = new();
     private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
     private readonly Mock<ITokenService> _tokenServiceMock = new();
-    private readonly Mock<IRefreshTokenRepository> _refreshTokenRepoMock = new();
+    private readonly Mock<IRefreshTokenWriteOnlyRepository> _refreshTokenRepoMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
     private LoginCommandHandler CreateHandler() =>

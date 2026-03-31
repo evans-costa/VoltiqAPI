@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
                 xmlns="">
         <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
         <xsd:element name="root" msdata:IsDataSet="true">
@@ -205,8 +206,8 @@
     <!-- ═══════════════════════════════ Aplicação — Auth ════════════════════ -->
 
     <data name="LOGIN_CREDENCIAIS_INVALIDAS" xml:space="preserve">
-    <value>E-mail ou senha inválidos.</value>
-  </data>
+        <value>E-mail e/ou senha inválidos.</value>
+    </data>
     <data name="REFRESH_TOKEN_INVALIDO" xml:space="preserve">
     <value>Refresh token inválido.</value>
   </data>

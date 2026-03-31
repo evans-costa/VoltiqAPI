@@ -1,5 +1,5 @@
 using ErrorOr;
-using MediatR;
+using Voltiq.Application.Common.Interfaces;
 
 namespace Voltiq.Application.Features.Clients.Commands.UpdateClient;
 
@@ -12,4 +12,7 @@ public sealed record UpdateClientCommand(
     string Number,
     string City,
     string State,
-    string ZipCode) : IRequest<ErrorOr<Updated>>;
+    string ZipCode) : IAuthenticatedRequest<ErrorOr<Updated>>
+{
+    public Guid UserId { get; set; }
+}

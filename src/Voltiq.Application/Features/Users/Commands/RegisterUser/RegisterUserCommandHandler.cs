@@ -4,7 +4,7 @@ using Voltiq.Application.Common.Interfaces;
 using Voltiq.Application.Mappings.Users;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Interfaces;
-using Voltiq.Domain.Interfaces.Repositories;
+using Voltiq.Domain.Interfaces.Repositories.RefreshToken;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Exceptions.Resources;
@@ -12,11 +12,12 @@ using Voltiq.Exceptions.Resources;
 namespace Voltiq.Application.Features.Users.Commands.RegisterUser;
 
 public sealed class RegisterUserCommandHandler(
-    IUserRepository userRepository,
+    IUserReadOnlyRepository userReadOnlyRepository,
+    IUserWriteOnlyRepository userWriteOnlyRepository,
     IUnitOfWork unitOfWork,
     IPasswordHasher passwordHasher,
     ITokenService tokenService,
-    IRefreshTokenRepository refreshTokenRepository)
+    IRefreshTokenWriteOnlyRepository refreshTokenRepository)
     : IRequestHandler<RegisterUserCommand, ErrorOr<RegisterUserResponse>>
 {
     public async Task<ErrorOr<RegisterUserResponse>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -24,7 +25,7 @@ public sealed class RegisterUserCommandHandler(
         var email = Email.Create(request.Email).Value;
         var document = Document.Create(request.Document).Value;
 
-        var userAlreadyExists = await userRepository.ExistsUserAsync(
+        var userAlreadyExists = await userReadOnlyRepository.ExistsUserAsync(
             document, email, cancellationToken);
 
         if (userAlreadyExists)
@@ -34,7 +35,7 @@ public sealed class RegisterUserCommandHandler(
 
         var user = User.Register(request.Name, email, document, passwordHash);
 
-        await userRepository.AddAsync(user, cancellationToken);
+        await userWriteOnlyRepository.AddAsync(user, cancellationToken);
 
         var accessToken = tokenService.GenerateAccessToken(user.Id.ToString(), user.Name, []);
         var rawRefreshToken = tokenService.GenerateRefreshToken();

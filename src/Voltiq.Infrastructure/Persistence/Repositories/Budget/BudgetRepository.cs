@@ -4,37 +4,61 @@ using Voltiq.Domain.Interfaces.Repositories.Budget;
 namespace Voltiq.Infrastructure.Persistence.Repositories.Budget;
 
 public sealed class BudgetRepository(ApplicationDbContext context)
-    : Repository<Domain.Entities.Budget>(context), IBudgetRepository
+    : IBudgetReadOnlyRepository, IBudgetWriteOnlyRepository, IBudgetUpdateOnlyRepository
 {
+    public async Task<Domain.Entities.Budget?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        => await context.Budgets
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
+
     public async Task<IReadOnlyList<Domain.Entities.Budget>> GetByUserIdAsync(
         Guid userId, CancellationToken cancellationToken = default)
-        => await Context.Budgets
+        => await context.Budgets
             .AsNoTracking()
             .Where(b => b.UserId == userId)
             .ToListAsync(cancellationToken);
 
     public async Task<IReadOnlyList<Domain.Entities.Budget>> GetByClientIdAsync(
         Guid clientId, CancellationToken cancellationToken = default)
-        => await Context.Budgets
+        => await context.Budgets
             .AsNoTracking()
             .Where(b => b.ClientId == clientId)
             .ToListAsync(cancellationToken);
 
-    public async Task<Domain.Entities.Budget?> GetByIdAndUserIdAsync(
-        Guid id, Guid userId, CancellationToken cancellationToken = default)
-        => await Context.Budgets
+    async Task<Domain.Entities.Budget?> IBudgetReadOnlyRepository.GetByIdAndUserIdAsync(
+        Guid id, Guid userId, CancellationToken cancellationToken)
+        => await context.Budgets
             .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId, cancellationToken);
+
+    async Task<Domain.Entities.Budget?> IBudgetUpdateOnlyRepository.GetByIdAndUserIdAsync(
+        Guid id, Guid userId, CancellationToken cancellationToken)
+        => await context.Budgets
             .FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId, cancellationToken);
 
     public async Task<Domain.Entities.Budget?> GetByIdWithItemsAsync(
         Guid id, CancellationToken cancellationToken = default)
-        => await Context.Budgets
+        => await context.Budgets
             .Include(b => b.Items)
+            .AsNoTracking()
             .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
 
-    public async Task<Domain.Entities.Budget?> GetByIdWithItemsAndUserIdAsync(
-        Guid id, Guid userId, CancellationToken cancellationToken = default)
-        => await Context.Budgets
+    async Task<Domain.Entities.Budget?> IBudgetReadOnlyRepository.GetByIdWithItemsAndUserIdAsync(
+        Guid id, Guid userId, CancellationToken cancellationToken)
+        => await context.Budgets
+            .Include(b => b.Items)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId, cancellationToken);
+
+    async Task<Domain.Entities.Budget?> IBudgetUpdateOnlyRepository.GetByIdWithItemsAndUserIdAsync(
+        Guid id, Guid userId, CancellationToken cancellationToken)
+        => await context.Budgets
             .Include(b => b.Items)
             .FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId, cancellationToken);
+
+    public async Task AddAsync(Domain.Entities.Budget entity, CancellationToken cancellationToken = default)
+        => await context.Budgets.AddAsync(entity, cancellationToken);
+
+    public void Remove(Domain.Entities.Budget entity)
+        => context.Budgets.Remove(entity);
 }

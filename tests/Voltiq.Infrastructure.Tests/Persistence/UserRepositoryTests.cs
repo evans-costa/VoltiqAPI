@@ -14,7 +14,6 @@ public class UserRepositoryTests(PostgreSqlContainerFixture fixture)
     : IClassFixture<PostgreSqlContainerFixture>, IAsyncLifetime
 {
     private ApplicationDbContext _dbContext = null!;
-    private Repository<User> _repository = null!;
     private UnitOfWork _unitOfWork = null!;
     private UserRepository _userRepository = null!;
 
@@ -25,7 +24,6 @@ public class UserRepositoryTests(PostgreSqlContainerFixture fixture)
         await _dbContext.Database.MigrateAsync();
         await DatabaseHelper.CleanAsync(_dbContext);
 
-        _repository = new Repository<User>(_dbContext);
         _userRepository = new UserRepository(_dbContext);
         _unitOfWork = new UnitOfWork(_dbContext);
     }
@@ -42,10 +40,10 @@ public class UserRepositoryTests(PostgreSqlContainerFixture fixture)
         var document = Document.Create("529.982.247-25").Value;
         var user = User.Register("João Silva", email, document, "$argon2id$hash");
 
-        await _repository.AddAsync(user, TestContext.Current.CancellationToken);
+        await _userRepository.AddAsync(user, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var found = await _repository.GetByIdAsync(user.Id, TestContext.Current.CancellationToken);
+        var found = await _userRepository.GetByIdAsync(user.Id, TestContext.Current.CancellationToken);
 
         found.ShouldNotBeNull();
         found.Id.ShouldBe(user.Id);
@@ -60,7 +58,7 @@ public class UserRepositoryTests(PostgreSqlContainerFixture fixture)
         var document = Document.Create("11222333000181").Value;
         var user = User.Register("Maria Santos", email, document, "$argon2id$hash");
 
-        await _repository.AddAsync(user, TestContext.Current.CancellationToken);
+        await _userRepository.AddAsync(user, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var exists =
@@ -77,7 +75,7 @@ public class UserRepositoryTests(PostgreSqlContainerFixture fixture)
         var document = Document.Create("153.509.460-56").Value;
         var user = User.Register("Carlos Souza", email, document, "$argon2id$hash");
 
-        await _repository.AddAsync(user, TestContext.Current.CancellationToken);
+        await _userRepository.AddAsync(user, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var found =

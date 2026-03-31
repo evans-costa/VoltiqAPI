@@ -7,7 +7,9 @@ using Voltiq.Domain.Enums;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Infrastructure.Persistence;
 using Voltiq.Infrastructure.Persistence.Repositories;
+using Voltiq.Domain.Interfaces.Repositories.Material;
 using Voltiq.Infrastructure.Persistence.Repositories.Material;
+using Voltiq.Infrastructure.Persistence.Repositories.User;
 
 namespace Voltiq.Infrastructure.Tests.Persistence;
 
@@ -17,9 +19,10 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
     private static readonly Guid UserId = Guid.NewGuid();
 
     private MaterialRepository _materialRepository = null!;
+    private IMaterialReadOnlyRepository _materialReadOnly = null!;
     private ApplicationDbContext _dbContext = null!;
     private UnitOfWork _unitOfWork = null!;
-    private Repository<User> _userRepository = null!;
+    private UserRepository _userRepository = null!;
 
     public async ValueTask InitializeAsync()
     {
@@ -27,8 +30,9 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
         await _dbContext.Database.MigrateAsync();
         await DatabaseHelper.CleanAsync(_dbContext);
 
-        _userRepository = new Repository<User>(_dbContext);
+        _userRepository = new UserRepository(_dbContext);
         _materialRepository = new MaterialRepository(_dbContext);
+        _materialReadOnly = _materialRepository;
         _unitOfWork = new UnitOfWork(_dbContext);
     }
 
@@ -105,7 +109,7 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
         await _materialRepository.AddAsync(material, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var found = await _materialRepository.GetByIdAndUserIdAsync(material.Id, user.Id, TestContext.Current.CancellationToken);
+        var found = await _materialReadOnly.GetByIdAndUserIdAsync(material.Id, user.Id, TestContext.Current.CancellationToken);
 
         found.ShouldNotBeNull();
         found.Id.ShouldBe(material.Id);
@@ -121,7 +125,7 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
         await _materialRepository.AddAsync(material, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var found = await _materialRepository.GetByIdAndUserIdAsync(material.Id, user2.Id, TestContext.Current.CancellationToken);
+        var found = await _materialReadOnly.GetByIdAndUserIdAsync(material.Id, user2.Id, TestContext.Current.CancellationToken);
 
         found.ShouldBeNull();
     }

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Asp.Versioning;
 using Microsoft.OpenApi;
 using Serilog;
@@ -17,7 +18,13 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+    });
+
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 builder.Services.AddApiVersioning(options =>
@@ -49,11 +56,11 @@ builder.Services.AddOpenApi("v1", o =>
                 """
                 Voltiq é uma aplicação para gerir orçamentos, clientes e materiais para
                 profissionais autônomos, principalmente eletricistas, oferecendo uma maneira
-                prática e eficiente de gerir seus clientes e orçamentos.
+                prática e eficiente de gerir seus serviços.
                 """,
             Contact = new OpenApiContact
             {
-                Name = "Team Voltiq",
+                Name = "Time Voltiq",
                 Email = "suporte@voltiq.com.br"
             }
         };
@@ -112,8 +119,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers().RequireAuthorization();
 
 await app.RunAsync();

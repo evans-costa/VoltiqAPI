@@ -7,10 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Domain.Interfaces;
-using Voltiq.Domain.Interfaces.Repositories;
 using Voltiq.Domain.Interfaces.Repositories.Budget;
 using Voltiq.Domain.Interfaces.Repositories.Client;
 using Voltiq.Domain.Interfaces.Repositories.Material;
+using Voltiq.Domain.Interfaces.Repositories.RefreshToken;
 using Voltiq.Domain.Interfaces.Repositories.User;
 using Voltiq.Exceptions.Resources;
 using Voltiq.Infrastructure.Auth;
@@ -52,12 +52,29 @@ public static class DependencyInjection
     private static void AddRepositories(IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-        services.AddScoped<IClientRepository, ClientRepository>();
-        services.AddScoped<IMaterialRepository, MaterialRepository>();
-        services.AddScoped<IBudgetRepository, BudgetRepository>();
+
+        services.AddScoped<UserRepository>();
+        services.AddScoped<IUserReadOnlyRepository>(sp => sp.GetRequiredService<UserRepository>());
+        services.AddScoped<IUserWriteOnlyRepository>(sp => sp.GetRequiredService<UserRepository>());
+
+        services.AddScoped<RefreshTokenRepository>();
+        services.AddScoped<IRefreshTokenReadOnlyRepository>(sp => sp.GetRequiredService<RefreshTokenRepository>());
+        services.AddScoped<IRefreshTokenWriteOnlyRepository>(sp => sp.GetRequiredService<RefreshTokenRepository>());
+
+        services.AddScoped<ClientRepository>();
+        services.AddScoped<IClientReadOnlyRepository>(sp => sp.GetRequiredService<ClientRepository>());
+        services.AddScoped<IClientWriteOnlyRepository>(sp => sp.GetRequiredService<ClientRepository>());
+        services.AddScoped<IClientUpdateOnlyRepository>(sp => sp.GetRequiredService<ClientRepository>());
+
+        services.AddScoped<MaterialRepository>();
+        services.AddScoped<IMaterialReadOnlyRepository>(sp => sp.GetRequiredService<MaterialRepository>());
+        services.AddScoped<IMaterialWriteOnlyRepository>(sp => sp.GetRequiredService<MaterialRepository>());
+        services.AddScoped<IMaterialUpdateOnlyRepository>(sp => sp.GetRequiredService<MaterialRepository>());
+
+        services.AddScoped<BudgetRepository>();
+        services.AddScoped<IBudgetReadOnlyRepository>(sp => sp.GetRequiredService<BudgetRepository>());
+        services.AddScoped<IBudgetWriteOnlyRepository>(sp => sp.GetRequiredService<BudgetRepository>());
+        services.AddScoped<IBudgetUpdateOnlyRepository>(sp => sp.GetRequiredService<BudgetRepository>());
     }
 
     private static void AddDatabase(IServiceCollection services, IConfiguration configuration)
