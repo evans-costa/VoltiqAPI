@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
+using Voltiq.CommonTestUtilities.Builders;
 using Voltiq.CommonTestUtilities.Database;
 using Voltiq.CommonTestUtilities.Fixtures;
-using Voltiq.Domain.Entities;
-using Voltiq.Domain.ValueObjects;
 using Voltiq.Infrastructure.Persistence;
 using Voltiq.Infrastructure.Persistence.Repositories;
 using Voltiq.Domain.Interfaces.Repositories.Client;
@@ -41,30 +40,10 @@ public class SoftDeleteTests(PostgreSqlContainerFixture fixture)
         await _dbContext.DisposeAsync();
     }
 
-    private static User MakeUser()
+    private async Task<(Voltiq.Domain.Entities.User user, Voltiq.Domain.Entities.Client client)> CreateUserAndClientAsync()
     {
-        var email = Email.Create("joao@example.com").Value;
-        var doc = Document.Create("529.982.247-25").Value;
-        return User.Register("João Silva", email, doc, "$argon2id$hash");
-    }
-
-    private static Client MakeClient(Guid userId)
-    {
-        var email = Email.Create("cliente@example.com").Value;
-        return Client.Register(userId, "Cliente Teste", "(11) 99999-9999", email,
-            Address.Create("Rua das Flores", "123", "São Paulo", "SP", "01310-100"));
-    }
-
-    private async Task<(User user, Client client)> CreateUserAndClientAsync()
-    {
-        var user = MakeUser();
-        await _userRepository.AddAsync(user);
-        await _unitOfWork.SaveChangesAsync();
-
-        var client = MakeClient(user.Id);
-        await _clientRepository.AddAsync(client);
-        await _unitOfWork.SaveChangesAsync();
-
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
+        var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id);
         return (user, client);
     }
 
