@@ -8,5 +8,5 @@ public sealed class PostgreSqlContainerFixture(IMessageSink messageSink)
     : ContainerFixture<PostgreSqlBuilder, PostgreSqlContainer>(messageSink)
 {
     protected override PostgreSqlBuilder Configure()
-        => new PostgreSqlBuilder("postgres:16-alpine");
+        => new PostgreSqlBuilder("postgres:17-alpine");
 }

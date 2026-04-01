@@ -11,7 +11,6 @@ using Voltiq.Application.Mappings.Materials;
 namespace Voltiq.API.Controllers.Materials;
 
 [ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/materials")]
 public sealed class MaterialsController : BaseApiController
 {
     /// <summary>Registers a new material for the authenticated user.</summary>

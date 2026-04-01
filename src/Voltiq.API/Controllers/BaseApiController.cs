@@ -8,6 +8,7 @@ using Voltiq.Exceptions.Resources;
 namespace Voltiq.API.Controllers;
 
 [ApiController]
+[Produces("application/json", "application/problem+json")]
 [Route("api/v{version:apiVersion}/[controller]")]
 public abstract class BaseApiController : ControllerBase
 {
