@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
+using Voltiq.CommonTestUtilities.Builders;
 using Voltiq.CommonTestUtilities.Database;
 using Voltiq.CommonTestUtilities.Fixtures;
-using Voltiq.Domain.Entities;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Infrastructure.Persistence;
 using Voltiq.Infrastructure.Persistence.Repositories;
@@ -36,12 +36,8 @@ public class UserRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task AddAndGetById_ShouldPersistUser()
     {
-        var email = Email.Create("joao@example.com").Value;
-        var document = Document.Create("529.982.247-25").Value;
-        var user = User.Register("João Silva", email, document, "$argon2id$hash");
-
-        await _userRepository.AddAsync(user, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         var found = await _userRepository.GetByIdAsync(user.Id, TestContext.Current.CancellationToken);
 
@@ -54,16 +50,12 @@ public class UserRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task ExistsUserAsync_ShouldReturnTrue_WhenEmailOrDocumentExists()
     {
-        var email = Email.Create("maria@example.com").Value;
-        var document = Document.Create("11222333000181").Value;
-        var user = User.Register("Maria Santos", email, document, "$argon2id$hash");
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            name: "Maria Santos", email: "maria@example.com", document: "11222333000181",
+            cancellationToken: TestContext.Current.CancellationToken);
 
-        await _userRepository.AddAsync(user, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-        var exists =
-            await _userRepository.ExistsUserAsync(document, email,
-                TestContext.Current.CancellationToken);
+        var exists = await _userRepository.ExistsUserAsync(
+            user.Document, user.Email, TestContext.Current.CancellationToken);
 
         exists.ShouldBeTrue();
     }
@@ -71,15 +63,11 @@ public class UserRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task GetByEmailAsync_ShouldReturnUser_WhenEmailExists()
     {
-        var email = Email.Create("carlos@example.com").Value;
-        var document = Document.Create("153.509.460-56").Value;
-        var user = User.Register("Carlos Souza", email, document, "$argon2id$hash");
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            name: "Carlos Souza", email: "carlos@example.com", document: "153.509.460-56",
+            cancellationToken: TestContext.Current.CancellationToken);
 
-        await _userRepository.AddAsync(user, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-        var found =
-            await _userRepository.GetByEmailAsync(email, TestContext.Current.CancellationToken);
+        var found = await _userRepository.GetByEmailAsync(user.Email, TestContext.Current.CancellationToken);
 
         found.ShouldNotBeNull();
         found.Id.ShouldBe(user.Id);
