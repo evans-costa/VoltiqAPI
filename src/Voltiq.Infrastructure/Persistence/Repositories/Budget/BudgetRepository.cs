@@ -83,4 +83,24 @@ public sealed class BudgetRepository(ApplicationDbContext context)
     {
         await context.Budgets.AddAsync(entity, cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Domain.Entities.Budget>> GetByUserIdWithClientAsync(
+        Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await context.Budgets
+            .Include(b => b.Client)
+            .AsNoTracking()
+            .Where(b => b.UserId == userId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Domain.Entities.Budget?> GetByIdWithItemsAndClientAsync(
+        Guid id, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await context.Budgets
+            .Include(b => b.Items)
+            .Include(b => b.Client)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId, cancellationToken);
+    }
 }
