@@ -45,4 +45,20 @@ public sealed class Material : AuditableEntity
     public void Deactivate() => IsActive = false;
 
     public void Activate() => IsActive = true;
+
+    public void Update(string name, decimal defaultPrice, MaterialUnit unit)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new DomainException(ResourceErrorMessages.MATERIAL_NOME_OBRIGATORIO);
+
+        if (!Enum.IsDefined(unit))
+            throw new DomainException(ResourceErrorMessages.MATERIAL_UNIDADE_INVALIDA);
+
+        if (defaultPrice <= 0)
+            throw new DomainException(ResourceErrorMessages.MATERIAL_PRECO_INVALIDO);
+
+        Name = name.Trim();
+        DefaultPrice = defaultPrice;
+        Unit = unit;
+    }
 }

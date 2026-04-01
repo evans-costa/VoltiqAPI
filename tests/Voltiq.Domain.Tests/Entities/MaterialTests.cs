@@ -90,4 +90,61 @@ public class MaterialTests
 
         material.IsActive.ShouldBeTrue();
     }
+
+    [Fact]
+    public void Update_WithValidData_ShouldUpdateFields()
+    {
+        var material = Material.Register(ValidUserId, "Cabo 10mm", 15.50m, MaterialUnit.Metro);
+
+        material.Update("Fio 6mm", 8.00m, MaterialUnit.Unidade);
+
+        material.Name.ShouldBe("Fio 6mm");
+        material.DefaultPrice.ShouldBe(8.00m);
+        material.Unit.ShouldBe(MaterialUnit.Unidade);
+    }
+
+    [Fact]
+    public void Update_ShouldTrimName()
+    {
+        var material = Material.Register(ValidUserId, "Cabo 10mm", 15.50m, MaterialUnit.Metro);
+
+        material.Update("  Fio 6mm  ", 8.00m, MaterialUnit.Unidade);
+
+        material.Name.ShouldBe("Fio 6mm");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData(null)]
+    public void Update_WithNullOrEmptyName_ShouldThrowDomainException(string? name)
+    {
+        var material = Material.Register(ValidUserId, "Cabo 10mm", 15.50m, MaterialUnit.Metro);
+
+        Should.Throw<DomainException>(() => material.Update(name!, 8.00m, MaterialUnit.Unidade))
+            .Message.ShouldBe(ResourceErrorMessages.MATERIAL_NOME_OBRIGATORIO);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-0.01)]
+    public void Update_WithInvalidPrice_ShouldThrowDomainException(decimal price)
+    {
+        var material = Material.Register(ValidUserId, "Cabo 10mm", 15.50m, MaterialUnit.Metro);
+
+        Should.Throw<DomainException>(() => material.Update("Fio 6mm", price, MaterialUnit.Unidade))
+            .Message.ShouldBe(ResourceErrorMessages.MATERIAL_PRECO_INVALIDO);
+    }
+
+    [Fact]
+    public void Update_ShouldNotAffectIsActive()
+    {
+        var material = Material.Register(ValidUserId, "Cabo 10mm", 15.50m, MaterialUnit.Metro);
+        material.Deactivate();
+
+        material.Update("Fio 6mm", 8.00m, MaterialUnit.Unidade);
+
+        material.IsActive.ShouldBeFalse();
+    }
 }
