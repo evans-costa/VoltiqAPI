@@ -17,18 +17,24 @@ public class DeleteMaterialCommandHandlerTests
 
     private readonly Guid _userId = Guid.NewGuid();
 
-    private DeleteMaterialCommandHandler CreateHandler() =>
-        new(_materialUpdateRepoMock.Object, _unitOfWorkMock.Object);
+    private DeleteMaterialCommandHandler CreateHandler()
+    {
+        return new DeleteMaterialCommandHandler(_materialUpdateRepoMock.Object,
+            _unitOfWorkMock.Object);
+    }
 
-    private static Material MakeMaterial(Guid userId) =>
-        Material.Register(userId, "Cabo 10mm", 15.50m, MaterialUnit.Metro);
+    private static Material MakeMaterial(Guid userId)
+    {
+        return Material.Register(userId, "Cabo 10mm", 15.50m, MaterialUnit.Metro);
+    }
 
     [Fact]
     public async Task Handle_WhenMaterialExists_ShouldDeleteAndReturnDeleted()
     {
         var material = MakeMaterial(_userId);
         _materialUpdateRepoMock
-            .Setup(r => r.GetByIdAndUserIdAsync(material.Id, _userId, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetTrackedByIdAndUserIdAsync(material.Id, _userId, It
+                .IsAny<CancellationToken>()))
             .ReturnsAsync(material);
 
         var command = new DeleteMaterialCommand(material.Id) { UserId = _userId };
@@ -45,7 +51,8 @@ public class DeleteMaterialCommandHandlerTests
     public async Task Handle_WhenMaterialNotFound_ShouldReturnNotFoundError()
     {
         _materialUpdateRepoMock
-            .Setup(r => r.GetByIdAndUserIdAsync(It.IsAny<Guid>(), _userId, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetTrackedByIdAndUserIdAsync(It.IsAny<Guid>(), _userId, It
+                .IsAny<CancellationToken>()))
             .ReturnsAsync((Material?)null);
 
         var command = new DeleteMaterialCommand(Guid.NewGuid()) { UserId = _userId };
