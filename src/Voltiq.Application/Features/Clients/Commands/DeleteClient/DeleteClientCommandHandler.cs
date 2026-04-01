@@ -15,7 +15,8 @@ public sealed class DeleteClientCommandHandler(
         CancellationToken cancellationToken)
     {
         var client =
-            await clientRepository.GetByIdAndUserIdAsync(request.Id, request.UserId, cancellationToken);
+            await clientRepository.GetTrackedByIdAndUserIdAsync(request.Id, request.UserId,
+                cancellationToken);
 
         if (client is null)
             return Error.NotFound(description: ResourceErrorMessages.CLIENTE_NAO_ENCONTRADO);
