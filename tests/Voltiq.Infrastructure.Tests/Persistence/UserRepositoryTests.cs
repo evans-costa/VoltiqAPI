@@ -36,8 +36,7 @@ public class UserRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task AddAndGetById_ShouldPersistUser()
     {
-        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            cancellationToken: TestContext.Current.CancellationToken);
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
 
         var found = await _userRepository.GetByIdAsync(user.Id, TestContext.Current.CancellationToken);
 
@@ -51,8 +50,7 @@ public class UserRepositoryTests(PostgreSqlContainerFixture fixture)
     public async Task ExistsUserAsync_ShouldReturnTrue_WhenEmailOrDocumentExists()
     {
         var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            name: "Maria Santos", email: "maria@example.com", document: "11222333000181",
-            cancellationToken: TestContext.Current.CancellationToken);
+            name: "Maria Santos", email: "maria@example.com", document: "11222333000181");
 
         var exists = await _userRepository.ExistsUserAsync(
             user.Document, user.Email, TestContext.Current.CancellationToken);
@@ -64,8 +62,7 @@ public class UserRepositoryTests(PostgreSqlContainerFixture fixture)
     public async Task GetByEmailAsync_ShouldReturnUser_WhenEmailExists()
     {
         var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            name: "Carlos Souza", email: "carlos@example.com", document: "153.509.460-56",
-            cancellationToken: TestContext.Current.CancellationToken);
+            name: "Carlos Souza", email: "carlos@example.com", document: "153.509.460-56");
 
         var found = await _userRepository.GetByEmailAsync(user.Email, TestContext.Current.CancellationToken);
 

@@ -1,8 +1,8 @@
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Enums;
 using Voltiq.Domain.Interfaces;
-using Voltiq.Domain.Interfaces.Repositories.Client;
 using Voltiq.Domain.Interfaces.Repositories.Budget;
+using Voltiq.Domain.Interfaces.Repositories.Client;
 using Voltiq.Domain.Interfaces.Repositories.Material;
 using Voltiq.Domain.Interfaces.Repositories.RefreshToken;
 using Voltiq.Domain.Interfaces.Repositories.User;
@@ -12,7 +12,7 @@ namespace Voltiq.CommonTestUtilities.Builders;
 
 public static class TestDataBuilder
 {
-    // ── In-memory factories ────────────────────────────────────────────────
+    private static CancellationToken Ct => TestContext.Current.CancellationToken;
 
     public static User MakeUser(
         string name = "João Silva",
@@ -41,30 +41,34 @@ public static class TestDataBuilder
         string name = "Cabo 10mm",
         decimal defaultPrice = 15.50m,
         MaterialUnit unit = MaterialUnit.Metro)
-        => Material.Register(userId, name, defaultPrice, unit);
+    {
+        return Material.Register(userId, name, defaultPrice, unit);
+    }
 
     public static Budget MakeBudget(Guid userId, Guid clientId)
-        => Budget.Register(userId, clientId);
+    {
+        return Budget.Register(userId, clientId);
+    }
 
     public static RefreshToken MakeRefreshToken(
         string token,
         Guid userId,
         int daysToExpire = 7)
-        => RefreshToken.Create(token, userId, daysToExpire);
+    {
+        return RefreshToken.Create(token, userId, daysToExpire);
+    }
 
-    // ── Seeders (persist to DB) ────────────────────────────────────────────
 
     public static async Task<User> SeedUserAsync(
         IUserWriteOnlyRepository repository,
         IUnitOfWork unitOfWork,
         string name = "João Silva",
         string email = "joao@example.com",
-        string document = "529.982.247-25",
-        CancellationToken cancellationToken = default)
+        string document = "529.982.247-25")
     {
         var user = MakeUser(name, email, document);
-        await repository.AddAsync(user, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        await repository.AddAsync(user, Ct);
+        await unitOfWork.SaveChangesAsync(Ct);
         return user;
     }
 
@@ -73,12 +77,11 @@ public static class TestDataBuilder
         IUnitOfWork unitOfWork,
         Guid userId,
         string name = "Cliente Teste",
-        string email = "cliente@example.com",
-        CancellationToken cancellationToken = default)
+        string email = "cliente@example.com")
     {
         var client = MakeClient(userId, name, email);
-        await repository.AddAsync(client, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        await repository.AddAsync(client, Ct);
+        await unitOfWork.SaveChangesAsync(Ct);
         return client;
     }
 
@@ -88,12 +91,11 @@ public static class TestDataBuilder
         Guid userId,
         string name = "Cabo 10mm",
         decimal defaultPrice = 15.50m,
-        MaterialUnit unit = MaterialUnit.Metro,
-        CancellationToken cancellationToken = default)
+        MaterialUnit unit = MaterialUnit.Metro)
     {
         var material = MakeMaterial(userId, name, defaultPrice, unit);
-        await repository.AddAsync(material, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        await repository.AddAsync(material, Ct);
+        await unitOfWork.SaveChangesAsync(Ct);
         return material;
     }
 
@@ -101,12 +103,11 @@ public static class TestDataBuilder
         IBudgetWriteOnlyRepository repository,
         IUnitOfWork unitOfWork,
         Guid userId,
-        Guid clientId,
-        CancellationToken cancellationToken = default)
+        Guid clientId)
     {
         var budget = MakeBudget(userId, clientId);
-        await repository.AddAsync(budget, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        await repository.AddAsync(budget, Ct);
+        await unitOfWork.SaveChangesAsync(Ct);
         return budget;
     }
 
@@ -115,12 +116,11 @@ public static class TestDataBuilder
         IUnitOfWork unitOfWork,
         Guid userId,
         string token = "test-token",
-        int daysToExpire = 7,
-        CancellationToken cancellationToken = default)
+        int daysToExpire = 7)
     {
         var refreshToken = MakeRefreshToken(token, userId, daysToExpire);
-        await repository.AddAsync(refreshToken, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        await repository.AddAsync(refreshToken, Ct);
+        await unitOfWork.SaveChangesAsync(Ct);
         return refreshToken;
     }
 }

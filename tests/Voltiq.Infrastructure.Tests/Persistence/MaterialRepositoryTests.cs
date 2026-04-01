@@ -43,10 +43,8 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task AddAndGetById_ShouldPersistMaterial()
     {
-        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            cancellationToken: TestContext.Current.CancellationToken);
-        var material = await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user.Id,
-            cancellationToken: TestContext.Current.CancellationToken);
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
+        var material = await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user.Id);
 
         var found = await _materialRepository.GetByIdAsync(material.Id, TestContext.Current.CancellationToken);
 
@@ -62,18 +60,13 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task GetByUserIdAsync_ShouldReturnOnlyMaterialsOfUser()
     {
-        var user1 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            cancellationToken: TestContext.Current.CancellationToken);
+        var user1 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
         var user2 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            email: "maria@example.com", document: "11222333000181",
-            cancellationToken: TestContext.Current.CancellationToken);
+            email: "maria@example.com", document: "11222333000181");
 
-        await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user1.Id, name: "Cabo A",
-            cancellationToken: TestContext.Current.CancellationToken);
-        await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user1.Id, name: "Cabo B",
-            cancellationToken: TestContext.Current.CancellationToken);
-        await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user2.Id, name: "Disjuntor",
-            cancellationToken: TestContext.Current.CancellationToken);
+        await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user1.Id, name: "Cabo A");
+        await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user1.Id, name: "Cabo B");
+        await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user2.Id, name: "Disjuntor");
 
         var user1Materials = await _materialRepository.GetByUserIdAsync(user1.Id, TestContext.Current.CancellationToken);
 
@@ -84,10 +77,8 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task GetByIdAndUserIdAsync_ShouldReturnMaterial_WhenBelongsToUser()
     {
-        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            cancellationToken: TestContext.Current.CancellationToken);
-        var material = await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user.Id,
-            cancellationToken: TestContext.Current.CancellationToken);
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
+        var material = await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user.Id);
 
         var found = await _materialReadOnly.GetByIdAndUserIdAsync(material.Id, user.Id, TestContext.Current.CancellationToken);
 
@@ -98,14 +89,11 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task GetByIdAndUserIdAsync_ShouldReturnNull_WhenMaterialBelongsToAnotherUser()
     {
-        var user1 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            cancellationToken: TestContext.Current.CancellationToken);
+        var user1 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
         var user2 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            email: "outro@example.com", document: "11222333000181",
-            cancellationToken: TestContext.Current.CancellationToken);
+            email: "outro@example.com", document: "11222333000181");
 
-        var material = await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user1.Id,
-            cancellationToken: TestContext.Current.CancellationToken);
+        var material = await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user1.Id);
 
         var found = await _materialReadOnly.GetByIdAndUserIdAsync(material.Id, user2.Id, TestContext.Current.CancellationToken);
 
@@ -115,11 +103,9 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task GetActiveByUserIdAsync_ShouldReturnOnlyActiveMaterials()
     {
-        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            cancellationToken: TestContext.Current.CancellationToken);
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
 
-        await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user.Id, name: "Ativo",
-            cancellationToken: TestContext.Current.CancellationToken);
+        await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user.Id, name: "Ativo");
 
         var inactive = TestDataBuilder.MakeMaterial(user.Id, name: "Inativo");
         inactive.Deactivate();
@@ -135,16 +121,12 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task GetActiveByUserIdAsync_ShouldNotReturnMaterialsOfOtherUser()
     {
-        var user1 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            cancellationToken: TestContext.Current.CancellationToken);
+        var user1 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
         var user2 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            email: "outro@example.com", document: "11222333000181",
-            cancellationToken: TestContext.Current.CancellationToken);
+            email: "outro@example.com", document: "11222333000181");
 
-        await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user1.Id, name: "User1 Material",
-            cancellationToken: TestContext.Current.CancellationToken);
-        await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user2.Id, name: "User2 Material",
-            cancellationToken: TestContext.Current.CancellationToken);
+        await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user1.Id, name: "User1 Material");
+        await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user2.Id, name: "User2 Material");
 
         var result = await _materialRepository.GetActiveByUserIdAsync(user1.Id, TestContext.Current.CancellationToken);
 

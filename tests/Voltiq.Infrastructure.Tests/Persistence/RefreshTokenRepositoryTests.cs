@@ -38,11 +38,9 @@ public class RefreshTokenRepositoryTests(PostgreSqlContainerFixture fixture)
     public async Task GetByTokenAsync_WhenTokenExists_ReturnsToken()
     {
         var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
-            email: $"{Guid.NewGuid()}@example.com",
-            cancellationToken: TestContext.Current.CancellationToken);
+            email: $"{Guid.NewGuid()}@example.com");
         var expected = await TestDataBuilder.SeedRefreshTokenAsync(_repository, _unitOfWork,
-            user.Id, token: "my-raw-token-abc",
-            cancellationToken: TestContext.Current.CancellationToken);
+            user.Id, token: "my-raw-token-abc");
 
         var found = await _repository.GetByTokenAsync("my-raw-token-abc",
             TestContext.Current.CancellationToken);
