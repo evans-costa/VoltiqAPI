@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
+using Voltiq.CommonTestUtilities.Builders;
 using Voltiq.CommonTestUtilities.Database;
 using Voltiq.CommonTestUtilities.Fixtures;
-using Voltiq.Domain.Entities;
 using Voltiq.Domain.ValueObjects;
 using Voltiq.Infrastructure.Persistence;
 using Voltiq.Infrastructure.Persistence.Repositories;
@@ -42,37 +42,13 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
         await _dbContext.DisposeAsync();
     }
 
-    private static User MakeUser()
-    {
-        var email = Email.Create("joao@example.com").Value;
-        var document = Document.Create("529.982.247-25").Value;
-        return User.Register("João Silva", email, document, "$argon2id$hash");
-    }
-
-    private static Client MakeClient(Guid userId, string name = "Cliente Teste",
-        string email = "cliente@example.com")
-    {
-        var emailVo = Email.Create(email).Value;
-        return Client.Register(userId, name, "(11) 99999-9999", emailVo,
-            Address.Create("Rua das Flores", "123", "São Paulo", "SP", "01310-100"));
-    }
-
-    private async Task<User> CreateAndSaveUserAsync()
-    {
-        var user = MakeUser();
-        await _userRepository.AddAsync(user);
-        await _unitOfWork.SaveChangesAsync();
-        return user;
-    }
-
     [Fact]
     public async Task AddAndGetById_ShouldPersistClient()
     {
-        var user = await CreateAndSaveUserAsync();
-        var client = MakeClient(user.Id);
-
-        await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            cancellationToken: TestContext.Current.CancellationToken);
+        var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         var found =
             await _clientReadOnly.GetByIdAndUserIdAsync(client.Id, user.Id, TestContext.Current.CancellationToken);
@@ -90,22 +66,21 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task GetByUserIdAsync_ShouldReturnOnlyClientsOfUser()
     {
-        var user1 = await CreateAndSaveUserAsync();
+        var user1 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            cancellationToken: TestContext.Current.CancellationToken);
+        var user2 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            name: "Maria Santos", email: "maria@example.com", document: "11222333000181",
+            cancellationToken: TestContext.Current.CancellationToken);
 
-        var email2 = Email.Create("maria@example.com").Value;
-        var doc2 = Document.Create("11222333000181").Value;
-        var user2 = User.Register("Maria Santos", email2, doc2, "$argon2id$hash2");
-        await _userRepository.AddAsync(user2, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-        var client1 = MakeClient(user1.Id, "Cliente User1", "user1a@example.com");
-        var client2 = MakeClient(user1.Id, "Cliente User1 B", "user1b@example.com");
-        var client3 = MakeClient(user2.Id, "Cliente User2", "user2@example.com");
-
-        await _clientRepository.AddAsync(client1, TestContext.Current.CancellationToken);
-        await _clientRepository.AddAsync(client2, TestContext.Current.CancellationToken);
-        await _clientRepository.AddAsync(client3, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+        await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user1.Id,
+            name: "Cliente User1", email: "user1a@example.com",
+            cancellationToken: TestContext.Current.CancellationToken);
+        await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user1.Id,
+            name: "Cliente User1 B", email: "user1b@example.com",
+            cancellationToken: TestContext.Current.CancellationToken);
+        await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user2.Id,
+            name: "Cliente User2", email: "user2@example.com",
+            cancellationToken: TestContext.Current.CancellationToken);
 
         var user1Clients =
             await _clientRepository.GetByUserIdAsync(user1.Id,
@@ -118,11 +93,10 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task GetByIdAndUserIdAsync_ShouldReturnClient_WhenBelongsToUser()
     {
-        var user = await CreateAndSaveUserAsync();
-        var client = MakeClient(user.Id);
-
-        await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            cancellationToken: TestContext.Current.CancellationToken);
+        var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         var found = await _clientReadOnly.GetByIdAndUserIdAsync(client.Id, user.Id,
             TestContext.Current.CancellationToken);
@@ -134,17 +108,14 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task GetByIdAndUserIdAsync_ShouldReturnNull_WhenClientBelongsToAnotherUser()
     {
-        var user1 = await CreateAndSaveUserAsync();
+        var user1 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            cancellationToken: TestContext.Current.CancellationToken);
+        var user2 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            name: "Outro User", email: "outro@example.com", document: "11222333000181",
+            cancellationToken: TestContext.Current.CancellationToken);
 
-        var email2 = Email.Create("outro@example.com").Value;
-        var doc2 = Document.Create("11222333000181").Value;
-        var user2 = User.Register("Outro User", email2, doc2, "$argon2id$hash2");
-        await _userRepository.AddAsync(user2, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-        var client = MakeClient(user1.Id);
-        await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user1.Id,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         var found = await _clientReadOnly.GetByIdAndUserIdAsync(client.Id, user2.Id,
             TestContext.Current.CancellationToken);
@@ -155,10 +126,11 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task ExistsWithEmailForUserAsync_ShouldReturnTrue_WhenEmailExistsForUser()
     {
-        var user = await CreateAndSaveUserAsync();
-        var client = MakeClient(user.Id, email: "ocupado@example.com");
-        await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            cancellationToken: TestContext.Current.CancellationToken);
+        await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id,
+            email: "ocupado@example.com",
+            cancellationToken: TestContext.Current.CancellationToken);
 
         var existingEmail = Email.Create("ocupado@example.com").Value;
 
@@ -171,7 +143,8 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task ExistsWithEmailForUserAsync_ShouldReturnFalse_WhenEmailDoesNotExistForUser()
     {
-        var user = await CreateAndSaveUserAsync();
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            cancellationToken: TestContext.Current.CancellationToken);
         var email = Email.Create("inexistente@example.co").Value;
 
         var exists = await _clientRepository.ExistsWithEmailForUserAsync(
@@ -184,10 +157,11 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
     public async Task
         ExistsWithEmailForUserAsync_ShouldReturnFalse_WhenExcludeIdMatchesExistingClient()
     {
-        var user = await CreateAndSaveUserAsync();
-        var client = MakeClient(user.Id, email: "meu@example.com");
-        await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            cancellationToken: TestContext.Current.CancellationToken);
+        var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id,
+            email: "meu@example.com",
+            cancellationToken: TestContext.Current.CancellationToken);
 
         var email = Email.Create("meu@example.com").Value;
 
@@ -200,17 +174,15 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
     [Fact]
     public async Task ExistsWithEmailForUserAsync_ShouldReturnFalse_WhenEmailBelongsToAnotherUser()
     {
-        var user1 = await CreateAndSaveUserAsync();
+        var user1 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            cancellationToken: TestContext.Current.CancellationToken);
+        var user2 = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork,
+            name: "Outro User", email: "outro@example.com", document: "11222333000181",
+            cancellationToken: TestContext.Current.CancellationToken);
 
-        var email2 = Email.Create("outro@example.com").Value;
-        var doc2 = Document.Create("11222333000181").Value;
-        var user2 = User.Register("Outro User", email2, doc2, "$argon2id$hash2");
-        await _userRepository.AddAsync(user2, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-        var client = MakeClient(user1.Id, email: "compartilhado@example.com");
-        await _clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
-        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+        await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user1.Id,
+            email: "compartilhado@example.com",
+            cancellationToken: TestContext.Current.CancellationToken);
 
         var clientEmail = Email.Create("compartilhado@example.com").Value;
 
