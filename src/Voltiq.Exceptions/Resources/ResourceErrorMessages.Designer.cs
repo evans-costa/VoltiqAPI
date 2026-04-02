@@ -330,6 +330,15 @@ namespace Voltiq.Exceptions.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to O orçamento deve conter pelo menos um item..
+        /// </summary>
+        public static string ORCAMENTO_ITEMS_OBRIGATORIOS {
+            get {
+                return ResourceManager.GetString("ORCAMENTO_ITEMS_OBRIGATORIOS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Orçamento não encontrado..
         /// </summary>
         public static string ORCAMENTO_NAO_ENCONTRADO {
