@@ -20,7 +20,8 @@ public class UpdateClientCommandHandlerTests
 
     private UpdateClientCommandHandler CreateHandler()
     {
-        return new UpdateClientCommandHandler(_clientReadRepoMock.Object, _clientUpdateRepoMock.Object, _unitOfWorkMock.Object);
+        return new UpdateClientCommandHandler(_clientReadRepoMock.Object,
+            _clientUpdateRepoMock.Object, _unitOfWorkMock.Object);
     }
 
     private static Client MakeClient(Guid userId)
@@ -35,7 +36,9 @@ public class UpdateClientCommandHandlerTests
     {
         var client = MakeClient(_userId);
         _clientUpdateRepoMock
-            .Setup(r => r.GetByIdAndUserIdAsync(client.Id, _userId, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetTrackedByIdAndUserIdAsync(client.Id, _userId, It
+                .IsAny<CancellationToken>
+                    ()))
             .ReturnsAsync(client);
         _clientReadRepoMock
             .Setup(r => r.ExistsWithEmailForUserAsync(It.IsAny<Email>(), _userId, client.Id, It
@@ -43,8 +46,8 @@ public class UpdateClientCommandHandlerTests
             .ReturnsAsync(false);
 
         var command = new UpdateClientCommand(
-            client.Id, "Maria Souza", "(11) 88888-8888", "maria@example.com",
-            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100")
+                client.Id, "Maria Souza", "(11) 88888-8888", "maria@example.com",
+                "Av. Paulista", "1000", "São Paulo", "SP", "01311-100")
         { UserId = _userId };
 
         var handler = CreateHandler();
@@ -59,7 +62,9 @@ public class UpdateClientCommandHandlerTests
     {
         var client = MakeClient(_userId);
         _clientUpdateRepoMock
-            .Setup(r => r.GetByIdAndUserIdAsync(client.Id, _userId, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetTrackedByIdAndUserIdAsync(client.Id, _userId, It
+                .IsAny<CancellationToken>
+                    ()))
             .ReturnsAsync(client);
         _clientReadRepoMock
             .Setup(r => r.ExistsWithEmailForUserAsync(It.IsAny<Email>(), _userId, client.Id, It
@@ -67,8 +72,8 @@ public class UpdateClientCommandHandlerTests
             .ReturnsAsync(true);
 
         var command = new UpdateClientCommand(
-            client.Id, "Maria Souza", "(11) 88888-8888", "outro@example.com",
-            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100")
+                client.Id, "Maria Souza", "(11) 88888-8888", "outro@example.com",
+                "Av. Paulista", "1000", "São Paulo", "SP", "01311-100")
         { UserId = _userId };
 
         var handler = CreateHandler();
@@ -85,12 +90,14 @@ public class UpdateClientCommandHandlerTests
     {
         _clientUpdateRepoMock
             .Setup(r =>
-                r.GetByIdAndUserIdAsync(It.IsAny<Guid>(), _userId, It.IsAny<CancellationToken>()))
+                r.GetTrackedByIdAndUserIdAsync(It.IsAny<Guid>(), _userId, It
+                    .IsAny<CancellationToken>
+                        ()))
             .ReturnsAsync((Client?)null);
 
         var command = new UpdateClientCommand(
-            Guid.NewGuid(), "Maria Souza", "(11) 88888-8888", "maria@example.com",
-            "Av. Paulista", "1000", "São Paulo", "SP", "01311-100")
+                Guid.NewGuid(), "Maria Souza", "(11) 88888-8888", "maria@example.com",
+                "Av. Paulista", "1000", "São Paulo", "SP", "01311-100")
         { UserId = _userId };
 
         var handler = CreateHandler();

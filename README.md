@@ -240,6 +240,33 @@ dotnet run --project src/Voltiq.API
 
 ---
 
+## Seed de Desenvolvimento
+
+O script `scripts/seed-dev.cs` popula o banco com dados de exemplo usando a feature de **file-based app** do .NET 10 — sem `.csproj`, sem dependências adicionais.
+
+```bash
+dotnet run scripts/seed-dev.cs
+```
+
+Por padrão conecta em `Host=localhost;Database=VoltiqDb;Port=5433;Username=postgres;Password=postgres`. Para usar outra connection string:
+
+```bash
+VOLTIQ_CONNECTION_STRING="Host=..." dotnet run scripts/seed-dev.cs
+```
+
+**Dados inseridos:**
+
+| Entidade | Qtd | Destaques |
+|---|---|---|
+| Usuário | 1 | `dev@voltiq.dev` / `senha@123` |
+| Clientes | 3 | Construtora ABC Ltda, João da Silva, Empresa XYZ S.A. |
+| Materiais | 4 | Cabo 2,5mm, Cabo 4mm, Tomada 2P+T, Disjuntor 20A |
+| Orçamentos | 2 | Um com 3 itens (materiais + customizado), outro com 1 item |
+
+O script é **idempotente**: se o usuário `dev@voltiq.dev` já existir, encerra sem inserir nada.
+
+---
+
 ## Camadas
 
 ### Domain

@@ -14,7 +14,7 @@ public sealed class UpdateMaterialCommandHandler(
     public async Task<ErrorOr<Updated>> Handle(UpdateMaterialCommand request,
         CancellationToken cancellationToken)
     {
-        var material = await materialUpdateOnlyRepository.GetByIdAndUserIdAsync(
+        var material = await materialUpdateOnlyRepository.GetTrackedByIdAndUserIdAsync(
             request.Id, request.UserId, cancellationToken);
 
         if (material is null)

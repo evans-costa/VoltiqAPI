@@ -8,4 +8,6 @@ public interface IBudgetReadOnlyRepository
     Task<Entities.Budget?> GetByIdAndUserIdAsync(Guid id, Guid userId, CancellationToken cancellationToken = default);
     Task<Entities.Budget?> GetByIdWithItemsAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Entities.Budget?> GetByIdWithItemsAndUserIdAsync(Guid id, Guid userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Entities.Budget>> GetByUserIdWithClientAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<Entities.Budget?> GetByIdWithItemsAndClientAsync(Guid id, Guid userId, CancellationToken cancellationToken = default);
 }

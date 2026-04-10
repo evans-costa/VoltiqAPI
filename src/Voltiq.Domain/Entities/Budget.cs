@@ -16,6 +16,8 @@ public sealed class Budget : AuditableEntity
     private readonly List<BudgetItem> _items = [];
     public IReadOnlyCollection<BudgetItem> Items => _items.AsReadOnly();
 
+    public Client Client { get; private set; } = null!;
+
     private Budget() { }
 
     private Budget(Guid userId, Guid clientId)

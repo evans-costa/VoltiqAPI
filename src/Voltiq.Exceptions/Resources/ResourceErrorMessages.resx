@@ -199,6 +199,9 @@
     <data name="ORCAMENTO_ITEM_PRECO_INVALIDO" xml:space="preserve">
     <value>O preço unitário deve ser maior que zero.</value>
   </data>
+    <data name="ORCAMENTO_ITEMS_OBRIGATORIOS" xml:space="preserve">
+    <value>O orçamento deve conter pelo menos um item.</value>
+  </data>
     <data name="ORCAMENTO_NAO_ENCONTRADO" xml:space="preserve">
     <value>Orçamento não encontrado.</value>
   </data>

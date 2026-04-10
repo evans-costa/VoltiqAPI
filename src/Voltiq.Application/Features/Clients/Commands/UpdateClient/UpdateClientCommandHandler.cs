@@ -17,7 +17,8 @@ public sealed class UpdateClientCommandHandler(
         CancellationToken cancellationToken)
     {
         var client =
-            await clientUpdateOnlyRepository.GetByIdAndUserIdAsync(request.Id, request.UserId, cancellationToken);
+            await clientUpdateOnlyRepository.GetTrackedByIdAndUserIdAsync(request.Id, request
+                .UserId, cancellationToken);
 
         if (client is null)
             return Error.NotFound(description: ResourceErrorMessages.CLIENTE_NAO_ENCONTRADO);

@@ -14,7 +14,7 @@ public sealed class DeleteMaterialCommandHandler(
     public async Task<ErrorOr<Deleted>> Handle(DeleteMaterialCommand request,
         CancellationToken cancellationToken)
     {
-        var material = await materialUpdateOnlyRepository.GetByIdAndUserIdAsync(
+        var material = await materialUpdateOnlyRepository.GetTrackedByIdAndUserIdAsync(
             request.Id, request.UserId, cancellationToken);
 
         if (material is null)

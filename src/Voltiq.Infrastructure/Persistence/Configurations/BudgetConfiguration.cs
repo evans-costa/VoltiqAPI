@@ -30,7 +30,7 @@ public sealed class BudgetConfiguration : IEntityTypeConfiguration<Budget>
             .HasForeignKey(b => b.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<Client>()
+        builder.HasOne(b => b.Client)
             .WithMany()
             .HasForeignKey(b => b.ClientId)
             .OnDelete(DeleteBehavior.Restrict);
