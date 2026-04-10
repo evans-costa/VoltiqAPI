@@ -38,7 +38,7 @@ public class UpdateMaterialCommandHandlerTests
             .ReturnsAsync(material);
 
         var command = new UpdateMaterialCommand(material.Id, "Fio 6mm", 8.00m, MaterialUnit.Unidade)
-            { UserId = _userId };
+        { UserId = _userId };
 
         var handler = CreateHandler();
         var result = await handler.Handle(command, CancellationToken.None);
@@ -57,7 +57,7 @@ public class UpdateMaterialCommandHandlerTests
 
         var command =
             new UpdateMaterialCommand(Guid.NewGuid(), "Fio 6mm", 8.00m, MaterialUnit.Unidade)
-                { UserId = _userId };
+            { UserId = _userId };
 
         var handler = CreateHandler();
         var result = await handler.Handle(command, CancellationToken.None);
