@@ -3,6 +3,7 @@ using Asp.Versioning;
 using Microsoft.OpenApi;
 using Serilog;
 using Voltiq.API.ExceptionHandlers;
+using Voltiq.API.Filters;
 using Voltiq.Application;
 using Voltiq.Infrastructure;
 using Voltiq.Infrastructure.Persistence;
@@ -83,16 +84,11 @@ builder.Services.AddOpenApi("v1", o =>
         };
 
         document.Security ??= new List<OpenApiSecurityRequirement>();
-        document.Security.Add(new OpenApiSecurityRequirement
-        {
-            {
-                new OpenApiSecuritySchemeReference("Bearer", document),
-                []
-            }
-        });
 
         return Task.CompletedTask;
     });
+
+    o.AddOperationTransformer<SecurityRequirementsOperationTransformer>();
 });
 
 builder.Services.AddCors(options =>
