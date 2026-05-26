@@ -118,19 +118,19 @@ Console.WriteLine($@"✅ {materials.Length} materiais criados.");
 
 // Orçamento 1: Construtora ABC — mix de material vinculado + item customizado
 var budget1 = Budget.Register(user.Id, clients[0].Id);
-budget1.AddItem(BudgetItem.Create(budget1.Id, materials[0].Id, "Cabo Flexível 2,5mm",
-    MaterialUnit.Metro, 50, 4.80m));
-budget1.AddItem(BudgetItem.Create(budget1.Id, materials[2].Id, "Tomada 2P+T", MaterialUnit.Unidade,
-    8, 18.50m));
-budget1.AddItem(BudgetItem.Create(budget1.Id, null, "Mão de obra elétrica", null, 1, 350.00m));
+budget1.AddItem(BudgetItem.Create(budget1.Id, materials[0].Id, BudgetItemType.Material,
+    MaterialUnit.Metro, 50, 4.80m, "Cabo Flexível 2,5mm"));
+budget1.AddItem(BudgetItem.Create(budget1.Id, materials[2].Id, BudgetItemType.Material, MaterialUnit.Unidade,
+    8, 18.50m, "Tomada 2P+T"));
+budget1.AddItem(BudgetItem.Create(budget1.Id, null, BudgetItemType.MaoDeObra, null, 1, 350.00m, "Mão de obra elétrica"));
 
 await db.Budgets.AddAsync(budget1);
 await db.SaveChangesAsync();
 
 // Orçamento 2: João da Silva — item customizado
 var budget2 = Budget.Register(user.Id, clients[1].Id);
-budget2.AddItem(BudgetItem.Create(budget2.Id, materials[3].Id, "Disjuntor 20A",
-    MaterialUnit.Unidade, 2, 32.00m));
+budget2.AddItem(BudgetItem.Create(budget2.Id, materials[3].Id, BudgetItemType.Material,
+    MaterialUnit.Unidade, 2, 32.00m, "Disjuntor 20A"));
 
 await db.Budgets.AddAsync(budget2);
 await db.SaveChangesAsync();
