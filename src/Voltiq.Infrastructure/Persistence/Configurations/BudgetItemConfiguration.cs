@@ -12,6 +12,10 @@ public sealed class BudgetItemConfiguration : IEntityTypeConfiguration<BudgetIte
 
         builder.Property(i => i.BudgetId).IsRequired();
 
+        builder.Property(i => i.Type)
+            .IsRequired()
+            .HasConversion<int>();
+
         builder.Property(i => i.MaterialId);
 
         builder.Property(i => i.MaterialName)
