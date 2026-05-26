@@ -14,6 +14,7 @@ public sealed record RegisterBudgetCommand(
 public sealed record RegisterBudgetItemCommand(
     Guid? MaterialId,
     string MaterialName,
+    BudgetItemType Type,
     MaterialUnit? Unit,
     int Quantity,
     decimal UnitPrice);

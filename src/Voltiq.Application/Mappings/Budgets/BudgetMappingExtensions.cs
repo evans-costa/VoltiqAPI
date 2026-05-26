@@ -12,7 +12,7 @@ public static class BudgetMappingExtensions
             new(request.ClientId,
                 request.Items
                     .Select(i => new RegisterBudgetItemCommand(
-                        i.MaterialId, i.MaterialName, i.Unit, i.Quantity, i.UnitPrice))
+                        i.MaterialId, i.MaterialName, i.Type, i.Unit, i.Quantity, i.UnitPrice))
                     .ToList());
     }
 
@@ -20,17 +20,17 @@ public static class BudgetMappingExtensions
     {
         public BudgetSummaryResponse ToSummaryResponse() =>
             new(budget.Id, budget.Status, budget.TotalAmount, budget.CreatedAt,
-                new BudgetClientSummaryResponse(budget.Client.Id, budget.Client.Name));
+                new BudgetClientSummaryResponse(budget.Client!.Id, budget.Client!.Name));
 
         public BudgetDetailResponse ToDetailResponse() =>
-            budget.ToDetailResponse(budget.Client);
+            budget.ToDetailResponse(budget.Client!);
 
         public BudgetDetailResponse ToDetailResponse(Client client) =>
             new(budget.Id, budget.Status, budget.TotalAmount, budget.CreatedAt,
                 new BudgetClientDetailResponse(
                     client.Id, client.Name, client.Phone, client.Email.Value),
                 budget.Items.Select(i => new BudgetItemResponse(
-                    i.Id, i.MaterialId, i.MaterialName, i.Unit,
+                    i.Id, i.MaterialId, i.MaterialName, i.Type, i.Unit,
                     i.Quantity, i.UnitPrice, i.TotalPrice)).ToList());
     }
 }

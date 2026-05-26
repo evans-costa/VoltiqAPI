@@ -43,8 +43,7 @@ public sealed class RegisterBudgetCommandHandler(
         foreach (var item in command.Items)
         {
             var budgetItem = BudgetItem.Create(
-                budget.Id, item.MaterialId, item.MaterialName,
-                item.Unit, item.Quantity, item.UnitPrice);
+                budget.Id, item.MaterialId, item.Type, item.Unit, item.Quantity, item.UnitPrice, item.MaterialName);
 
             budget.AddItem(budgetItem);
         }

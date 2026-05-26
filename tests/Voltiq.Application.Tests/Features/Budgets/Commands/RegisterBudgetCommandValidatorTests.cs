@@ -9,8 +9,13 @@ public class RegisterBudgetCommandValidatorTests
 {
     private readonly RegisterBudgetCommandValidator _validator = new();
 
-    private static RegisterBudgetCommand ValidCommand() =>
-        new(Guid.NewGuid(), [new RegisterBudgetItemCommand(null, "Cabo 10mm", MaterialUnit.Metro, 2, 15.50m)]);
+    private static RegisterBudgetCommand ValidCommand()
+    {
+        return new RegisterBudgetCommand(Guid.NewGuid(), [
+            new RegisterBudgetItemCommand(null, "Cabo 10mm", BudgetItemType.MaoDeObra,
+                null, 2, 15.50m)
+        ]);
+    }
 
     [Fact]
     public void Validate_WithValidData_ShouldHaveNoErrors()
@@ -44,7 +49,11 @@ public class RegisterBudgetCommandValidatorTests
     {
         var command = ValidCommand() with
         {
-            Items = [new RegisterBudgetItemCommand(null, name!, MaterialUnit.Metro, 1, 10.00m)]
+            Items =
+            [
+                new RegisterBudgetItemCommand(null, name!, BudgetItemType.MaoDeObra, null, 1,
+                    10.00m)
+            ]
         };
         _validator.TestValidate(command)
             .ShouldHaveValidationErrorFor("Items[0].MaterialName")
@@ -58,7 +67,11 @@ public class RegisterBudgetCommandValidatorTests
     {
         var command = ValidCommand() with
         {
-            Items = [new RegisterBudgetItemCommand(null, "Cabo 10mm", MaterialUnit.Metro, quantity, 15.50m)]
+            Items =
+            [
+                new RegisterBudgetItemCommand(null, "Cabo 10mm", BudgetItemType.MaoDeObra, null,
+                    quantity, 15.50m)
+            ]
         };
         _validator.TestValidate(command)
             .ShouldHaveValidationErrorFor("Items[0].Quantity")
@@ -72,7 +85,11 @@ public class RegisterBudgetCommandValidatorTests
     {
         var command = ValidCommand() with
         {
-            Items = [new RegisterBudgetItemCommand(null, "Cabo 10mm", MaterialUnit.Metro, 1, (decimal)price)]
+            Items =
+            [
+                new RegisterBudgetItemCommand(null, "Cabo 10mm", BudgetItemType.MaoDeObra, null, 1,
+                    (decimal)price)
+            ]
         };
         _validator.TestValidate(command)
             .ShouldHaveValidationErrorFor("Items[0].UnitPrice")
