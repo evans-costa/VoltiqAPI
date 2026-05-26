@@ -199,6 +199,21 @@
     <data name="ORCAMENTO_ITEM_PRECO_INVALIDO" xml:space="preserve">
     <value>O preço unitário deve ser maior que zero.</value>
   </data>
+    <data name="ORCAMENTO_ITEM_TIPO_INVALIDO" xml:space="preserve">
+    <value>Tipo de item do orçamento inválido.</value>
+  </data>
+    <data name="ORCAMENTO_ITEM_MATERIAL_ID_OBRIGATORIO_PARA_MATERIAL" xml:space="preserve">
+    <value>O material é obrigatório para itens do tipo Material.</value>
+  </data>
+    <data name="ORCAMENTO_ITEM_UNIDADE_OBRIGATORIA_PARA_MATERIAL" xml:space="preserve">
+    <value>A unidade é obrigatória para itens do tipo Material.</value>
+  </data>
+    <data name="ORCAMENTO_ITEM_MATERIAL_ID_DEVE_SER_NULO" xml:space="preserve">
+    <value>O material deve ser nulo para este tipo de item.</value>
+  </data>
+    <data name="ORCAMENTO_ITEM_UNIDADE_DEVE_SER_NULA" xml:space="preserve">
+    <value>A unidade deve ser nula para este tipo de item.</value>
+  </data>
     <data name="ORCAMENTO_ITEMS_OBRIGATORIOS" xml:space="preserve">
     <value>O orçamento deve conter pelo menos um item.</value>
   </data>

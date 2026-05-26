@@ -303,6 +303,24 @@ namespace Voltiq.Exceptions.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to O material deve ser nulo para este tipo de item..
+        /// </summary>
+        public static string ORCAMENTO_ITEM_MATERIAL_ID_DEVE_SER_NULO {
+            get {
+                return ResourceManager.GetString("ORCAMENTO_ITEM_MATERIAL_ID_DEVE_SER_NULO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to O material é obrigatório para itens do tipo Material..
+        /// </summary>
+        public static string ORCAMENTO_ITEM_MATERIAL_ID_OBRIGATORIO_PARA_MATERIAL {
+            get {
+                return ResourceManager.GetString("ORCAMENTO_ITEM_MATERIAL_ID_OBRIGATORIO_PARA_MATERIAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to O nome do material no item é obrigatório..
         /// </summary>
         public static string ORCAMENTO_ITEM_NOME_OBRIGATORIO {
@@ -326,6 +344,33 @@ namespace Voltiq.Exceptions.Resources {
         public static string ORCAMENTO_ITEM_QUANTIDADE_INVALIDA {
             get {
                 return ResourceManager.GetString("ORCAMENTO_ITEM_QUANTIDADE_INVALIDA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tipo de item do orçamento inválido..
+        /// </summary>
+        public static string ORCAMENTO_ITEM_TIPO_INVALIDO {
+            get {
+                return ResourceManager.GetString("ORCAMENTO_ITEM_TIPO_INVALIDO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A unidade deve ser nula para este tipo de item..
+        /// </summary>
+        public static string ORCAMENTO_ITEM_UNIDADE_DEVE_SER_NULA {
+            get {
+                return ResourceManager.GetString("ORCAMENTO_ITEM_UNIDADE_DEVE_SER_NULA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A unidade é obrigatória para itens do tipo Material..
+        /// </summary>
+        public static string ORCAMENTO_ITEM_UNIDADE_OBRIGATORIA_PARA_MATERIAL {
+            get {
+                return ResourceManager.GetString("ORCAMENTO_ITEM_UNIDADE_OBRIGATORIA_PARA_MATERIAL", resourceCulture);
             }
         }
         
