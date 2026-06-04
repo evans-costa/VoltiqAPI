@@ -19,7 +19,7 @@ public class UpdateBudgetCommandHandlerTests
     private readonly Mock<IClientReadOnlyRepository> _clientReadRepoMock = new();
     private readonly Mock<IMaterialReadOnlyRepository> _materialReadRepoMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
-    
+
     private readonly Guid _userId = Guid.NewGuid();
     private readonly Guid _budgetId = Guid.NewGuid();
     private readonly Guid _clientId = Guid.NewGuid();
@@ -109,7 +109,7 @@ public class UpdateBudgetCommandHandlerTests
     {
         // Arrange
         var budget = Budget.Register(_userId, _clientId);
-        
+
         _budgetUpdateRepoMock
             .Setup(r => r.GetTrackedByIdWithItemsAndUserIdAsync(_budgetId, _userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(budget);

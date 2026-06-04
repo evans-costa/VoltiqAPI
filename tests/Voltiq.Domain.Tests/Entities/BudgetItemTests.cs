@@ -10,10 +10,10 @@ public class BudgetItemTests
 {
     private static readonly Guid ValidBudgetId = Guid.NewGuid();
     private static readonly Guid ValidMaterialId = Guid.NewGuid();
-    private const string ValidName = "Cabo 10mm";
+    private const string VALID_NAME = "Cabo 10mm";
 
     private static BudgetItem ValidMaterialItemCreate() =>
-        BudgetItem.Create(ValidBudgetId, ValidMaterialId, BudgetItemType.Material, MaterialUnit.Metro, 2, 15.50m, ValidName);
+        BudgetItem.Create(ValidBudgetId, ValidMaterialId, BudgetItemType.Material, MaterialUnit.Metro, 2, 15.50m, VALID_NAME);
 
     [Fact]
     public void Create_MaterialTypeWithValidData_ShouldSucceed()
@@ -50,7 +50,7 @@ public class BudgetItemTests
     public void Create_MaterialTypeWithoutMaterialId_ShouldThrowDomainException()
     {
         Should.Throw<DomainException>(() =>
-            BudgetItem.Create(ValidBudgetId, null, BudgetItemType.Material, MaterialUnit.Metro, 2, 15.50m, ValidName))
+            BudgetItem.Create(ValidBudgetId, null, BudgetItemType.Material, MaterialUnit.Metro, 2, 15.50m, VALID_NAME))
             .Message.ShouldBe(ResourceErrorMessages.ORCAMENTO_ITEM_MATERIAL_ID_OBRIGATORIO_PARA_MATERIAL);
     }
 
@@ -58,7 +58,7 @@ public class BudgetItemTests
     public void Create_MaterialTypeWithoutUnit_ShouldThrowDomainException()
     {
         Should.Throw<DomainException>(() =>
-            BudgetItem.Create(ValidBudgetId, ValidMaterialId, BudgetItemType.Material, null, 2, 15.50m, ValidName))
+            BudgetItem.Create(ValidBudgetId, ValidMaterialId, BudgetItemType.Material, null, 2, 15.50m, VALID_NAME))
             .Message.ShouldBe(ResourceErrorMessages.ORCAMENTO_ITEM_UNIDADE_OBRIGATORIA_PARA_MATERIAL);
     }
 
@@ -103,7 +103,7 @@ public class BudgetItemTests
     public void Create_WithInvalidQuantity_ShouldThrowDomainException(int quantity)
     {
         Should.Throw<DomainException>(() =>
-            BudgetItem.Create(ValidBudgetId, null, BudgetItemType.MaoDeObra, null, quantity, 10m, ValidName))
+            BudgetItem.Create(ValidBudgetId, null, BudgetItemType.MaoDeObra, null, quantity, 10m, VALID_NAME))
             .Message.ShouldBe(ResourceErrorMessages.ORCAMENTO_ITEM_QUANTIDADE_INVALIDA);
     }
 
@@ -113,7 +113,7 @@ public class BudgetItemTests
     public void Create_WithInvalidUnitPrice_ShouldThrowDomainException(decimal unitPrice)
     {
         Should.Throw<DomainException>(() =>
-            BudgetItem.Create(ValidBudgetId, null, BudgetItemType.MaoDeObra, null, 3, unitPrice, ValidName))
+            BudgetItem.Create(ValidBudgetId, null, BudgetItemType.MaoDeObra, null, 3, unitPrice, VALID_NAME))
             .Message.ShouldBe(ResourceErrorMessages.ORCAMENTO_ITEM_PRECO_INVALIDO);
     }
 

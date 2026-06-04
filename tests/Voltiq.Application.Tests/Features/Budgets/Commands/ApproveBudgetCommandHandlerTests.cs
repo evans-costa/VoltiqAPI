@@ -14,7 +14,7 @@ public class ApproveBudgetCommandHandlerTests
 {
     private readonly Mock<IBudgetUpdateOnlyRepository> _budgetUpdateRepoMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
-    
+
     private readonly Guid _userId = Guid.NewGuid();
     private readonly Guid _budgetId = Guid.NewGuid();
     private readonly Guid _clientId = Guid.NewGuid();

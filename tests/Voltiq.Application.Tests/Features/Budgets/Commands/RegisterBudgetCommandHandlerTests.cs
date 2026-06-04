@@ -43,7 +43,7 @@ public class RegisterBudgetCommandHandlerTests
                 new RegisterBudgetItemCommand(null, "Cabo 10mm", BudgetItemType.MaoDeObra, null,
                     2, 15.50m)
             ])
-            { UserId = _userId };
+        { UserId = _userId };
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class RegisterBudgetCommandHandlerTests
                     new RegisterBudgetItemCommand(materialId, "Cabo 10mm", BudgetItemType.Material,
                         MaterialUnit.Metro, 3, 10.00m)
                 ])
-            { UserId = _userId };
+        { UserId = _userId };
 
         var handler = CreateHandler();
         var result = await handler.Handle(command, CancellationToken.None);
@@ -139,7 +139,7 @@ public class RegisterBudgetCommandHandlerTests
                     new RegisterBudgetItemCommand(Guid.NewGuid(), "Cabo 10mm",
                         BudgetItemType.Material, MaterialUnit.Metro, 1, 10.00m)
                 ])
-            { UserId = _userId };
+        { UserId = _userId };
 
         var handler = CreateHandler();
         var result = await handler.Handle(command, CancellationToken.None);
