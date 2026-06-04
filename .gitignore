@@ -66,3 +66,4 @@ logs/
 # Copilot instructions
 .github/copilot-instructions.md
 .agents
+.antigravitycli
