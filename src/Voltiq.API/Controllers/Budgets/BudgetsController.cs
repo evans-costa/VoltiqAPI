@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Voltiq.Application.Features.Budgets;
 using Voltiq.Application.Features.Budgets.Commands.DeleteBudget;
 using Voltiq.Application.Features.Budgets.Commands.RegisterBudget;
+using Voltiq.Application.Features.Budgets.Commands.UpdateBudget;
+using Voltiq.Application.Features.Budgets.Commands.FinalizeBudget;
+using Voltiq.Application.Features.Budgets.Commands.ApproveBudget;
+using Voltiq.Application.Features.Budgets.Commands.RejectBudget;
 using Voltiq.Application.Features.Budgets.Queries.GetBudgetById;
 using Voltiq.Application.Features.Budgets.Queries.GetBudgets;
 using Voltiq.Application.Mappings.Budgets;
@@ -64,6 +68,67 @@ public sealed class BudgetsController : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await Sender.Send(new DeleteBudgetCommand(id), cancellationToken);
+
+        return result.Match(_ => NoContent(), ToErrorResult);
+    }
+
+    /// <summary>Updates a budget (must belong to the authenticated user).</summary>
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(
+        Guid id,
+        [FromBody] UpdateBudgetRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await Sender.Send(request.ToCommand(id), cancellationToken);
+
+        return result.Match(_ => NoContent(), ToErrorResult);
+    }
+
+    /// <summary>Finalizes a budget, making it read-only.</summary>
+    [HttpPut("{id:guid}/finalize")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Finalize(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var result = await Sender.Send(new FinalizeBudgetCommand(id), cancellationToken);
+
+        return result.Match(_ => NoContent(), ToErrorResult);
+    }
+
+    /// <summary>Approves a finalized budget.</summary>
+    [HttpPut("{id:guid}/approve")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Approve(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var result = await Sender.Send(new ApproveBudgetCommand(id), cancellationToken);
+
+        return result.Match(_ => NoContent(), ToErrorResult);
+    }
+
+    /// <summary>Rejects a finalized budget.</summary>
+    [HttpPut("{id:guid}/reject")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Reject(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var result = await Sender.Send(new RejectBudgetCommand(id), cancellationToken);
 
         return result.Match(_ => NoContent(), ToErrorResult);
     }
