@@ -1,5 +1,6 @@
 using Voltiq.Application.Features.Budgets;
 using Voltiq.Application.Features.Budgets.Commands.RegisterBudget;
+using Voltiq.Application.Features.Budgets.Commands.UpdateBudget;
 using Voltiq.Domain.Entities;
 
 namespace Voltiq.Application.Mappings.Budgets;
@@ -12,6 +13,17 @@ public static class BudgetMappingExtensions
             new(request.ClientId,
                 request.Items
                     .Select(i => new RegisterBudgetItemCommand(
+                        i.MaterialId, i.MaterialName, i.Type, i.Unit, i.Quantity, i.UnitPrice))
+                    .ToList());
+    }
+
+    extension(UpdateBudgetRequest request)
+    {
+        public UpdateBudgetCommand ToCommand(Guid id) =>
+            new(id,
+                request.ClientId,
+                request.Items
+                    .Select(i => new UpdateBudgetItemCommand(
                         i.MaterialId, i.MaterialName, i.Type, i.Unit, i.Quantity, i.UnitPrice))
                     .ToList());
     }

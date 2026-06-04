@@ -220,6 +220,18 @@
     <data name="ORCAMENTO_NAO_ENCONTRADO" xml:space="preserve">
     <value>Orçamento não encontrado.</value>
   </data>
+    <data name="ORCAMENTO_APENAS_RASCUNHO_PODE_SER_EDITADO" xml:space="preserve">
+    <value>Apenas orçamentos em rascunho podem ser editados.</value>
+  </data>
+    <data name="ORCAMENTO_APENAS_RASCUNHO_PODE_SER_FINALIZADO" xml:space="preserve">
+    <value>Apenas orçamentos em rascunho podem ser finalizados.</value>
+  </data>
+    <data name="ORCAMENTO_STATUS_INVALIDO_PARA_APROVACAO" xml:space="preserve">
+    <value>O status atual do orçamento não permite aprovação. Ele deve estar finalizado ou com PDF gerado.</value>
+  </data>
+    <data name="ORCAMENTO_STATUS_INVALIDO_PARA_REJEICAO" xml:space="preserve">
+    <value>O status atual do orçamento não permite rejeição. Ele deve estar finalizado ou com PDF gerado.</value>
+  </data>
 
     <!-- ═══════════════════════════════ Aplicação — Auth ════════════════════ -->
 
