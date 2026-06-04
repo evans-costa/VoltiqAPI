@@ -460,7 +460,68 @@ Cria um novo usuário na plataforma.
 - Documento deve ser único no sistema.
 - Senha é armazenada como hash **Argon2id** — nunca em texto puro.
 
+### Orçamentos
+
+#### `PUT /api/v1/budgets/{id}/finalize` — Finalizar orçamento
+
+Muda o status do orçamento de `Draft` para `Finalized`. O orçamento deve ter pelo menos um item e pertencer ao usuário autenticado. Uma vez finalizado, o orçamento torna-se somente leitura e não pode mais ser editado.
+
+**Headers obrigatórios:**
+```
+Authorization: Bearer <token>
+```
+
+**Respostas:**
+
+| Status | Descrição |
+|---|---|
+| `204 NoContent` | Orçamento finalizado com sucesso |
+| `400 Bad Request` | Orçamento não está em rascunho ou não contém itens (lança DomainException) |
+| `401 Unauthorized` | Token ausente ou inválido |
+| `404 Not Found` | Orçamento não encontrado ou não pertence ao usuário |
+
 ---
+
+#### `PUT /api/v1/budgets/{id}/approve` — Aprovar orçamento
+
+Aprova um orçamento que foi finalizado ou tem PDF gerado.
+
+**Headers obrigatórios:**
+```
+Authorization: Bearer <token>
+```
+
+**Respostas:**
+
+| Status | Descrição |
+|---|---|
+| `204 NoContent` | Orçamento aprovado com sucesso |
+| `400 Bad Request` | Orçamento não está nos estados `Finalized` ou `PdfGenerated` (lança DomainException) |
+| `401 Unauthorized` | Token ausente ou inválido |
+| `404 Not Found` | Orçamento não encontrado ou não pertence ao usuário |
+
+---
+
+#### `PUT /api/v1/budgets/{id}/reject` — Rejeitar orçamento
+
+Rejeita um orçamento que foi finalizado ou tem PDF gerado.
+
+**Headers obrigatórios:**
+```
+Authorization: Bearer <token>
+```
+
+**Respostas:**
+
+| Status | Descrição |
+|---|---|
+| `204 NoContent` | Orçamento rejeitado com sucesso |
+| `400 Bad Request` | Orçamento não está nos estados `Finalized` ou `PdfGenerated` (lança DomainException) |
+| `401 Unauthorized` | Token ausente ou inválido |
+| `404 Not Found` | Orçamento não encontrado ou não pertence ao usuário |
+
+---
+
 
 
 
