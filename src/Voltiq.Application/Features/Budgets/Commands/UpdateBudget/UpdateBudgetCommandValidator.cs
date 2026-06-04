@@ -2,11 +2,11 @@ using FluentValidation;
 using Voltiq.Domain.Enums;
 using Voltiq.Exceptions.Resources;
 
-namespace Voltiq.Application.Features.Budgets.Commands.RegisterBudget;
+namespace Voltiq.Application.Features.Budgets.Commands.UpdateBudget;
 
-public sealed class RegisterBudgetCommandValidator : AbstractValidator<RegisterBudgetCommand>
+public sealed class UpdateBudgetCommandValidator : AbstractValidator<UpdateBudgetCommand>
 {
-    public RegisterBudgetCommandValidator()
+    public UpdateBudgetCommandValidator()
     {
         RuleFor(x => x.ClientId)
             .NotEmpty()

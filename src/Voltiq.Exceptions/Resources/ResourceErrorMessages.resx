@@ -199,11 +199,38 @@
     <data name="ORCAMENTO_ITEM_PRECO_INVALIDO" xml:space="preserve">
     <value>O preço unitário deve ser maior que zero.</value>
   </data>
+    <data name="ORCAMENTO_ITEM_TIPO_INVALIDO" xml:space="preserve">
+    <value>Tipo de item do orçamento inválido.</value>
+  </data>
+    <data name="ORCAMENTO_ITEM_MATERIAL_ID_OBRIGATORIO_PARA_MATERIAL" xml:space="preserve">
+    <value>O material é obrigatório para itens do tipo Material.</value>
+  </data>
+    <data name="ORCAMENTO_ITEM_UNIDADE_OBRIGATORIA_PARA_MATERIAL" xml:space="preserve">
+    <value>A unidade é obrigatória para itens do tipo Material.</value>
+  </data>
+    <data name="ORCAMENTO_ITEM_MATERIAL_ID_DEVE_SER_NULO" xml:space="preserve">
+    <value>O material deve ser nulo para este tipo de item.</value>
+  </data>
+    <data name="ORCAMENTO_ITEM_UNIDADE_DEVE_SER_NULA" xml:space="preserve">
+    <value>A unidade deve ser nula para este tipo de item.</value>
+  </data>
     <data name="ORCAMENTO_ITEMS_OBRIGATORIOS" xml:space="preserve">
     <value>O orçamento deve conter pelo menos um item.</value>
   </data>
     <data name="ORCAMENTO_NAO_ENCONTRADO" xml:space="preserve">
     <value>Orçamento não encontrado.</value>
+  </data>
+    <data name="ORCAMENTO_APENAS_RASCUNHO_PODE_SER_EDITADO" xml:space="preserve">
+    <value>Apenas orçamentos em rascunho podem ser editados.</value>
+  </data>
+    <data name="ORCAMENTO_APENAS_RASCUNHO_PODE_SER_FINALIZADO" xml:space="preserve">
+    <value>Apenas orçamentos em rascunho podem ser finalizados.</value>
+  </data>
+    <data name="ORCAMENTO_STATUS_INVALIDO_PARA_APROVACAO" xml:space="preserve">
+    <value>O status atual do orçamento não permite aprovação. Ele deve estar finalizado ou com PDF gerado.</value>
+  </data>
+    <data name="ORCAMENTO_STATUS_INVALIDO_PARA_REJEICAO" xml:space="preserve">
+    <value>O status atual do orçamento não permite rejeição. Ele deve estar finalizado ou com PDF gerado.</value>
   </data>
 
     <!-- ═══════════════════════════════ Aplicação — Auth ════════════════════ -->

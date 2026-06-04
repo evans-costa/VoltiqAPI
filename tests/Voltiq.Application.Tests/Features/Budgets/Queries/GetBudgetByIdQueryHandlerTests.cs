@@ -1,7 +1,6 @@
 using ErrorOr;
 using Moq;
 using Shouldly;
-using Voltiq.Application.Features.Budgets;
 using Voltiq.Application.Features.Budgets.Queries.GetBudgetById;
 using Voltiq.Domain.Entities;
 using Voltiq.Domain.Enums;
@@ -13,13 +12,15 @@ namespace Voltiq.Application.Tests.Features.Budgets.Queries;
 
 public class GetBudgetByIdQueryHandlerTests
 {
+    private readonly Guid _budgetId = Guid.NewGuid();
     private readonly Mock<IBudgetReadOnlyRepository> _budgetReadRepoMock = new();
 
     private readonly Guid _userId = Guid.NewGuid();
-    private readonly Guid _budgetId = Guid.NewGuid();
 
-    private GetBudgetByIdQueryHandler CreateHandler() =>
-        new(_budgetReadRepoMock.Object);
+    private GetBudgetByIdQueryHandler CreateHandler()
+    {
+        return new GetBudgetByIdQueryHandler(_budgetReadRepoMock.Object);
+    }
 
     private static Budget MakeBudgetWithItemsAndClient(Guid userId, Guid budgetId)
     {
@@ -29,7 +30,8 @@ public class GetBudgetByIdQueryHandlerTests
 
         var budget = Budget.Register(userId, client.Id);
         typeof(Budget).GetProperty("Id")!.SetValue(budget, budgetId);
-        budget.AddItem(BudgetItem.Create(budgetId, null, "Fio elétrico", MaterialUnit.Metro, 5, 8.00m));
+        budget.AddItem(BudgetItem.Create(budgetId, null, BudgetItemType.MaoDeObra, null, 5, 8.00m,
+            "Fio elétrico"));
         typeof(Budget).GetProperty("Client")!.SetValue(budget, client);
 
         return budget;
@@ -40,7 +42,8 @@ public class GetBudgetByIdQueryHandlerTests
     {
         var budget = MakeBudgetWithItemsAndClient(_userId, _budgetId);
         _budgetReadRepoMock
-            .Setup(r => r.GetByIdWithItemsAndClientAsync(_budgetId, _userId, It.IsAny<CancellationToken>()))
+            .Setup(r =>
+                r.GetByIdWithItemsAndClientAsync(_budgetId, _userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(budget);
 
         var handler = CreateHandler();
@@ -64,7 +67,8 @@ public class GetBudgetByIdQueryHandlerTests
     public async Task Handle_WhenBudgetNotFound_ShouldReturnNotFoundError()
     {
         _budgetReadRepoMock
-            .Setup(r => r.GetByIdWithItemsAndClientAsync(_budgetId, _userId, It.IsAny<CancellationToken>()))
+            .Setup(r =>
+                r.GetByIdWithItemsAndClientAsync(_budgetId, _userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Budget?)null);
 
         var handler = CreateHandler();

@@ -1,18 +1,18 @@
 using FluentValidation.TestHelper;
-using Voltiq.Application.Features.Budgets.Commands.RegisterBudget;
+using Voltiq.Application.Features.Budgets.Commands.UpdateBudget;
 using Voltiq.Domain.Enums;
 using Voltiq.Exceptions.Resources;
 
 namespace Voltiq.Application.Tests.Features.Budgets.Commands;
 
-public class RegisterBudgetCommandValidatorTests
+public class UpdateBudgetCommandValidatorTests
 {
-    private readonly RegisterBudgetCommandValidator _validator = new();
+    private readonly UpdateBudgetCommandValidator _validator = new();
 
-    private static RegisterBudgetCommand ValidCommand()
+    private static UpdateBudgetCommand ValidCommand()
     {
-        return new RegisterBudgetCommand(Guid.NewGuid(), [
-            new RegisterBudgetItemCommand(null, "Cabo 10mm", BudgetItemType.MaoDeObra,
+        return new UpdateBudgetCommand(Guid.NewGuid(), Guid.NewGuid(), [
+            new UpdateBudgetItemCommand(null, "Cabo 10mm", BudgetItemType.MaoDeObra,
                 null, 2, 15.50m)
         ]);
     }
@@ -51,7 +51,7 @@ public class RegisterBudgetCommandValidatorTests
         {
             Items =
             [
-                new RegisterBudgetItemCommand(null, name!, BudgetItemType.MaoDeObra, null, 1,
+                new UpdateBudgetItemCommand(null, name!, BudgetItemType.MaoDeObra, null, 1,
                     10.00m)
             ]
         };
@@ -69,7 +69,7 @@ public class RegisterBudgetCommandValidatorTests
         {
             Items =
             [
-                new RegisterBudgetItemCommand(null, "Cabo 10mm", BudgetItemType.MaoDeObra, null,
+                new UpdateBudgetItemCommand(null, "Cabo 10mm", BudgetItemType.MaoDeObra, null,
                     quantity, 15.50m)
             ]
         };
@@ -87,7 +87,7 @@ public class RegisterBudgetCommandValidatorTests
         {
             Items =
             [
-                new RegisterBudgetItemCommand(null, "Cabo 10mm", BudgetItemType.MaoDeObra, null, 1,
+                new UpdateBudgetItemCommand(null, "Cabo 10mm", BudgetItemType.MaoDeObra, null, 1,
                     (decimal)price)
             ]
         };

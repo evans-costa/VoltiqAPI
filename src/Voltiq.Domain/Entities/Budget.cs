@@ -46,8 +46,60 @@ public sealed class Budget : AuditableEntity
         RecalculateTotals();
     }
 
+    public void Edit(Guid clientId, IReadOnlyCollection<BudgetItem> items)
+    {
+        if (Status != BudgetStatus.Draft)
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_APENAS_RASCUNHO_PODE_SER_EDITADO);
+
+        if (clientId == Guid.Empty)
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_CLIENTE_OBRIGATORIO);
+
+        if (items is null || items.Count == 0)
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_ITEMS_OBRIGATORIOS);
+
+        ClientId = clientId;
+
+        _items.Clear();
+        foreach (var item in items)
+        {
+            _items.Add(item);
+        }
+
+        RecalculateTotals();
+    }
+
     public void RecalculateTotals()
     {
         TotalAmount = _items.Sum(i => i.TotalPrice);
+    }
+
+    public void FinalizeBudget()
+    {
+        if (Status != BudgetStatus.Draft)
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_APENAS_RASCUNHO_PODE_SER_FINALIZADO);
+
+        if (_items.Count == 0)
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_ITEMS_OBRIGATORIOS);
+
+        Status = BudgetStatus.Finalized;
+        AddDomainEvent(new BudgetFinalizedEvent(Id));
+    }
+
+    public void Approve()
+    {
+        if (Status != BudgetStatus.Finalized && Status != BudgetStatus.PdfGenerated)
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_STATUS_INVALIDO_PARA_APROVACAO);
+
+        Status = BudgetStatus.Approved;
+        AddDomainEvent(new BudgetApprovedEvent(Id));
+    }
+
+    public void Reject()
+    {
+        if (Status != BudgetStatus.Finalized && Status != BudgetStatus.PdfGenerated)
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_STATUS_INVALIDO_PARA_REJEICAO);
+
+        Status = BudgetStatus.Rejected;
+        AddDomainEvent(new BudgetRejectedEvent(Id));
     }
 }

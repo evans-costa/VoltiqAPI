@@ -9,6 +9,7 @@ public sealed record RegisterBudgetRequest(
 public sealed record RegisterBudgetItemRequest(
     Guid? MaterialId,
     string MaterialName,
+    BudgetItemType Type,
     MaterialUnit? Unit,
     int Quantity,
     decimal UnitPrice);

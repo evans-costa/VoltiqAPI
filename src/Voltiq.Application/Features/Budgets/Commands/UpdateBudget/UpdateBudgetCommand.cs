@@ -2,16 +2,17 @@ using ErrorOr;
 using Voltiq.Application.Common.Interfaces;
 using Voltiq.Domain.Enums;
 
-namespace Voltiq.Application.Features.Budgets.Commands.RegisterBudget;
+namespace Voltiq.Application.Features.Budgets.Commands.UpdateBudget;
 
-public sealed record RegisterBudgetCommand(
+public sealed record UpdateBudgetCommand(
+    Guid Id,
     Guid ClientId,
-    IReadOnlyList<RegisterBudgetItemCommand> Items) : IAuthenticatedRequest<ErrorOr<BudgetDetailResponse>>
+    IReadOnlyList<UpdateBudgetItemCommand> Items) : IAuthenticatedRequest<ErrorOr<Updated>>
 {
     public Guid UserId { get; set; }
 }
 
-public sealed record RegisterBudgetItemCommand(
+public sealed record UpdateBudgetItemCommand(
     Guid? MaterialId,
     string MaterialName,
     BudgetItemType Type,

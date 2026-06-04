@@ -25,6 +25,7 @@ public sealed record BudgetItemResponse(
     Guid Id,
     Guid? MaterialId,
     string MaterialName,
+    BudgetItemType Type,
     MaterialUnit? Unit,
     int Quantity,
     decimal UnitPrice,

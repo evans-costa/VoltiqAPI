@@ -132,7 +132,7 @@ public class BudgetRepositoryTests(PostgreSqlContainerFixture fixture)
         var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id);
 
         var budget = TestDataBuilder.MakeBudget(user.Id, client.Id);
-        var item = BudgetItem.Create(budget.Id, null, "Cabo 10mm", MaterialUnit.Metro, 2, 15.50m);
+        var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 15.50m, "Cabo 10mm");
         budget.AddItem(item);
         await _budgetRepository.AddAsync(budget, TestContext.Current.CancellationToken);
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);

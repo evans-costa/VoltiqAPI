@@ -26,7 +26,7 @@ public class GetBudgetsQueryHandlerTests
             Address.Create("Rua das Flores", "123", "São Paulo", "SP", "01310-100"));
 
         var budget = Budget.Register(userId, client.Id);
-        budget.AddItem(BudgetItem.Create(budget.Id, null, "Cabo 10mm", MaterialUnit.Metro, 2, 15.50m));
+        budget.AddItem(BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 15.50m, "Cabo 10mm"));
 
         typeof(Budget).GetProperty("Client")!.SetValue(budget, client);
 
