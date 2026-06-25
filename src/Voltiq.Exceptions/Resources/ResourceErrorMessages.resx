@@ -182,6 +182,21 @@
     <value>Material não encontrado.</value>
   </data>
 
+    <!-- ═══════════════════════════════ Domínio — Serviço ═══════════════════ -->
+
+    <data name="SERVICE_USUARIO_OBRIGATORIO" xml:space="preserve">
+    <value>O usuário do serviço é obrigatório.</value>
+  </data>
+    <data name="SERVICE_NOME_OBRIGATORIO" xml:space="preserve">
+    <value>O nome do serviço é obrigatório.</value>
+  </data>
+    <data name="SERVICE_PRECO_INVALIDO" xml:space="preserve">
+    <value>O preço base do serviço deve ser maior que zero.</value>
+  </data>
+    <data name="SERVICE_NAO_ENCONTRADO" xml:space="preserve">
+    <value>Serviço não encontrado.</value>
+  </data>
+
     <!-- ═══════════════════════════════ Domínio — Orçamento ══════════════════ -->
 
     <data name="ORCAMENTO_USUARIO_OBRIGATORIO" xml:space="preserve">
