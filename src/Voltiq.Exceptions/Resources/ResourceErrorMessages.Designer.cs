@@ -285,6 +285,42 @@ namespace Voltiq.Exceptions.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Serviço não encontrado..
+        /// </summary>
+        public static string SERVICE_NAO_ENCONTRADO {
+            get {
+                return ResourceManager.GetString("SERVICE_NAO_ENCONTRADO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to O nome do serviço é obrigatório..
+        /// </summary>
+        public static string SERVICE_NOME_OBRIGATORIO {
+            get {
+                return ResourceManager.GetString("SERVICE_NOME_OBRIGATORIO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to O preço base do serviço deve ser maior que zero..
+        /// </summary>
+        public static string SERVICE_PRECO_INVALIDO {
+            get {
+                return ResourceManager.GetString("SERVICE_PRECO_INVALIDO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to O usuário do serviço é obrigatório..
+        /// </summary>
+        public static string SERVICE_USUARIO_OBRIGATORIO {
+            get {
+                return ResourceManager.GetString("SERVICE_USUARIO_OBRIGATORIO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to O nome é obrigatório..
         /// </summary>
         public static string NOME_OBRIGATORIO {
