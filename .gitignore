@@ -62,6 +62,9 @@ appsettings.Production.json
 # Logs
 logs/
 
+# Documentation
+docs/
+
 
 # Copilot instructions
 .github/copilot-instructions.md
