@@ -13,23 +13,42 @@ public sealed class Service : AuditableEntity
 
     private Service() { }
 
+    private Service(Guid userId, string name, decimal basePrice)
+    {
+        UserId = userId;
+        Name = name;
+        BasePrice = basePrice;
+        IsActive = true;
+        AddDomainEvent(new ServiceRegisteredEvent(Id));
+    }
+
     public static Service Register(Guid userId, string name, decimal basePrice)
     {
-        throw new NotImplementedException();
+        if (userId == Guid.Empty)
+            throw new DomainException(ResourceErrorMessages.SERVICE_USUARIO_OBRIGATORIO);
+
+        if (string.IsNullOrWhiteSpace(name))
+            throw new DomainException(ResourceErrorMessages.SERVICE_NOME_OBRIGATORIO);
+
+        if (basePrice <= 0)
+            throw new DomainException(ResourceErrorMessages.SERVICE_PRECO_INVALIDO);
+
+        return new Service(userId, name.Trim(), basePrice);
     }
 
-    public void Deactivate()
-    {
-        throw new NotImplementedException();
-    }
+    public void Deactivate() => IsActive = false;
 
-    public void Activate()
-    {
-        throw new NotImplementedException();
-    }
+    public void Activate() => IsActive = true;
 
     public void Update(string name, decimal basePrice)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(name))
+            throw new DomainException(ResourceErrorMessages.SERVICE_NOME_OBRIGATORIO);
+
+        if (basePrice <= 0)
+            throw new DomainException(ResourceErrorMessages.SERVICE_PRECO_INVALIDO);
+
+        Name = name.Trim();
+        BasePrice = basePrice;
     }
 }
