@@ -64,14 +64,14 @@ public sealed class BudgetRepository(ApplicationDbContext context)
     }
 
     public async Task<Domain.Entities.Budget?> GetTrackedByIdAndUserIdAsync(
-        Guid id, Guid userId, CancellationToken cancellationToken)
+        Guid id, Guid userId, CancellationToken cancellationToken = default)
     {
         return await context.Budgets
             .FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId, cancellationToken);
     }
 
     public async Task<Domain.Entities.Budget?> GetTrackedByIdWithItemsAndUserIdAsync(
-        Guid id, Guid userId, CancellationToken cancellationToken)
+        Guid id, Guid userId, CancellationToken cancellationToken = default)
     {
         return await context.Budgets
             .Include(b => b.Items)

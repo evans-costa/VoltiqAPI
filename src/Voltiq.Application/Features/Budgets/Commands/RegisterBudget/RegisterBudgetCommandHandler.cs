@@ -27,15 +27,15 @@ public sealed class RegisterBudgetCommandHandler(
             return Error.NotFound(description: ResourceErrorMessages.CLIENTE_NAO_ENCONTRADO);
 
         var materialLookup = new Dictionary<Guid, Material>();
-        foreach (var item in command.Items.Where(i => i.MaterialId.HasValue))
+        foreach (var materialId in command.Items.Where(i => i.MaterialId.HasValue).Select(i => i.MaterialId!.Value).Distinct())
         {
             var material = await materialReadOnly.GetByIdAndUserIdAsync(
-                item.MaterialId!.Value, command.UserId, cancellationToken);
+                materialId, command.UserId, cancellationToken);
 
             if (material is null)
                 return Error.NotFound(description: ResourceErrorMessages.MATERIAL_NAO_ENCONTRADO);
 
-            materialLookup[item.MaterialId!.Value] = material;
+            materialLookup[materialId] = material;
         }
 
         var budget = Budget.Register(command.UserId, command.ClientId);

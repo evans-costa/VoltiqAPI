@@ -20,9 +20,9 @@ public sealed class Argon2PasswordHasher : IPasswordHasher
         return $"{Convert.ToBase64String(salt)}.{Convert.ToBase64String(hash)}";
     }
 
-    public bool Verify(string password, string storedHash)
+    public bool Verify(string password, string hash)
     {
-        var parts = storedHash.Split('.');
+        var parts = hash.Split('.');
         if (parts.Length != 2) return false;
 
         var salt = Convert.FromBase64String(parts[0]);

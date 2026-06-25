@@ -18,7 +18,7 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
     private static readonly Guid UserId = Guid.NewGuid();
 
     private ClientRepository _clientRepository = null!;
-    private IClientReadOnlyRepository _clientReadOnly = null!;
+    private ClientRepository? _clientReadOnly;
 
     private ApplicationDbContext _dbContext = null!;
     private UnitOfWork _unitOfWork = null!;
@@ -49,7 +49,7 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
         var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id);
 
         var found =
-            await _clientReadOnly.GetByIdAndUserIdAsync(client.Id, user.Id, TestContext.Current.CancellationToken);
+            await _clientReadOnly!.GetByIdAndUserIdAsync(client.Id, user.Id, TestContext.Current.CancellationToken);
 
         found.ShouldNotBeNull();
         found.Id.ShouldBe(client.Id);
@@ -89,7 +89,7 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
         var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
         var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id);
 
-        var found = await _clientReadOnly.GetByIdAndUserIdAsync(client.Id, user.Id,
+        var found = await _clientReadOnly!.GetByIdAndUserIdAsync(client.Id, user.Id,
             TestContext.Current.CancellationToken);
 
         found.ShouldNotBeNull();
@@ -105,7 +105,7 @@ public class ClientRepositoryTests(PostgreSqlContainerFixture fixture)
 
         var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user1.Id);
 
-        var found = await _clientReadOnly.GetByIdAndUserIdAsync(client.Id, user2.Id,
+        var found = await _clientReadOnly!.GetByIdAndUserIdAsync(client.Id, user2.Id,
             TestContext.Current.CancellationToken);
 
         found.ShouldBeNull();

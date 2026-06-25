@@ -271,8 +271,8 @@ public class BudgetRepositoryTests(PostgreSqlContainerFixture fixture)
         var budgets = await _budgetRepository.GetByUserIdWithClientAsync(user.Id, TestContext.Current.CancellationToken);
 
         budgets.Count.ShouldBe(1);
-        budgets.First().Client.ShouldNotBeNull();
-        budgets.First().Client.Name.ShouldBe(client.Name);
+        budgets[0].Client.ShouldNotBeNull();
+        budgets[0].Client.Name.ShouldBe(client.Name);
     }
 
     [Fact]
