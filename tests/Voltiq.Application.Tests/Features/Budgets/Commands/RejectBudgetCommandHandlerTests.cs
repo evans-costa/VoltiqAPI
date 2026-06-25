@@ -34,6 +34,8 @@ public class RejectBudgetCommandHandlerTests
         var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 15.50m, "Cabo 10mm");
         budget.AddItem(item);
         budget.FinalizeBudget();
+        budget.StartPdfProcessing();
+        budget.SetPdfGenerationSuccess("https://storage.voltiq.com/budgets/budget-123.pdf");
 
         _budgetUpdateRepoMock
             .Setup(r => r.GetTrackedByIdAndUserIdAsync(_budgetId, _userId, It.IsAny<CancellationToken>()))

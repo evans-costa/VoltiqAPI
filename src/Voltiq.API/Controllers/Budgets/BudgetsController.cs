@@ -7,6 +7,7 @@ using Voltiq.Application.Features.Budgets.Commands.UpdateBudget;
 using Voltiq.Application.Features.Budgets.Commands.FinalizeBudget;
 using Voltiq.Application.Features.Budgets.Commands.ApproveBudget;
 using Voltiq.Application.Features.Budgets.Commands.RejectBudget;
+using Voltiq.Application.Features.Budgets.Commands.GenerateBudgetPdf;
 using Voltiq.Application.Features.Budgets.Queries.GetBudgetById;
 using Voltiq.Application.Features.Budgets.Queries.GetBudgets;
 using Voltiq.Application.Mappings.Budgets;
@@ -90,7 +91,7 @@ public sealed class BudgetsController : BaseApiController
 
     /// <summary>Finalizes a budget, making it read-only.</summary>
     [HttpPut("{id:guid}/finalize")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -100,7 +101,22 @@ public sealed class BudgetsController : BaseApiController
     {
         var result = await Sender.Send(new FinalizeBudgetCommand(id), cancellationToken);
 
-        return result.Match(_ => NoContent(), ToErrorResult);
+        return result.Match(_ => Accepted(), ToErrorResult);
+    }
+
+    /// <summary>Generates/Regenerates the PDF for a finalized budget.</summary>
+    [HttpPost("{id:guid}/generate-pdf")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GeneratePdf(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var result = await Sender.Send(new GenerateBudgetPdfCommand(id), cancellationToken);
+
+        return result.Match(_ => Accepted(), ToErrorResult);
     }
 
     /// <summary>Approves a finalized budget.</summary>

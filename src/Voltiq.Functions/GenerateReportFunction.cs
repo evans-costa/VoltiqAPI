@@ -56,12 +56,15 @@ public class GenerateReportFunction
                 return;
             }
 
-            var budget = await _budgetRepository.GetByIdAsync(msg.BudgetId, cancellationToken);
+            var budget = await _budgetUpdateRepository.GetTrackedByIdAsync(msg.BudgetId, cancellationToken);
             if (budget == null)
             {
                 _logger.LogWarning("Budget not found for ID: {BudgetId}", msg.BudgetId);
                 return;
             }
+
+            budget.StartPdfProcessing();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             var client = await _clientRepository.GetByIdAndUserIdAsync(budget.ClientId, budget.UserId, cancellationToken);
 
@@ -74,19 +77,28 @@ public class GenerateReportFunction
                 CreatedAt = budget.CreatedAt
             };
 
-            _logger.LogInformation("Generating PDF for Budget ID: {BudgetId}", budget.Id);
-            var pdfBytes = await _reportGenerator.GenerateAsync(reportData, cancellationToken);
+            try
+            {
+                _logger.LogInformation("Generating PDF for Budget ID: {BudgetId}", budget.Id);
+                var pdfBytes = await _reportGenerator.GenerateAsync(reportData, cancellationToken);
 
-            var fileName = $"budget-{budget.Id}.pdf";
-            
-            _logger.LogInformation("Uploading PDF for Budget ID: {BudgetId} to Blob Storage", budget.Id);
-            var uri = await _storageService.UploadAsync(fileName, pdfBytes, "application/pdf", cancellationToken);
+                var fileName = $"budget-{budget.Id}.pdf";
 
-            budget.MarkAsPdfGenerated(uri);
-            _budgetUpdateRepository.Update(budget);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+                _logger.LogInformation("Uploading PDF for Budget ID: {BudgetId} to Blob Storage", budget.Id);
+                var uri = await _storageService.UploadAsync(fileName, pdfBytes, "application/pdf", cancellationToken);
 
-            _logger.LogInformation("Report generated and budget status updated successfully. URI: {Uri}", uri);
+                budget.SetPdfGenerationSuccess(uri);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _logger.LogInformation("Report generated and budget status updated successfully. URI: {Uri}", uri);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating report for budget ID: {BudgetId}", budget.Id);
+                budget.SetPdfGenerationFailed();
+                await _unitOfWork.SaveChangesAsync(CancellationToken.None);
+                throw;
+            }
         }
         catch (Exception ex)
         {

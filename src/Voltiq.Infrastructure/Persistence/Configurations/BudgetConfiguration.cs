@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Voltiq.Domain.Entities;
+using Voltiq.Domain.Enums;
 
 namespace Voltiq.Infrastructure.Persistence.Configurations;
 
@@ -21,6 +22,10 @@ public sealed class BudgetConfiguration : IEntityTypeConfiguration<Budget>
         builder.Property(b => b.Status)
             .IsRequired()
             .HasConversion<int>();
+
+        builder.Property(b => b.PdfGenerationStatus)
+            .HasConversion<int>()
+            .IsRequired(false);
 
         builder.Property(b => b.PdfUrl)
             .HasMaxLength(2048);

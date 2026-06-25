@@ -164,17 +164,32 @@ public class BudgetTests
     }
 
     [Fact]
-    public void Approve_WithFinalizedBudget_ShouldTransitionToApproved()
+    public void Approve_WithFinalizedBudgetAndGeneratedPdf_ShouldTransitionToApproved()
+    {
+        var budget = Budget.Register(ValidUserId, ValidClientId);
+        var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 10m, "Cabo");
+        budget.AddItem(item);
+        budget.FinalizeBudget();
+        budget.StartPdfProcessing();
+        budget.SetPdfGenerationSuccess("https://storage.voltiq.com/budgets/budget-123.pdf");
+
+        budget.Approve();
+
+        budget.Status.ShouldBe(BudgetStatus.Approved);
+        budget.DomainEvents.ShouldContain(e => e is BudgetApprovedEvent);
+    }
+
+    [Fact]
+    public void Approve_WithFinalizedBudgetButNoPdf_ShouldThrowDomainException()
     {
         var budget = Budget.Register(ValidUserId, ValidClientId);
         var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 10m, "Cabo");
         budget.AddItem(item);
         budget.FinalizeBudget();
 
-        budget.Approve();
-
-        budget.Status.ShouldBe(BudgetStatus.Approved);
-        budget.DomainEvents.ShouldContain(e => e is BudgetApprovedEvent);
+        Should.Throw<DomainException>(() =>
+            budget.Approve())
+            .Message.ShouldBe(ResourceErrorMessages.ORCAMENTO_PDF_NAO_DISPONIVEL);
     }
 
     [Fact]
@@ -188,17 +203,32 @@ public class BudgetTests
     }
 
     [Fact]
-    public void Reject_WithFinalizedBudget_ShouldTransitionToRejected()
+    public void Reject_WithFinalizedBudgetAndGeneratedPdf_ShouldTransitionToRejected()
+    {
+        var budget = Budget.Register(ValidUserId, ValidClientId);
+        var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 10m, "Cabo");
+        budget.AddItem(item);
+        budget.FinalizeBudget();
+        budget.StartPdfProcessing();
+        budget.SetPdfGenerationSuccess("https://storage.voltiq.com/budgets/budget-123.pdf");
+
+        budget.Reject();
+
+        budget.Status.ShouldBe(BudgetStatus.Rejected);
+        budget.DomainEvents.ShouldContain(e => e is BudgetRejectedEvent);
+    }
+
+    [Fact]
+    public void Reject_WithFinalizedBudgetButNoPdf_ShouldThrowDomainException()
     {
         var budget = Budget.Register(ValidUserId, ValidClientId);
         var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 10m, "Cabo");
         budget.AddItem(item);
         budget.FinalizeBudget();
 
-        budget.Reject();
-
-        budget.Status.ShouldBe(BudgetStatus.Rejected);
-        budget.DomainEvents.ShouldContain(e => e is BudgetRejectedEvent);
+        Should.Throw<DomainException>(() =>
+            budget.Reject())
+            .Message.ShouldBe(ResourceErrorMessages.ORCAMENTO_PDF_NAO_DISPONIVEL);
     }
 
     [Fact]
@@ -209,5 +239,92 @@ public class BudgetTests
         Should.Throw<DomainException>(() =>
             budget.Reject())
             .Message.ShouldBe(ResourceErrorMessages.ORCAMENTO_STATUS_INVALIDO_PARA_REJEICAO);
+    }
+
+    [Fact]
+    public void StartPdfProcessing_WithValidFinalizedBudget_ShouldTransitionToProcessing()
+    {
+        var budget = Budget.Register(ValidUserId, ValidClientId);
+        var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 10m, "Cabo");
+        budget.AddItem(item);
+        budget.FinalizeBudget();
+
+        budget.StartPdfProcessing();
+
+        budget.PdfGenerationStatus.ShouldBe(PdfGenerationStatus.Processing);
+        budget.DomainEvents.ShouldContain(e => e is BudgetPdfGenerationStatusChangedEvent && ((BudgetPdfGenerationStatusChangedEvent)e).Status == PdfGenerationStatus.Processing);
+    }
+
+    [Fact]
+    public void StartPdfProcessing_WithDraftBudget_ShouldThrowDomainException()
+    {
+        var budget = Budget.Register(ValidUserId, ValidClientId);
+
+        Should.Throw<DomainException>(() =>
+            budget.StartPdfProcessing())
+            .Message.ShouldBe(ResourceErrorMessages.ORCAMENTO_STATUS_INVALIDO_PARA_GERAR_PDF);
+    }
+
+    [Fact]
+    public void SetPdfGenerationSuccess_WithValidFinalizedBudget_ShouldTransitionToSuccessAndSetUrl()
+    {
+        var budget = Budget.Register(ValidUserId, ValidClientId);
+        var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 10m, "Cabo");
+        budget.AddItem(item);
+        budget.FinalizeBudget();
+
+        const string pdfUrl = "https://storage.voltiq.com/budgets/budget-123.pdf";
+        budget.SetPdfGenerationSuccess(pdfUrl);
+
+        budget.PdfUrl.ShouldBe(pdfUrl);
+        budget.PdfGenerationStatus.ShouldBe(PdfGenerationStatus.Success);
+        budget.DomainEvents.ShouldContain(e => e is BudgetPdfGenerationStatusChangedEvent && ((BudgetPdfGenerationStatusChangedEvent)e).Status == PdfGenerationStatus.Success);
+    }
+
+    [Fact]
+    public void SetPdfGenerationSuccess_WithDraftBudget_ShouldThrowDomainException()
+    {
+        var budget = Budget.Register(ValidUserId, ValidClientId);
+
+        Should.Throw<DomainException>(() =>
+            budget.SetPdfGenerationSuccess("https://storage.voltiq.com/budgets/budget-123.pdf"))
+            .Message.ShouldBe(ResourceErrorMessages.ORCAMENTO_STATUS_INVALIDO_PARA_GERAR_PDF);
+    }
+
+    [Fact]
+    public void SetPdfGenerationSuccess_WithEmptyPdfUrl_ShouldThrowDomainException()
+    {
+        var budget = Budget.Register(ValidUserId, ValidClientId);
+        var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 10m, "Cabo");
+        budget.AddItem(item);
+        budget.FinalizeBudget();
+
+        Should.Throw<DomainException>(() =>
+            budget.SetPdfGenerationSuccess(""))
+            .Message.ShouldBe(ResourceErrorMessages.ORCAMENTO_PDF_URL_OBRIGATORIA);
+    }
+
+    [Fact]
+    public void SetPdfGenerationFailed_WithValidFinalizedBudget_ShouldTransitionToFailed()
+    {
+        var budget = Budget.Register(ValidUserId, ValidClientId);
+        var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 10m, "Cabo");
+        budget.AddItem(item);
+        budget.FinalizeBudget();
+
+        budget.SetPdfGenerationFailed();
+
+        budget.PdfGenerationStatus.ShouldBe(PdfGenerationStatus.Failed);
+        budget.DomainEvents.ShouldContain(e => e is BudgetPdfGenerationStatusChangedEvent && ((BudgetPdfGenerationStatusChangedEvent)e).Status == PdfGenerationStatus.Failed);
+    }
+
+    [Fact]
+    public void SetPdfGenerationFailed_WithDraftBudget_ShouldThrowDomainException()
+    {
+        var budget = Budget.Register(ValidUserId, ValidClientId);
+
+        Should.Throw<DomainException>(() =>
+            budget.SetPdfGenerationFailed())
+            .Message.ShouldBe(ResourceErrorMessages.ORCAMENTO_STATUS_INVALIDO_PARA_GERAR_PDF);
     }
 }

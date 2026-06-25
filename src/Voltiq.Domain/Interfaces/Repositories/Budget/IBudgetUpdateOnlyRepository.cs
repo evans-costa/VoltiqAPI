@@ -8,5 +8,7 @@ public interface IBudgetUpdateOnlyRepository
     Task<Entities.Budget?> GetTrackedByIdWithItemsAndUserIdAsync(Guid id, Guid userId,
         CancellationToken cancellationToken = default);
 
+    Task<Entities.Budget?> GetTrackedByIdAsync(Guid id, CancellationToken cancellationToken = default);
+
     void Remove(Entities.Budget entity);
 }

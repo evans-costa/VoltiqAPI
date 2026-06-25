@@ -78,6 +78,13 @@ public sealed class BudgetRepository(ApplicationDbContext context)
             .FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId, cancellationToken);
     }
 
+    public async Task<Domain.Entities.Budget?> GetTrackedByIdAsync(
+        Guid id, CancellationToken cancellationToken = default)
+    {
+        return await context.Budgets
+            .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
+    }
+
     public async Task AddAsync(Domain.Entities.Budget entity,
         CancellationToken cancellationToken = default)
     {

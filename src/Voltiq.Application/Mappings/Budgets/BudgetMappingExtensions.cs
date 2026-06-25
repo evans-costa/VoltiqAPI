@@ -31,14 +31,14 @@ public static class BudgetMappingExtensions
     extension(Budget budget)
     {
         public BudgetSummaryResponse ToSummaryResponse() =>
-            new(budget.Id, budget.Status, budget.TotalAmount, budget.CreatedAt,
+            new(budget.Id, budget.Status, budget.PdfGenerationStatus, budget.TotalAmount, budget.CreatedAt,
                 new BudgetClientSummaryResponse(budget.Client!.Id, budget.Client!.Name));
 
         public BudgetDetailResponse ToDetailResponse() =>
             budget.ToDetailResponse(budget.Client!);
 
         public BudgetDetailResponse ToDetailResponse(Client client) =>
-            new(budget.Id, budget.Status, budget.TotalAmount, budget.CreatedAt,
+            new(budget.Id, budget.Status, budget.PdfGenerationStatus, budget.TotalAmount, budget.CreatedAt,
                 new BudgetClientDetailResponse(
                     client.Id, client.Name, client.Phone, client.Email.Value),
                 budget.Items.Select(i => new BudgetItemResponse(

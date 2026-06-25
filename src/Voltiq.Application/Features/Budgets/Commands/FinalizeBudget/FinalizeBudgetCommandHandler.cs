@@ -1,5 +1,6 @@
 using ErrorOr;
 using MediatR;
+using Voltiq.Application.Common.Interfaces.Queue;
 using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories.Budget;
 using Voltiq.Exceptions.Resources;
@@ -8,10 +9,11 @@ namespace Voltiq.Application.Features.Budgets.Commands.FinalizeBudget;
 
 public sealed class FinalizeBudgetCommandHandler(
     IBudgetUpdateOnlyRepository budgetUpdateOnly,
-    IUnitOfWork unitOfWork)
-    : IRequestHandler<FinalizeBudgetCommand, ErrorOr<Updated>>
+    IUnitOfWork unitOfWork,
+    IQueueService queueService)
+    : IRequestHandler<FinalizeBudgetCommand, ErrorOr<Success>>
 {
-    public async Task<ErrorOr<Updated>> Handle(
+    public async Task<ErrorOr<Success>> Handle(
         FinalizeBudgetCommand command, CancellationToken cancellationToken)
     {
         var budget = await budgetUpdateOnly.GetTrackedByIdWithItemsAndUserIdAsync(
@@ -24,6 +26,9 @@ public sealed class FinalizeBudgetCommandHandler(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result.Updated;
+        var message = new { BudgetId = budget.Id };
+        await queueService.SendMessageAsync("budget-reports", message, cancellationToken);
+
+        return Result.Success;
     }
 }

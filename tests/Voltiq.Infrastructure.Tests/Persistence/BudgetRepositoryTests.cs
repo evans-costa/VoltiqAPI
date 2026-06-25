@@ -162,4 +162,135 @@ public class BudgetRepositoryTests(PostgreSqlContainerFixture fixture)
 
         found.ShouldBeNull();
     }
+
+    [Fact]
+    public async Task GetByClientIdAsync_ShouldReturnOnlyBudgetsOfClient()
+    {
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
+        var client1 = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id);
+        var client2 = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id, email: "outro@example.com");
+
+        await TestDataBuilder.SeedBudgetAsync(_budgetRepository, _unitOfWork, user.Id, client1.Id);
+        await TestDataBuilder.SeedBudgetAsync(_budgetRepository, _unitOfWork, user.Id, client2.Id);
+
+        var budgets = await _budgetRepository.GetByClientIdAsync(client1.Id, TestContext.Current.CancellationToken);
+
+        budgets.Count.ShouldBe(1);
+        budgets.ShouldAllBe(b => b.ClientId == client1.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdWithItemsAsync_ShouldReturnBudgetWithItems_WhenBudgetExists()
+    {
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
+        var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id);
+        var budget = TestDataBuilder.MakeBudget(user.Id, client.Id);
+        var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 10.0m, "Instalação");
+        budget.AddItem(item);
+        await _budgetRepository.AddAsync(budget, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var found = await _budgetRepository.GetByIdWithItemsAsync(budget.Id, TestContext.Current.CancellationToken);
+
+        found.ShouldNotBeNull();
+        found.Items.Count.ShouldBe(1);
+        found.Items.First().MaterialName.ShouldBe("Instalação");
+    }
+
+    [Fact]
+    public async Task Remove_ShouldDeleteBudget()
+    {
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
+        var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id);
+        var budget = await TestDataBuilder.SeedBudgetAsync(_budgetRepository, _unitOfWork, user.Id, client.Id);
+
+        _budgetRepository.Remove(budget);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var found = await _budgetRepository.GetByIdAsync(budget.Id, TestContext.Current.CancellationToken);
+        found.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GetTrackedByIdAndUserIdAsync_ShouldReturnTrackedBudget_WhenBelongsToUser()
+    {
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
+        var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id);
+        var budget = await TestDataBuilder.SeedBudgetAsync(_budgetRepository, _unitOfWork, user.Id, client.Id);
+
+        _dbContext.ChangeTracker.Clear();
+
+        var found = await _budgetRepository.GetTrackedByIdAndUserIdAsync(budget.Id, user.Id, TestContext.Current.CancellationToken);
+
+        found.ShouldNotBeNull();
+        _dbContext.Entry(found).State.ShouldBe(EntityState.Unchanged);
+    }
+
+    [Fact]
+    public async Task GetTrackedByIdWithItemsAndUserIdAsync_ShouldReturnTrackedBudgetWithItems_WhenBelongsToUser()
+    {
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
+        var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id);
+        var budget = TestDataBuilder.MakeBudget(user.Id, client.Id);
+        var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 10.0m, "Instalação");
+        budget.AddItem(item);
+        await _budgetRepository.AddAsync(budget, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        _dbContext.ChangeTracker.Clear();
+
+        var found = await _budgetRepository.GetTrackedByIdWithItemsAndUserIdAsync(budget.Id, user.Id, TestContext.Current.CancellationToken);
+
+        found.ShouldNotBeNull();
+        found.Items.Count.ShouldBe(1);
+        _dbContext.Entry(found).State.ShouldBe(EntityState.Unchanged);
+    }
+
+    [Fact]
+    public async Task GetTrackedByIdAsync_ShouldReturnTrackedBudget_WhenExists()
+    {
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
+        var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id);
+        var budget = await TestDataBuilder.SeedBudgetAsync(_budgetRepository, _unitOfWork, user.Id, client.Id);
+
+        _dbContext.ChangeTracker.Clear();
+
+        var found = await _budgetRepository.GetTrackedByIdAsync(budget.Id, TestContext.Current.CancellationToken);
+
+        found.ShouldNotBeNull();
+        _dbContext.Entry(found).State.ShouldBe(EntityState.Unchanged);
+    }
+
+    [Fact]
+    public async Task GetByUserIdWithClientAsync_ShouldReturnBudgetsWithClientLoaded()
+    {
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
+        var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id);
+        await TestDataBuilder.SeedBudgetAsync(_budgetRepository, _unitOfWork, user.Id, client.Id);
+
+        var budgets = await _budgetRepository.GetByUserIdWithClientAsync(user.Id, TestContext.Current.CancellationToken);
+
+        budgets.Count.ShouldBe(1);
+        budgets.First().Client.ShouldNotBeNull();
+        budgets.First().Client.Name.ShouldBe(client.Name);
+    }
+
+    [Fact]
+    public async Task GetByIdWithItemsAndClientAsync_ShouldReturnBudgetWithItemsAndClientLoaded()
+    {
+        var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
+        var client = await TestDataBuilder.SeedClientAsync(_clientRepository, _unitOfWork, user.Id);
+        var budget = TestDataBuilder.MakeBudget(user.Id, client.Id);
+        var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 10.0m, "Instalação");
+        budget.AddItem(item);
+        await _budgetRepository.AddAsync(budget, TestContext.Current.CancellationToken);
+        await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var found = await _budgetRepository.GetByIdWithItemsAndClientAsync(budget.Id, user.Id, TestContext.Current.CancellationToken);
+
+        found.ShouldNotBeNull();
+        found.Items.Count.ShouldBe(1);
+        found.Client.ShouldNotBeNull();
+        found.Client.Name.ShouldBe(client.Name);
+    }
 }
