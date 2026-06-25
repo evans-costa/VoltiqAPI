@@ -14,6 +14,7 @@ public class FinalizeBudgetCommandHandlerTests
 {
     private readonly Mock<IBudgetUpdateOnlyRepository> _budgetUpdateRepoMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+    private readonly Mock<Voltiq.Application.Common.Interfaces.Queue.IQueueService> _queueServiceMock = new();
 
     private readonly Guid _userId = Guid.NewGuid();
     private readonly Guid _budgetId = Guid.NewGuid();
@@ -23,11 +24,12 @@ public class FinalizeBudgetCommandHandlerTests
     {
         return new FinalizeBudgetCommandHandler(
             _budgetUpdateRepoMock.Object,
-            _unitOfWorkMock.Object);
+            _unitOfWorkMock.Object,
+            _queueServiceMock.Object);
     }
 
     [Fact]
-    public async Task Handle_WithValidDraftBudget_ShouldFinalizeAndSave()
+    public async Task Handle_WithValidDraftBudget_ShouldFinalizeAndSaveAndQueueMessage()
     {
         // Arrange
         var budget = Budget.Register(_userId, _clientId);
@@ -46,11 +48,13 @@ public class FinalizeBudgetCommandHandlerTests
 
         // Assert
         result.IsError.ShouldBeFalse();
-        result.Value.ShouldBe(Result.Updated);
+        result.Value.ShouldBe(Result.Success);
 
         budget.Status.ShouldBe(BudgetStatus.Finalized);
+        budget.PdfGenerationStatus.ShouldBe(PdfGenerationStatus.Pending);
 
         _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _queueServiceMock.Verify(q => q.SendMessageAsync("budget-reports", It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -73,5 +77,6 @@ public class FinalizeBudgetCommandHandlerTests
         result.FirstError.Description.ShouldBe(ResourceErrorMessages.ORCAMENTO_NAO_ENCONTRADO);
 
         _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+        _queueServiceMock.Verify(q => q.SendMessageAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

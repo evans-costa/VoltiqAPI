@@ -27,10 +27,14 @@ public class GenerateBudgetPdfCommandHandlerTests
     {
         // Arrange
         var budget = Budget.Register(_userId, Guid.NewGuid());
-        _budgetRepoMock.Setup(r => r.GetByIdAsync(_budgetId, It.IsAny<CancellationToken>()))
+        var item = BudgetItem.Create(budget.Id, null, BudgetItemType.MaoDeObra, null, 2, 10m, "Cabo");
+        budget.AddItem(item);
+        budget.FinalizeBudget();
+
+        _budgetRepoMock.Setup(r => r.GetByIdAndUserIdAsync(_budgetId, _userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(budget);
 
-        var command = new GenerateBudgetPdfCommand(_budgetId);
+        var command = new GenerateBudgetPdfCommand(_budgetId) { UserId = _userId };
         var handler = CreateHandler();
 
         // Act
@@ -47,10 +51,10 @@ public class GenerateBudgetPdfCommandHandlerTests
     public async Task Handle_WhenBudgetDoesNotExist_ShouldReturnNotFoundError()
     {
         // Arrange
-        _budgetRepoMock.Setup(r => r.GetByIdAsync(_budgetId, It.IsAny<CancellationToken>()))
+        _budgetRepoMock.Setup(r => r.GetByIdAndUserIdAsync(_budgetId, _userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Budget?)null);
 
-        var command = new GenerateBudgetPdfCommand(_budgetId);
+        var command = new GenerateBudgetPdfCommand(_budgetId) { UserId = _userId };
         var handler = CreateHandler();
 
         // Act
@@ -59,7 +63,7 @@ public class GenerateBudgetPdfCommandHandlerTests
         // Assert
         result.IsError.ShouldBeTrue();
         result.FirstError.Type.ShouldBe(ErrorType.NotFound);
-        result.FirstError.Description.ShouldBe(ResourceErrorMessages.TITULO_NAO_ENCONTRADO);
+        result.FirstError.Description.ShouldBe(ResourceErrorMessages.ORCAMENTO_NAO_ENCONTRADO);
 
         _queueServiceMock.Verify(q => q.SendMessageAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Never);
     }
