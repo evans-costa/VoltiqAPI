@@ -28,7 +28,7 @@ public class GetBudgetPdfUrlQueryHandlerTests
         var budget = Budget.Register(_userId, Guid.NewGuid());
         _budgetRepoMock.Setup(r => r.GetByIdAsync(_budgetId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(budget);
-            
+
         var expectedUrl = "https://azure.blob/reports/budget.pdf?sas=token";
         _storageServiceMock.Setup(s => s.GetSasUrlAsync($"budget-{_budgetId}.pdf", 1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedUrl);
@@ -51,7 +51,7 @@ public class GetBudgetPdfUrlQueryHandlerTests
         var budget = Budget.Register(_userId, Guid.NewGuid());
         _budgetRepoMock.Setup(r => r.GetByIdAsync(_budgetId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(budget);
-            
+
         _storageServiceMock.Setup(s => s.GetSasUrlAsync($"budget-{_budgetId}.pdf", 1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(string.Empty);
 

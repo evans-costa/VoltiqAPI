@@ -39,7 +39,7 @@ public class GenerateBudgetPdfCommandHandlerTests
         // Assert
         result.IsError.ShouldBeFalse();
         result.Value.ShouldBe(Result.Success);
-        
+
         _queueServiceMock.Verify(q => q.SendMessageAsync("budget-reports", It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
