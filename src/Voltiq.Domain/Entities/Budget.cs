@@ -12,6 +12,7 @@ public sealed class Budget : AuditableEntity
     public decimal TotalAmount { get; private set; }
     public BudgetStatus Status { get; private set; }
     public string? PdfUrl { get; private set; }
+    public PdfGenerationStatus? PdfGenerationStatus { get; private set; }
 
     private readonly List<BudgetItem> _items = [];
     public IReadOnlyCollection<BudgetItem> Items => _items.AsReadOnly();
@@ -82,13 +83,17 @@ public sealed class Budget : AuditableEntity
             throw new DomainException(ResourceErrorMessages.ORCAMENTO_ITEMS_OBRIGATORIOS);
 
         Status = BudgetStatus.Finalized;
+        PdfGenerationStatus = Enums.PdfGenerationStatus.Pending;
         AddDomainEvent(new BudgetFinalizedEvent(Id));
     }
 
     public void Approve()
     {
-        if (Status != BudgetStatus.Finalized && Status != BudgetStatus.PdfGenerated)
+        if (Status != BudgetStatus.Finalized)
             throw new DomainException(ResourceErrorMessages.ORCAMENTO_STATUS_INVALIDO_PARA_APROVACAO);
+
+        if (PdfGenerationStatus != Enums.PdfGenerationStatus.Success)
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_PDF_NAO_DISPONIVEL);
 
         Status = BudgetStatus.Approved;
         AddDomainEvent(new BudgetApprovedEvent(Id));
@@ -96,10 +101,44 @@ public sealed class Budget : AuditableEntity
 
     public void Reject()
     {
-        if (Status != BudgetStatus.Finalized && Status != BudgetStatus.PdfGenerated)
+        if (Status != BudgetStatus.Finalized)
             throw new DomainException(ResourceErrorMessages.ORCAMENTO_STATUS_INVALIDO_PARA_REJEICAO);
+
+        if (PdfGenerationStatus != Enums.PdfGenerationStatus.Success)
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_PDF_NAO_DISPONIVEL);
 
         Status = BudgetStatus.Rejected;
         AddDomainEvent(new BudgetRejectedEvent(Id));
+    }
+
+    public void StartPdfProcessing()
+    {
+        if (Status != BudgetStatus.Finalized)
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_STATUS_INVALIDO_PARA_GERAR_PDF);
+
+        PdfGenerationStatus = Enums.PdfGenerationStatus.Processing;
+        AddDomainEvent(new BudgetPdfGenerationStatusChangedEvent(Id, Enums.PdfGenerationStatus.Processing));
+    }
+
+    public void SetPdfGenerationSuccess(string pdfUrl)
+    {
+        if (Status != BudgetStatus.Finalized)
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_STATUS_INVALIDO_PARA_GERAR_PDF);
+
+        if (string.IsNullOrWhiteSpace(pdfUrl))
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_PDF_URL_OBRIGATORIA);
+
+        PdfUrl = pdfUrl;
+        PdfGenerationStatus = Enums.PdfGenerationStatus.Success;
+        AddDomainEvent(new BudgetPdfGenerationStatusChangedEvent(Id, Enums.PdfGenerationStatus.Success));
+    }
+
+    public void SetPdfGenerationFailed()
+    {
+        if (Status != BudgetStatus.Finalized)
+            throw new DomainException(ResourceErrorMessages.ORCAMENTO_STATUS_INVALIDO_PARA_GERAR_PDF);
+
+        PdfGenerationStatus = Enums.PdfGenerationStatus.Failed;
+        AddDomainEvent(new BudgetPdfGenerationStatusChangedEvent(Id, Enums.PdfGenerationStatus.Failed));
     }
 }

@@ -4,7 +4,6 @@ public enum BudgetStatus
 {
     Draft = 1,
     Finalized = 2,
-    PdfGenerated = 3,
-    Approved = 4,
-    Rejected = 5,
+    Approved = 3,
+    Rejected = 4
 }

@@ -5,6 +5,7 @@ namespace Voltiq.Application.Features.Budgets;
 public sealed record BudgetSummaryResponse(
     Guid Id,
     BudgetStatus Status,
+    PdfGenerationStatus? PdfGenerationStatus,
     decimal TotalAmount,
     DateTime CreatedAt,
     BudgetClientSummaryResponse Client);
@@ -14,6 +15,7 @@ public sealed record BudgetClientSummaryResponse(Guid Id, string Name);
 public sealed record BudgetDetailResponse(
     Guid Id,
     BudgetStatus Status,
+    PdfGenerationStatus? PdfGenerationStatus,
     decimal TotalAmount,
     DateTime CreatedAt,
     BudgetClientDetailResponse Client,

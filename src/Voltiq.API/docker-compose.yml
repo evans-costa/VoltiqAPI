@@ -2,6 +2,7 @@ services:
   db:
     image: postgres:17-alpine
     container_name: voltiq-db
+    restart: unless-stopped
     environment:
       POSTGRES_DB: VoltiqDb
       POSTGRES_USER: postgres
@@ -11,5 +12,18 @@ services:
     volumes:
       - voltiq-db-data:/var/lib/postgresql/data
 
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: voltiq-azurite
+    restart: unless-stopped
+    command: azurite --skipApiVersionCheck --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0
+    ports:
+      - "10000:10000" # Blob service
+      - "10001:10001" # Queue service
+      - "10002:10002" # Table service
+    volumes:
+      - voltiq-azurite-data:/data
+
 volumes:
   voltiq-db-data:
+  voltiq-azurite-data:

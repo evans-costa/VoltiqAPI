@@ -6,6 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Voltiq.Application.Common.Interfaces;
+using Voltiq.Application.Common.Interfaces.Storage;
+using Voltiq.Application.Common.Interfaces.Queue;
+using Voltiq.Application.Common.Interfaces.Reports;
 using Voltiq.Domain.Interfaces;
 using Voltiq.Domain.Interfaces.Repositories.Budget;
 using Voltiq.Domain.Interfaces.Repositories.Client;
@@ -35,6 +38,14 @@ public static class DependencyInjection
         AddJwtAuthentication(services, configuration);
         AddAuthServices(services);
         AddCryptography(services);
+        AddExternalServices(services);
+    }
+
+    private static void AddExternalServices(IServiceCollection services)
+    {
+        services.AddScoped<IStorageService, Storage.AzureBlobStorageService>();
+        services.AddScoped<IQueueService, Queue.AzureQueueService>();
+        services.AddScoped<IReportGenerator, Reports.QuestPdfReportGenerator>();
     }
 
     private static void AddCryptography(IServiceCollection services)

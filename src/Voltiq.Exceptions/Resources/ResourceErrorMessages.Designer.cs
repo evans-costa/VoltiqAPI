@@ -447,7 +447,7 @@ namespace Voltiq.Exceptions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to O status atual do orçamento não permite aprovação. Ele deve estar finalizado ou com PDF gerado..
+        ///   Looks up a localized string similar to O status atual do orçamento não permite aprovação. Ele deve estar finalizado..
         /// </summary>
         public static string ORCAMENTO_STATUS_INVALIDO_PARA_APROVACAO {
             get {
@@ -456,11 +456,38 @@ namespace Voltiq.Exceptions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to O status atual do orçamento não permite rejeição. Ele deve estar finalizado ou com PDF gerado..
+        ///   Looks up a localized string similar to O status atual do orçamento não permite rejeição. Ele deve estar finalizado..
         /// </summary>
         public static string ORCAMENTO_STATUS_INVALIDO_PARA_REJEICAO {
             get {
                 return ResourceManager.GetString("ORCAMENTO_STATUS_INVALIDO_PARA_REJEICAO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to O status atual do orçamento não permite a geração do PDF. Ele deve estar finalizado..
+        /// </summary>
+        public static string ORCAMENTO_STATUS_INVALIDO_PARA_GERAR_PDF {
+            get {
+                return ResourceManager.GetString("ORCAMENTO_STATUS_INVALIDO_PARA_GERAR_PDF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A URL do PDF do orçamento é obrigatória..
+        /// </summary>
+        public static string ORCAMENTO_PDF_URL_OBRIGATORIA {
+            get {
+                return ResourceManager.GetString("ORCAMENTO_PDF_URL_OBRIGATORIA", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to O PDF do orçamento ainda não foi gerado ou não está disponível para aprovação/rejeição..
+        /// </summary>
+        public static string ORCAMENTO_PDF_NAO_DISPONIVEL {
+            get {
+                return ResourceManager.GetString("ORCAMENTO_PDF_NAO_DISPONIVEL", resourceCulture);
             }
         }
         
