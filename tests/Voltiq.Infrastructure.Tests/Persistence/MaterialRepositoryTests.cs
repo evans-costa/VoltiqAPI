@@ -18,7 +18,7 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
     private static readonly Guid UserId = Guid.NewGuid();
 
     private MaterialRepository _materialRepository = null!;
-    private IMaterialReadOnlyRepository _materialReadOnly = null!;
+    private MaterialRepository? _materialReadOnly;
     private ApplicationDbContext _dbContext = null!;
     private UnitOfWork _unitOfWork = null!;
     private UserRepository _userRepository = null!;
@@ -80,7 +80,7 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
         var user = await TestDataBuilder.SeedUserAsync(_userRepository, _unitOfWork);
         var material = await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user.Id);
 
-        var found = await _materialReadOnly.GetByIdAndUserIdAsync(material.Id, user.Id, TestContext.Current.CancellationToken);
+        var found = await _materialReadOnly!.GetByIdAndUserIdAsync(material.Id, user.Id, TestContext.Current.CancellationToken);
 
         found.ShouldNotBeNull();
         found.Id.ShouldBe(material.Id);
@@ -95,7 +95,7 @@ public class MaterialRepositoryTests(PostgreSqlContainerFixture fixture)
 
         var material = await TestDataBuilder.SeedMaterialAsync(_materialRepository, _unitOfWork, user1.Id);
 
-        var found = await _materialReadOnly.GetByIdAndUserIdAsync(material.Id, user2.Id, TestContext.Current.CancellationToken);
+        var found = await _materialReadOnly!.GetByIdAndUserIdAsync(material.Id, user2.Id, TestContext.Current.CancellationToken);
 
         found.ShouldBeNull();
     }

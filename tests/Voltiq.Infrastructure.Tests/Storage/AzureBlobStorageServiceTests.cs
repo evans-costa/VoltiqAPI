@@ -28,7 +28,11 @@ public class AzureBlobStorageServiceTests(AzuriteContainerFixture fixture)
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    public ValueTask DisposeAsync()
+    {
+        GC.SuppressFinalize(this);
+        return ValueTask.CompletedTask;
+    }
 
     [Fact]
     public async Task UploadAsync_ShouldUploadFileAndReturnBlobUri()

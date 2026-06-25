@@ -17,7 +17,7 @@ public class SoftDeleteTests(PostgreSqlContainerFixture fixture)
     private static readonly Guid UserId = Guid.NewGuid();
 
     private ClientRepository _clientRepository = null!;
-    private IClientReadOnlyRepository _clientReadOnly = null!;
+    private ClientRepository? _clientReadOnly;
     private ApplicationDbContext _dbContext = null!;
     private UnitOfWork _unitOfWork = null!;
     private UserRepository _userRepository = null!;
@@ -89,7 +89,7 @@ public class SoftDeleteTests(PostgreSqlContainerFixture fixture)
         await _unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var found =
-            await _clientReadOnly.GetByIdAndUserIdAsync(client.Id, user.Id, TestContext.Current.CancellationToken);
+            await _clientReadOnly!.GetByIdAndUserIdAsync(client.Id, user.Id, TestContext.Current.CancellationToken);
 
         found.ShouldBeNull();
     }

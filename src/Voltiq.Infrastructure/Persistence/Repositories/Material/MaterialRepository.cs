@@ -24,7 +24,7 @@ public sealed class MaterialRepository(ApplicationDbContext context)
     }
 
     public async Task<Domain.Entities.Material?> GetByIdAndUserIdAsync(
-        Guid id, Guid userId, CancellationToken cancellationToken)
+        Guid id, Guid userId, CancellationToken cancellationToken = default)
     {
         return await context.Materials
             .AsNoTracking()
@@ -41,7 +41,7 @@ public sealed class MaterialRepository(ApplicationDbContext context)
     }
 
     public async Task<Domain.Entities.Material?> GetTrackedByIdAndUserIdAsync(
-        Guid id, Guid userId, CancellationToken cancellationToken)
+        Guid id, Guid userId, CancellationToken cancellationToken = default)
     {
         return await context.Materials
             .FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId, cancellationToken);

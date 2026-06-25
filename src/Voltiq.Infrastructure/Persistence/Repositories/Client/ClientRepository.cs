@@ -17,7 +17,7 @@ public sealed class ClientRepository(ApplicationDbContext context)
     }
 
     public async Task<Domain.Entities.Client?> GetByIdAndUserIdAsync(
-        Guid id, Guid userId, CancellationToken cancellationToken)
+        Guid id, Guid userId, CancellationToken cancellationToken = default)
     {
         return await context.Clients
             .AsNoTracking()
@@ -37,7 +37,7 @@ public sealed class ClientRepository(ApplicationDbContext context)
     }
 
     public async Task<Domain.Entities.Client?> GetTrackedByIdAndUserIdAsync(
-        Guid id, Guid userId, CancellationToken cancellationToken)
+        Guid id, Guid userId, CancellationToken cancellationToken = default)
     {
         return await context.Clients
             .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId, cancellationToken);

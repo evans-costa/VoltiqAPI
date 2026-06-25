@@ -17,7 +17,6 @@ public class GenerateReportMessage
 public class GenerateReportFunction
 {
     private readonly ILogger<GenerateReportFunction> _logger;
-    private readonly IBudgetReadOnlyRepository _budgetRepository;
     private readonly IBudgetUpdateOnlyRepository _budgetUpdateRepository;
     private readonly IClientReadOnlyRepository _clientRepository;
     private readonly IReportGenerator _reportGenerator;
@@ -26,7 +25,6 @@ public class GenerateReportFunction
 
     public GenerateReportFunction(
         ILogger<GenerateReportFunction> logger,
-        IBudgetReadOnlyRepository budgetRepository,
         IBudgetUpdateOnlyRepository budgetUpdateRepository,
         IClientReadOnlyRepository clientRepository,
         IReportGenerator reportGenerator,
@@ -34,7 +32,6 @@ public class GenerateReportFunction
         IUnitOfWork unitOfWork)
     {
         _logger = logger;
-        _budgetRepository = budgetRepository;
         _budgetUpdateRepository = budgetUpdateRepository;
         _clientRepository = clientRepository;
         _reportGenerator = reportGenerator;
@@ -45,8 +42,6 @@ public class GenerateReportFunction
     [Function(nameof(GenerateReportFunction))]
     public async Task Run([QueueTrigger("budget-reports")] string message, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Processing report generation message: {Message}", message);
-
         try
         {
             var msg = JsonSerializer.Deserialize<GenerateReportMessage>(message);
@@ -79,31 +74,25 @@ public class GenerateReportFunction
 
             try
             {
-                _logger.LogInformation("Generating PDF for Budget ID: {BudgetId}", budget.Id);
                 var pdfBytes = await _reportGenerator.GenerateAsync(reportData, cancellationToken);
 
                 var fileName = $"budget-{budget.Id}.pdf";
 
-                _logger.LogInformation("Uploading PDF for Budget ID: {BudgetId} to Blob Storage", budget.Id);
                 var uri = await _storageService.UploadAsync(fileName, pdfBytes, "application/pdf", cancellationToken);
 
                 budget.SetPdfGenerationSuccess(uri);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                _logger.LogInformation("Report generated and budget status updated successfully. URI: {Uri}", uri);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error generating report for budget ID: {BudgetId}", budget.Id);
                 budget.SetPdfGenerationFailed();
                 await _unitOfWork.SaveChangesAsync(CancellationToken.None);
-                throw;
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error processing report generation for message: {Message}", message);
-            throw;
         }
     }
 }

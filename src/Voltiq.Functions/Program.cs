@@ -19,4 +19,4 @@ if (!string.IsNullOrEmpty(
         .UseFunctionsWorkerDefaults()
         .UseAzureMonitorExporter();
 
-builder.Build().Run();
+await builder.Build().RunAsync();
